@@ -1,0 +1,167 @@
+1
+00:00:03,400 --> 00:00:05,966
+Here's a new Starter project, Sky Gems,
+
+2
+00:00:05,966 --> 00:00:08,166
+with Claude Code open in its folder.
+
+3
+00:00:08,311 --> 00:00:10,221
+Describe your game in one line:
+
+4
+00:00:10,227 --> 00:00:11,945
+collect all the gems on a floating
+
+5
+00:00:11,945 --> 00:00:14,145
+island before the timer runs out.
+
+6
+00:00:14,700 --> 00:00:16,952
+Claude Code checks that Blender is connected,
+
+7
+00:00:16,952 --> 00:00:18,712
+then writes a one-page plan:
+
+8
+00:00:18,717 --> 00:00:21,777
+an island, six gems and a one-minute timer.
+
+9
+00:00:22,333 --> 00:00:24,620
+Then it builds with GameStudio's kits:
+
+10
+00:00:24,620 --> 00:00:26,617
+a floating island from the terrain kit
+
+11
+00:00:26,617 --> 00:00:29,177
+replaces the lawn, with the player on it.
+
+12
+00:00:29,733 --> 00:00:32,380
+Six gems follow, each just above the ground,
+
+13
+00:00:32,380 --> 00:00:33,901
+with the Collectible component,
+
+14
+00:00:33,901 --> 00:00:35,649
+so the player can pick them up.
+
+15
+00:00:36,200 --> 00:00:38,592
+While Claude works, scroll out in the 3D
+
+16
+00:00:38,592 --> 00:00:41,048
+Viewport to see the whole island floating.
+
+17
+00:00:41,600 --> 00:00:43,208
+The timer is new code:
+
+18
+00:00:43,214 --> 00:00:44,839
+a small TypeScript system that counts
+
+19
+00:00:44,839 --> 00:00:46,337
+down from sixty seconds,
+
+20
+00:00:46,337 --> 00:00:49,466
+and shows Time's up at zero, or if you fall off.
+
+21
+00:01:06,567 --> 00:01:08,471
+Menus and the HUD are made in Blender too,
+
+22
+00:01:08,471 --> 00:01:10,393
+so Claude opens the screens file.
+
+23
+00:01:10,538 --> 00:01:13,272
+To watch, open the scene list in the top bar.
+
+24
+00:01:13,833 --> 00:01:15,691
+Type HUD and press Enter:
+
+25
+00:01:15,691 --> 00:01:18,634
+the HUD is the screen that stays up while you play.
+
+26
+00:01:19,200 --> 00:01:20,651
+Claude adds a timer to the HUD,
+
+27
+00:01:20,651 --> 00:01:22,840
+across from the score, and saves.
+
+28
+00:01:24,033 --> 00:01:24,950
+Back in the level,
+
+29
+00:01:24,950 --> 00:01:27,093
+Claude playtests in a hidden browser:
+
+30
+00:01:27,133 --> 00:01:29,775
+it presses Play and runs into the first gem.
+
+31
+00:01:29,919 --> 00:01:31,614
+The gem counts, the clock runs,
+
+32
+00:01:31,614 --> 00:01:33,292
+and there are no errors.
+
+33
+00:01:33,867 --> 00:01:35,341
+Claude says the game is ready.
+
+34
+00:01:35,341 --> 00:01:37,600
+Press F5 to play it yourself.
+
+35
+00:01:38,167 --> 00:01:39,961
+Click Play on the title screen.
+
+36
+00:01:39,967 --> 00:01:42,550
+That also gives the game your mouse and keyboard.
+
+37
+00:01:43,100 --> 00:01:44,720
+The clock starts at one minute.
+
+38
+00:01:44,725 --> 00:01:47,158
+Hold W to run to the gem ahead.
+
+39
+00:01:47,733 --> 00:01:50,026
+One gem down, and the clock is ticking.
+
+40
+00:01:50,113 --> 00:01:51,947
+From one line, Claude Code built a
+
+41
+00:01:51,947 --> 00:01:53,701
+game you can play, and every part
+
+42
+00:01:53,701 --> 00:01:56,064
+of it is yours to change in Blender.

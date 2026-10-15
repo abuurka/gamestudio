@@ -1,0 +1,40 @@
+schema_version = "1.0.0"
+
+id = "gamestudio"
+version = "0.1.0"
+name = "GameStudio"
+tagline = "Make 3D web games in Blender with your AI agent"
+maintainer = "GameStudio contributors"
+website = "https://abuurka.github.io/gamestudio/"
+type = "add-on"
+
+blender_version_min = "5.2.0"
+
+# The extension is GPL; the runtime packages it bundles are MIT, the project templates' code and the
+# demo MIT-0, the starter's sounds, music and UI images CC0 (LICENSE.md at the repository root).
+license = ["SPDX:GPL-3.0-or-later", "SPDX:MIT", "SPDX:MIT-0", "SPDX:CC0-1.0"]
+copyright = ["2026 GameStudio contributors"]
+tags = ["Game Engine", "Development", "Import-Export"]
+
+# Node.js downloads exist for these (core/node.lock.json); the runtime itself is JavaScript.
+platforms = ["windows-x64", "windows-arm64", "macos-x64", "macos-arm64", "linux-x64", "linux-arm64"]
+
+# Each is at most 64 characters (`blender --command extension validate`); docs/EXTENSION-LISTING.md
+# explains them in full. No website yet: add `website = "..."` once one exists.
+[permissions]
+network = "Localhost links, Node.js and npm downloads, optional AI chat"
+files = "Creates game projects and reads and writes their files"
+clipboard = "Copies starter prompts and install commands for Claude Code"
+
+[build]
+# tools/build_extension.py stages the zip (adding the runtime packages and the demo game);
+# these patterns are a second guard.
+paths_exclude_pattern = [
+  "__pycache__/",
+  "*.pyc",
+  "/assistant/_vendor/",
+  ".gamestudio/",
+  "node_modules/",
+  ".ruff_cache/",
+  "*.blend1",
+]

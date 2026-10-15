@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: gsfork <gsfork@localhost>
+Date: Fri, 9 Oct 2026 20:49:13 +0100
+Subject: [PATCH] S08: hook to hide editor types from the editor-type menu
+
+Why:         a game IDE hides editors that are irrelevant to it (Video Sequencer, Movie Clip,
+             Compositor node trees). The editor-type menu is built in C with no static items,
+             so Python cannot filter it. The hook sees editor types and sub-types (node tree
+             types) and is a null function pointer by default.
+Hook-for:    editor/native/blender/python_module.cc (_gamestudio.set_hidden_editor_types)
+Upstream:    candidate (useful for app templates)
+Test:        editor/tests/contract/test_extension_editor.py test_hidden_editor_types
+Remove-when: upstream lets app templates filter editor types
+---
+ source/blender/makesrna/intern/rna_screen.cc | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/source/blender/makesrna/intern/rna_screen.cc b/source/blender/makesrna/intern/rna_screen.cc
+index cdf3f251e8afaf579ad87c4d3001dd438ab6d18e..c02059b8f5b7b6725fe9403cff6b8a011b104680 100644
+--- a/source/blender/makesrna/intern/rna_screen.cc
++++ b/source/blender/makesrna/intern/rna_screen.cc
+@@ -199,6 +199,11 @@ static void rna_Area_type_update(bContext *C, PointerRNA *ptr)
+   WM_main_add_notifier(NC_NODE | ND_NODE_GIZMO, nullptr);
+ }
+ 
++/** Distributions of Blender can hide entries from the editor-type menu: whole editor types,
++ * or sub-types such as node tree types. Return true to hide. The area's own type is always
++ * shown. Null by default. */
++bool (*RNA_area_ui_type_hidden_fn)(int space_type, const char *identifier) = nullptr;
++
+ static const EnumPropertyItem *rna_Area_ui_type_itemf(bContext *C,
+                                                       PointerRNA *ptr,
+                                                       PropertyRNA * /*prop*/,
+@@ -217,11 +222,24 @@ static const EnumPropertyItem *rna_Area_ui_type_itemf(bContext *C,
+     if (ELEM(item_from->value, SPACE_TOPBAR, SPACE_STATUSBAR)) {
+       continue;
+     }
++    const bool filter = RNA_area_ui_type_hidden_fn && item_from->value != area->spacetype;
++    if (filter && RNA_area_ui_type_hidden_fn(item_from->value, item_from->identifier)) {
++      continue;
++    }
+ 
+     SpaceType *st = item_from->identifier[0] ? BKE_spacetype_from_id(item_from->value) : nullptr;
+     int totitem_prev = totitem;
+     if (C && st && st->space_subtype_item_extend != nullptr) {
+       st->space_subtype_item_extend(C, &item, &totitem);
++      if (filter) {
++        int kept = totitem_prev;
++        for (int i = totitem_prev; i < totitem; i++) {
++          if (!RNA_area_ui_type_hidden_fn(item_from->value, item[i].identifier)) {
++            item[kept++] = item[i];
++          }
++        }
++        totitem = kept;
++      }
+       while (totitem_prev < totitem) {
+         item[totitem_prev++].value |= item_from->value << 16;
+       }

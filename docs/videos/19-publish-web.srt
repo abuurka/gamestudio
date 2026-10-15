@@ -1,0 +1,179 @@
+1
+00:00:03,400 --> 00:00:05,350
+Gem Island is ready to share.
+
+2
+00:00:05,350 --> 00:00:07,266
+Publishing starts in the Properties:
+
+3
+00:00:07,266 --> 00:00:08,851
+open the Scene tab.
+
+4
+00:00:09,433 --> 00:00:12,307
+Its Game Project panel has everything for a web build.
+
+5
+00:00:12,347 --> 00:00:13,589
+Press Control Space over the
+
+6
+00:00:13,589 --> 00:00:15,813
+Properties to give it the whole window.
+
+7
+00:00:16,367 --> 00:00:18,805
+Scroll down, past Blender's own scene settings,
+
+8
+00:00:18,805 --> 00:00:20,564
+to the levels and the build.
+
+9
+00:00:21,600 --> 00:00:23,980
+First, click Export All, so the build gets
+
+10
+00:00:23,980 --> 00:00:26,587
+the latest version of every level and menu.
+
+11
+00:00:27,167 --> 00:00:29,501
+The project box shows the export's size,
+
+12
+00:00:29,501 --> 00:00:31,225
+triangles and draw calls.
+
+13
+00:00:31,428 --> 00:00:34,197
+Lower numbers load and run faster on the web.
+
+14
+00:00:34,767 --> 00:00:36,271
+Now click Build Web.
+
+15
+00:00:37,900 --> 00:00:40,094
+GameStudio builds it in the background:
+
+16
+00:00:40,094 --> 00:00:42,045
+it bundles the code, compresses the
+
+17
+00:00:42,045 --> 00:00:44,652
+levels and copies the sounds and menus.
+
+18
+00:00:45,233 --> 00:00:46,052
+It's done.
+
+19
+00:00:46,139 --> 00:00:48,177
+Scroll down a little to see the result.
+
+20
+00:00:48,733 --> 00:00:50,811
+The finished game is in the dist folder,
+
+21
+00:00:50,811 --> 00:00:52,257
+inside your project.
+
+22
+00:00:52,460 --> 00:00:55,577
+Open Output Folder shows it in your file manager.
+
+23
+00:00:56,133 --> 00:00:58,577
+You can also look inside right here in Blender.
+
+24
+00:00:58,664 --> 00:01:00,748
+Open the Editor Type menu,
+
+25
+00:01:01,300 --> 00:01:03,036
+and choose File Browser.
+
+26
+00:01:04,500 --> 00:01:07,130
+It opens in your project's scenes folder.
+
+27
+00:01:07,217 --> 00:01:10,416
+Click the arrow pointing up to go to the project folder.
+
+28
+00:01:10,967 --> 00:01:13,510
+Double-click dist to open it, or, as here,
+
+29
+00:01:13,510 --> 00:01:17,858
+click the path at the top, press End, type dist, and press Enter.
+
+30
+00:01:18,433 --> 00:01:19,856
+That's your whole game:
+
+31
+00:01:19,942 --> 00:01:22,833
+index.html starts it, and the folders
+
+32
+00:01:22,833 --> 00:01:25,347
+hold its code, levels and sounds.
+
+33
+00:01:25,933 --> 00:01:28,986
+THIRD-PARTY-NOTICES.md lists the
+
+34
+00:01:28,986 --> 00:01:31,169
+licences of the libraries inside.
+
+35
+00:01:31,169 --> 00:01:33,404
+It must always stay with the game.
+
+36
+00:01:33,967 --> 00:01:35,674
+To test it before you upload it,
+
+37
+00:01:35,674 --> 00:01:37,485
+serve the dist folder from your computer,
+
+38
+00:01:37,485 --> 00:01:40,382
+as the manual shows, and open it in a browser.
+
+39
+00:01:40,422 --> 00:01:41,647
+Click Play.
+
+40
+00:01:42,367 --> 00:01:44,463
+It plays just as it did in Blender.
+
+41
+00:01:44,468 --> 00:01:46,936
+It's the same game, now a website.
+
+42
+00:01:47,500 --> 00:01:49,926
+To publish, upload everything in dist:
+
+43
+00:01:49,926 --> 00:01:52,655
+zip it for itch.io as an HTML game,
+
+44
+00:01:52,655 --> 00:01:55,476
+or put it on GitHub Pages, notices included.
+
+45
+00:01:55,476 --> 00:01:57,270
+That's your game, on the web.

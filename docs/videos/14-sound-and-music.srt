@@ -1,0 +1,171 @@
+1
+00:00:03,400 --> 00:00:05,484
+Here's Gem Island, the starter game.
+
+2
+00:00:05,490 --> 00:00:07,365
+Let's give a gem a sound of its own.
+
+3
+00:00:07,405 --> 00:00:09,130
+Click it in the 3D View.
+
+4
+00:00:09,700 --> 00:00:11,209
+In the Properties, the gem's
+
+5
+00:00:11,209 --> 00:00:13,143
+Game panel lists its components.
+
+6
+00:00:13,148 --> 00:00:14,873
+Click Add Component.
+
+7
+00:00:15,667 --> 00:00:17,629
+Choose AudioSource, under Audio.
+
+8
+00:00:17,629 --> 00:00:19,864
+It plays a sound from this object.
+
+9
+00:00:20,433 --> 00:00:22,169
+Scroll down to its settings.
+
+10
+00:00:24,033 --> 00:00:26,930
+Clip is the sound file, a path in your project.
+
+11
+00:00:26,970 --> 00:00:30,256
+The starter's sound effects are in assets, sfx:
+
+12
+00:00:30,256 --> 00:00:32,967
+type the path of whoosh dot wav.
+
+13
+00:00:33,533 --> 00:00:35,919
+Turn on Loop, so it keeps repeating,
+
+14
+00:00:36,500 --> 00:00:38,875
+and Autoplay, so it starts on its own.
+
+15
+00:00:39,019 --> 00:00:40,494
+Spatial is already on:
+
+16
+00:00:40,494 --> 00:00:42,038
+the sound comes from the gem,
+
+17
+00:00:42,038 --> 00:00:44,180
+and gets louder as you walk up to it.
+
+18
+00:00:44,733 --> 00:00:46,393
+The starter has music too.
+
+19
+00:00:46,393 --> 00:00:48,094
+Scroll down the Outliner,
+
+20
+00:00:49,133 --> 00:00:51,008
+and click the Music object.
+
+21
+00:00:52,100 --> 00:00:54,004
+It has an AudioSource too:
+
+22
+00:00:54,004 --> 00:00:56,268
+the theme, looping, and not spatial,
+
+23
+00:00:56,268 --> 00:00:58,120
+so it sounds the same everywhere.
+
+24
+00:00:58,207 --> 00:00:59,879
+Its Channel is Music;
+
+25
+00:00:59,879 --> 00:01:02,056
+sound effects use Sfx.
+
+26
+00:01:02,633 --> 00:01:05,547
+As the tooltip says, music keeps playing under menus,
+
+27
+00:01:05,547 --> 00:01:07,701
+while sound effects pause with the game.
+
+28
+00:01:07,788 --> 00:01:09,803
+Press F5 to play.
+
+29
+00:01:10,367 --> 00:01:12,312
+Click Options on the title screen.
+
+30
+00:01:12,399 --> 00:01:14,454
+Browsers only play sound after a click
+
+31
+00:01:14,454 --> 00:01:16,875
+or a key press, so the theme starts now.
+
+32
+00:01:16,961 --> 00:01:19,533
+The gem's whoosh waits until you play.
+
+33
+00:01:20,100 --> 00:01:22,533
+Here are the player's own volume sliders.
+
+34
+00:01:22,573 --> 00:01:24,465
+Drag Music to the left, and the theme
+
+35
+00:01:24,465 --> 00:01:27,270
+gets quieter at once, even under this menu.
+
+36
+00:01:27,833 --> 00:01:29,488
+Sound sets the effects:
+
+37
+00:01:29,493 --> 00:01:31,438
+the gem's whoosh and the pickups.
+
+38
+00:01:31,444 --> 00:01:34,677
+The game saves both settings for the player, with no code.
+
+39
+00:01:35,233 --> 00:01:37,294
+Press F8 to stop the game.
+
+40
+00:01:37,933 --> 00:01:39,669
+That's sound in GameStudio:
+
+41
+00:01:39,674 --> 00:01:42,136
+an AudioSource plays a file from an object,
+
+42
+00:01:42,136 --> 00:01:44,156
+its channel says music or effects,
+
+43
+00:01:44,156 --> 00:01:47,192
+and the Options screen lets players set each volume.

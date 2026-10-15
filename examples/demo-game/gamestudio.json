@@ -1,0 +1,6 @@
+{
+  "name": "demo-game",
+  "formatVersion": 1,
+  "startScene": "main",
+  "link": { "editorPort": 7710, "gamePort": 7711 }
+}

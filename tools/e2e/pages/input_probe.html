@@ -1,0 +1,64 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Game View input probe (tools/e2e/blender_game_view_play.py): records the DOM events the page
+     receives and posts them to the test's server. KeyL requests pointer lock; Escape exits it. -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Game View input probe</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1d2633; }
+  canvas { display: block; width: 100vw; height: 100vh; outline: none; }
+</style>
+</head>
+<body>
+<canvas id="game" tabindex="0"></canvas>
+<script>
+  const canvas = document.getElementById('game');
+  const pending = [];
+  let seq = 0;
+  const locked = () => document.pointerLockElement === canvas;
+  const record = (type, fields = {}) => pending.push({ seq: ++seq, type, t: performance.now(), locked: locked(), ...fields });
+
+  for (const type of ['keydown', 'keyup', 'keypress']) {
+    window.addEventListener(type, (e) => {
+      record(type, { code: e.code, key: e.key, repeat: e.repeat, shift: e.shiftKey, keyCode: e.keyCode, target: e.target.id || e.target.nodeName });
+      if (type !== 'keydown') return;
+      if (e.code === 'KeyL') canvas.requestPointerLock();
+      if (e.code === 'Escape' && locked()) document.exitPointerLock();
+    });
+  }
+  for (const type of ['pointermove', 'pointerdown', 'pointerup', 'mousemove', 'mousedown', 'mouseup', 'click', 'contextmenu', 'wheel']) {
+    window.addEventListener(type, (e) => record(type, {
+      x: e.clientX, y: e.clientY, button: e.button, buttons: e.buttons, mx: e.movementX, my: e.movementY,
+      dx: e.deltaX ?? 0, dy: e.deltaY ?? 0, target: e.target.id || e.target.nodeName,
+    }), true);
+  }
+  window.addEventListener('focus', () => record('focus'));
+  window.addEventListener('blur', () => record('blur'));
+  document.addEventListener('pointerlockchange', () => record('pointerlockchange'));
+
+  // Animate, so the offscreen page keeps painting frames.
+  const ctx = canvas.getContext('2d');
+  function draw(t) {
+    const w = Math.round(innerWidth * devicePixelRatio), h = Math.round(innerHeight * devicePixelRatio);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    ctx.fillStyle = '#1d2633';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = locked() ? '#e0a030' : '#4a90d9';
+    const x = (Math.sin(t / 500) * 0.4 + 0.5) * w;
+    ctx.fillRect(x - 20, h / 2 - 20, 40, 40);
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+
+  const send = () => {
+    const events = pending.splice(0);
+    const body = JSON.stringify({ dpr: devicePixelRatio, width: innerWidth, height: innerHeight, events });
+    fetch('/events', { method: 'POST', body }).catch(() => {});
+  };
+  setInterval(send, 40);
+  send();
+</script>
+</body>
+</html>

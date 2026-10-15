@@ -1,0 +1,32 @@
+{
+  "name": "@gamestudio/engine",
+  "version": "0.1.0",
+  "description": "GameStudio runtime: ECS, scene loader, Rapier physics, input, HUD and the live-link client.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts",
+    "./API.md": "./API.md",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "API.md",
+    "LICENSE",
+    "THIRD-PARTY-NOTICES.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.21.0",
+    "recast-navigation": "0.43.1",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@gamestudio/devserver": "0.1.0",
+    "@types/three": "0.186.0"
+  }
+}

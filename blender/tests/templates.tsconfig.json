@@ -1,0 +1,8 @@
+{
+  "//": "Typechecks every project template's src/ against this checkout's engine (npm run typecheck).",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client", "@gamestudio/devserver/client"]
+  },
+  "include": ["../gamestudio/project_templates/*/src"]
+}

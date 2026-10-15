@@ -1,0 +1,127 @@
+WEBVTT
+
+00:00:03.400 --> 00:00:05.432
+Gem Island has one level, main.
+
+00:00:05.432 --> 00:00:07.563
+A new level starts as a copy of it.
+
+00:00:07.603 --> 00:00:09.269
+Open the File menu,
+
+00:00:09.833 --> 00:00:11.476
+and choose Save As.
+
+00:00:12.867 --> 00:00:14.307
+Blender opens the project's
+
+00:00:14.307 --> 00:00:16.496
+scenes folder, where levels live.
+
+00:00:16.582 --> 00:00:19.154
+Name the copy level2 dot blend,
+
+00:00:19.733 --> 00:00:21.423
+and click Save As.
+
+00:00:22.233 --> 00:00:23.807
+Level two is open now.
+
+00:00:23.893 --> 00:00:26.755
+To make it look different, click Ground in the Outliner,
+
+00:00:27.333 --> 00:00:29.859
+open the Material tab in the Properties,
+
+00:00:30.533 --> 00:00:33.709
+open the list of materials, left of GS Grass,
+
+00:00:34.267 --> 00:00:37.048
+type dirt, and press Enter to pick GS Dirt.
+
+00:00:37.088 --> 00:00:38.975
+Level two is a dirt field now.
+
+00:00:39.533 --> 00:00:41.269
+Now open the Scene tab,
+
+00:00:42.567 --> 00:00:44.350
+and scroll down to Game Project.
+
+00:00:44.494 --> 00:00:46.822
+Levels lists the files in the scenes folder:
+
+00:00:46.909 --> 00:00:49.272
+level2 is there, next to main.
+
+00:00:49.833 --> 00:00:51.226
+Main is marked start:
+
+00:00:51.226 --> 00:00:52.480
+the game begins there.
+
+00:00:52.480 --> 00:00:55.011
+That's startScene in gamestudio.json.
+
+00:00:55.011 --> 00:00:56.306
+Leave it on main.
+
+00:00:56.867 --> 00:00:58.574
+Click Export All, so the game
+
+00:00:58.574 --> 00:01:00.461
+can load level two while it runs.
+
+00:01:01.033 --> 00:01:03.094
+Save level two with Control S.
+
+00:01:03.667 --> 00:01:05.350
+Then click Open next to main,
+
+00:01:05.350 --> 00:01:07.028
+to go back to level one.
+
+00:01:07.600 --> 00:01:08.540
+Now the goal.
+
+00:01:08.540 --> 00:01:11.396
+On Gem Island you win by collecting every gem,
+
+00:01:11.396 --> 00:01:14.166
+in src, systems, collect dot ts.
+
+00:01:14.171 --> 00:01:16.691
+In main, make the last gem load level two,
+
+00:01:16.691 --> 00:01:18.903
+with ctx dot load scene.
+
+00:01:19.467 --> 00:01:21.482
+Press F5 to play level one.
+
+00:01:22.033 --> 00:01:24.094
+Click Play on the title screen.
+
+00:01:25.433 --> 00:01:27.076
+Walk over the three gems.
+
+00:01:27.082 --> 00:01:27.964
+After the last one,
+
+00:01:27.964 --> 00:01:30.309
+the picture fades, and level two loads:
+
+00:01:30.309 --> 00:01:31.627
+the dirt field.
+
+00:01:34.500 --> 00:01:36.178
+That's a game with two levels:
+
+00:01:36.183 --> 00:01:38.691
+one file per level in scenes, the start level in
+
+00:01:38.691 --> 00:01:42.633
+gamestudio.json, and ctx dot load scene to move on.
+
+00:01:42.778 --> 00:01:44.735
+Your score comes along too.

@@ -1,0 +1,24 @@
+{
+  "name": "@gamestudio/host",
+  "version": "0.1.0",
+  "description": "GameStudio runtime host: runs a game in Electron, docked (offscreen, GPU-shared frames to the editor over docs/SURFACE.md) or in its own window.",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/main.js",
+  "exports": {
+    "./package.json": "./package.json",
+    "./frame-pump": "./src/frame-pump.js",
+    "./args": "./src/args.js"
+  },
+  "files": [
+    "src",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "electron .",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "electron": "44.4.4"
+  }
+}

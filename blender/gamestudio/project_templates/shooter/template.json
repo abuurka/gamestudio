@@ -1,0 +1,8 @@
+{
+  "label": "Arena Shooter",
+  "description": "Top-down arena shooter: mouse aim, waves of chasing enemies, health and score",
+  "icon": "LIGHT_SUN",
+  "order": 2,
+  "base": "starter",
+  "exclude": ["src/components", "src/systems", "ui/locales"]
+}

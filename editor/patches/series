@@ -1,0 +1,11 @@
+# GameStudio seam patches, applied in this order with `git am -3` onto the tag in
+# ../upstream.lock.json. Every patch carries the header defined in docs/ARCHITECTURE.md
+# section 9 (Why / Hook-for / Upstream / Test / Remove-when). Budget: 15 patches, ~250 lines.
+S01-build-hook-for-an-out-of-tree-native-module.patch
+S02-overridable-folder-names-for-user-and-system-data.patch
+S03-overridable-application-name-and-windows-app-id.patch
+S04-overridable-default-app-template.patch
+S05-extension-editor-space-type-dna.patch
+S06-register-the-extension-editor-and-the-native-pytho.patch
+S07-python-and-rna-access-to-the-extension-editor.patch
+S08-hook-to-hide-editor-types-from-the-editor-type-men.patch

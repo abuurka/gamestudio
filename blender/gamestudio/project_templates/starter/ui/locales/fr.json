@@ -1,0 +1,19 @@
+{
+  "name": "Français",
+  "strings": {
+    "Collect every gem": "Ramassez toutes les gemmes",
+    "Play": "Jouer",
+    "Options": "Options",
+    "WASD move · Space jump · Esc pause": "ZQSD/WASD : se déplacer · Espace : sauter · Échap : pause",
+    "Paused": "Pause",
+    "Resume": "Reprendre",
+    "Restart": "Recommencer",
+    "Music": "Musique",
+    "Sound": "Son",
+    "Language": "Langue",
+    "Back": "Retour",
+    "You win!": "Gagné !",
+    "Score {score}": "Score {score}",
+    "Play again": "Rejouer"
+  }
+}

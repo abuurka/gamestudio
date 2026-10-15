@@ -1,0 +1,115 @@
+WEBVTT
+
+00:00:03.400 --> 00:00:05.687
+Here's Gem Island with one change:
+
+00:00:05.687 --> 00:00:07.684
+a stone ledge, two metres high,
+
+00:00:07.684 --> 00:00:09.356
+with the third gem on top.
+
+00:00:09.356 --> 00:00:10.447
+Can the player get it?
+
+00:00:10.447 --> 00:00:12.613
+Let's ask Claude Code to find out.
+
+00:00:13.167 --> 00:00:14.996
+Open the GameStudio menu,
+
+00:00:15.667 --> 00:00:17.821
+and choose Open in Claude Code.
+
+00:00:18.700 --> 00:00:20.233
+Claude Code starts in a terminal,
+
+00:00:20.233 --> 00:00:21.486
+in your project folder.
+
+00:00:21.486 --> 00:00:22.712
+Click Done.
+
+00:00:23.400 --> 00:00:25.885
+In the terminal, ask in plain words:
+
+00:00:25.885 --> 00:00:28.108
+can the player collect every gem?
+
+00:00:28.253 --> 00:00:30.105
+Fix anything that's wrong.
+
+00:00:30.667 --> 00:00:32.107
+Claude Code connects to Blender
+
+00:00:32.107 --> 00:00:33.727
+and reads the level first:
+
+00:00:33.813 --> 00:00:35.056
+where the player starts,
+
+00:00:35.056 --> 00:00:37.465
+where the gems are, and the new ledge.
+
+00:00:38.033 --> 00:00:39.281
+Then it playtests.
+
+00:00:39.322 --> 00:00:41.179
+GameStudio plays the game in a hidden
+
+00:00:41.179 --> 00:00:43.571
+browser with scripted keys, and sends back
+
+00:00:43.571 --> 00:00:46.340
+screenshots, the game's state and its logs.
+
+00:00:46.427 --> 00:00:48.407
+Two gems out of three.
+
+00:00:48.967 --> 00:00:50.813
+The third gem was never picked up:
+
+00:00:50.813 --> 00:00:51.823
+it's two metres up,
+
+00:00:51.823 --> 00:00:54.191
+and the player's jump peaks under one metre.
+
+00:00:54.191 --> 00:00:55.858
+So Claude adds stairs.
+
+00:00:56.433 --> 00:00:59.469
+The stairs appear in Blender, up against the ledge.
+
+00:01:00.433 --> 00:01:02.244
+It gives them a mesh Collider,
+
+00:01:02.244 --> 00:01:05.327
+shaped like the steps, so the player can walk up them.
+
+00:01:05.900 --> 00:01:08.391
+Then it runs the very same playtest again.
+
+00:01:08.535 --> 00:01:10.440
+This time the player climbs the stairs and
+
+00:01:10.440 --> 00:01:13.580
+takes all three gems, and the win screen opens.
+
+00:01:14.133 --> 00:01:16.629
+Claude saves the level, and tells you what was wrong,
+
+00:01:16.629 --> 00:01:18.655
+what it changed, and the proof:
+
+00:01:18.696 --> 00:01:20.838
+the playtest that now passes.
+
+00:01:21.400 --> 00:01:22.387
+That's the loop:
+
+00:01:22.387 --> 00:01:25.545
+ask Claude Code to playtest, let it fix what fails,
+
+00:01:25.545 --> 00:01:27.827
+and check that the same test passes.

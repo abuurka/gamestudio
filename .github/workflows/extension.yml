@@ -1,0 +1,198 @@
+# SPDX-License-Identifier: MIT
+#
+# The GameStudio extension on stock Blender 5.2.2, on GitHub-hosted Ubuntu and Windows runners:
+# typecheck, unit tests, the Blender suites (addon, shell, contract), the extension zip (uploaded
+# as an artifact from Ubuntu) and the headless-browser runs (smoke, features).
+#
+# Safe for pull requests: GitHub-hosted runners are throwaway VMs, the token is read-only and no
+# secrets are used. Blender comes from download.blender.org: tools/ci/blender.lock.json pins each
+# archive's URL and SHA-256, and the unpacked Blender is cached per lock. Every test step runs even
+# when an earlier one failed, so one run shows all failures. No display is needed: the Blender
+# suites run in --background and Chrome runs headless (software WebGL).
+#
+# Run by hand with "templates" on, it also plays the four project templates (npm run e2e:templates,
+# Ubuntu). That run checks gameplay in real time, which SwiftShader makes slow, so it is not a gate.
+
+name: extension
+
+on:
+  push:
+    paths-ignore:
+      - "editor/**"
+      - "research/**"
+      - "docs/**"
+      - "README.md"
+  pull_request:
+    paths-ignore:
+      - "editor/**"
+      - "research/**"
+      - "docs/**"
+      - "README.md"
+  workflow_dispatch:
+    inputs:
+      templates:
+        description: "Also play the project templates (npm run e2e:templates on Ubuntu)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: extension-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUTF8: "1"
+  ELECTRON_SKIP_BINARY_DOWNLOAD: "1" # runtime/packages/host (the shelved fork's Electron host) is never started
+  npm_config_audit: "false"
+  npm_config_fund: "false"
+  # Blender's shared libraries, needed even in --background (Ubuntu package names).
+  BLENDER_APT: libx11-6 libxext6 libxi6 libxfixes3 libxrender1 libxxf86vm1 libxkbcommon0 libsm6 libice6 libgl1 libegl1
+
+jobs:
+  test:
+    name: Extension (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-latest
+            browser: /usr/bin/google-chrome
+          - name: Windows
+            os: windows-latest
+            browser: C:\Program Files\Google\Chrome\Application\chrome.exe
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out files as committed (Windows would convert line endings)
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Blender's libraries (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends ${{ env.BLENDER_APT }}
+
+      - name: Temp folder without 8.3 names (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          echo "TEMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
+          echo "TMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
+
+      - name: Cache Blender
+        uses: actions/cache@v4
+        with:
+          path: ~/gs-ci/blender
+          key: blender-${{ runner.os }}-${{ hashFiles('tools/ci/blender.lock.json') }}
+
+      - name: Install Blender
+        # Git Bash hands ~ to python.exe as C:/Users/<runner>/..., the folder actions/cache uses.
+        run: python tools/ci/install_blender.py --dest ~/gs-ci/blender --github-env
+
+      - name: npm ci
+        id: deps
+        run: npm ci
+
+      - name: Typecheck
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: npm run typecheck
+
+      - name: Unit tests (vitest)
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: npm test
+
+      - name: Blender suites (addon, shell, contract)
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: python tools/test_blender.py --blender "$BLENDER"
+
+      - name: Build the extension zip
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: python tools/build_extension.py --blender "$BLENDER"
+
+      - name: Upload the extension zip
+        if: ${{ !cancelled() && runner.os == 'Linux' && hashFiles('dist/gamestudio-*.zip') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: gamestudio-extension
+          path: dist/gamestudio-*.zip
+          if-no-files-found: error
+
+      - name: Smoke (headless Chrome)
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        env:
+          GS_BROWSER: ${{ matrix.browser }}
+        run: npm run smoke
+
+      - name: Features (Blender + headless Chrome)
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        env:
+          GS_BROWSER: ${{ matrix.browser }}
+        run: npm run features
+
+      - name: Upload screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.name }}
+          path: runtime/.smoke/*.png
+          if-no-files-found: ignore
+
+  templates:
+    name: Project templates (Linux)
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.templates }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Blender's libraries
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends ${{ env.BLENDER_APT }}
+
+      - name: Cache Blender
+        uses: actions/cache@v4
+        with:
+          path: ~/gs-ci/blender
+          key: blender-${{ runner.os }}-${{ hashFiles('tools/ci/blender.lock.json') }}
+
+      - name: Install Blender
+        run: python tools/ci/install_blender.py --dest ~/gs-ci/blender --github-env
+
+      - name: npm ci
+        run: npm ci
+
+      - name: New Project with every template, then play each game
+        env:
+          GS_BROWSER: /usr/bin/google-chrome
+        run: npm run e2e:templates -- --out "$RUNNER_TEMP/templates-e2e"
+
+      - name: Upload screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: templates-screenshots
+          path: ${{ runner.temp }}/templates-e2e/screenshots/*.png
+          if-no-files-found: ignore

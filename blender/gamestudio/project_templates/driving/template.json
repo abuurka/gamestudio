@@ -1,0 +1,8 @@
+{
+  "label": "Time Trial",
+  "description": "Arcade driving: a race track, checkpoints, a lap timer and a chase camera",
+  "icon": "AUTO",
+  "order": 3,
+  "base": "starter",
+  "exclude": ["src/components", "src/systems", "ui/locales"]
+}

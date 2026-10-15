@@ -1,0 +1,133 @@
+WEBVTT
+
+00:00:03.400 --> 00:00:06.123
+GameStudio's kits make game-ready props:
+
+00:00:06.210 --> 00:00:09.559
+rocks, crates, barrels, trees, fences and more.
+
+00:00:09.600 --> 00:00:11.469
+They're not in Blender's Add menu:
+
+00:00:11.469 --> 00:00:13.542
+you ask for them in Claude Code.
+
+00:00:13.744 --> 00:00:14.220
+Here:
+
+00:00:14.220 --> 00:00:17.768
+a crate, a barrel, a mossy rock and a pine tree.
+
+00:00:18.333 --> 00:00:19.471
+Claude checks the kits and
+
+00:00:19.471 --> 00:00:21.207
+builds all four in your level.
+
+00:00:21.352 --> 00:00:24.388
+Each one is a finished model, standing on the lawn.
+
+00:00:24.967 --> 00:00:26.732
+To change one, select it first.
+
+00:00:26.732 --> 00:00:27.957
+Click the rock.
+
+00:00:28.533 --> 00:00:30.223
+Then say what to change.
+
+00:00:30.263 --> 00:00:31.929
+Claude sees what you selected.
+
+00:00:31.970 --> 00:00:34.542
+Make this rock bigger, with a different shape.
+
+00:00:35.100 --> 00:00:36.911
+It rebuilds the rock from its kit
+
+00:00:36.911 --> 00:00:39.065
+with a new size and a new seed.
+
+00:00:39.210 --> 00:00:40.696
+The seed picks the shape,
+
+00:00:40.696 --> 00:00:43.756
+and the same seed always gives the same rock.
+
+00:00:44.333 --> 00:00:45.883
+Next, click the barrel.
+
+00:00:46.833 --> 00:00:47.954
+Now a colour.
+
+00:00:47.994 --> 00:00:50.188
+The kits share one material palette:
+
+00:00:50.188 --> 00:00:52.568
+stone, woods, metals, brick and more.
+
+00:00:52.568 --> 00:00:54.560
+Paint this barrel brick red.
+
+00:00:55.133 --> 00:00:56.143
+Claude gives the barrel's
+
+00:00:56.143 --> 00:00:57.914
+wood the palette's brick red.
+
+00:00:57.954 --> 00:01:00.538
+The iron hoops and the lid stay as they were.
+
+00:01:01.100 --> 00:01:03.579
+In the Properties, open the Material tab.
+
+00:01:03.666 --> 00:01:04.636
+There it is:
+
+00:01:04.722 --> 00:01:07.875
+G S Brick, the palette's shared brick material.
+
+00:01:07.961 --> 00:01:09.169
+Change it here, and every
+
+00:01:09.169 --> 00:01:11.102
+prop that uses it follows.
+
+00:01:11.667 --> 00:01:13.130
+Claude places props, too.
+
+00:01:13.130 --> 00:01:13.513
+Say:
+
+00:01:13.513 --> 00:01:15.307
+now put it on top of the crate.
+
+00:01:16.800 --> 00:01:18.356
+It moves the barrel over the crate
+
+00:01:18.356 --> 00:01:20.434
+and snaps it onto the first surface below,
+
+00:01:20.434 --> 00:01:22.507
+so nothing floats or sinks.
+
+00:01:22.593 --> 00:01:25.781
+The same snap sets props on hills and slopes.
+
+00:01:26.333 --> 00:01:29.549
+For a last look, turn on Game in the 3D View's header,
+
+00:01:29.549 --> 00:01:32.109
+to see the props the way the game draws them.
+
+00:01:32.667 --> 00:01:33.352
+That's it:
+
+00:01:33.352 --> 00:01:35.964
+ask for props from the kits, change their size,
+
+00:01:35.964 --> 00:01:37.724
+seed or colour, and place them.
+
+00:01:37.996 --> 00:01:40.626
+Every change Claude makes can be undone.

@@ -1,0 +1,151 @@
+1
+00:00:03,400 --> 00:00:05,513
+Here's Gem Island, the starter game,
+
+2
+00:00:05,513 --> 00:00:07,191
+open on the Game workspace.
+
+3
+00:00:07,231 --> 00:00:09,774
+Click a gem in the 3D View to select it.
+
+4
+00:00:09,774 --> 00:00:11,777
+The Outliner highlights it too.
+
+5
+00:00:12,333 --> 00:00:14,905
+To move it, pick the Move tool in the toolbar.
+
+6
+00:00:15,800 --> 00:00:18,877
+Drag the green arrow to slide the gem along that axis,
+
+7
+00:00:18,877 --> 00:00:21,205
+here closer to where the player starts.
+
+8
+00:00:21,767 --> 00:00:23,387
+Now give it some behaviour.
+
+9
+00:00:23,427 --> 00:00:25,413
+In the Properties, the Object tab's
+
+10
+00:00:25,413 --> 00:00:27,822
+Game panel lists the gem's components:
+
+11
+00:00:27,909 --> 00:00:29,819
+Collectible came with the starter.
+
+12
+00:00:29,906 --> 00:00:31,630
+Click Add Component.
+
+13
+00:00:32,333 --> 00:00:33,993
+Choose Spin, under Motion.
+
+14
+00:00:33,993 --> 00:00:36,716
+It turns the object while the game runs.
+
+15
+00:00:37,267 --> 00:00:39,839
+Scroll down the Properties to Spin's settings.
+
+16
+00:00:40,600 --> 00:00:42,034
+Set its Speed to three.
+
+17
+00:00:42,040 --> 00:00:43,746
+The gems already turn slowly;
+
+18
+00:00:43,746 --> 00:00:45,215
+this one will whirl.
+
+19
+00:00:45,767 --> 00:00:48,019
+To see the level the way the game draws it,
+
+20
+00:00:48,019 --> 00:00:50,336
+turn on Game in the 3D View's header.
+
+21
+00:00:50,539 --> 00:00:52,321
+This is the Scene view:
+
+22
+00:00:52,408 --> 00:00:55,259
+the game's own renderer, without playing.
+
+23
+00:00:55,833 --> 00:00:58,893
+Selecting, moving and zooming all work as usual here.
+
+24
+00:00:58,979 --> 00:01:00,588
+Scroll to get closer.
+
+25
+00:01:01,167 --> 00:01:03,089
+Now press F5 to play.
+
+26
+00:01:03,129 --> 00:01:06,200
+The game runs right here, in place of the 3D View.
+
+27
+00:01:06,767 --> 00:01:08,457
+It opens on its title screen.
+
+28
+00:01:08,543 --> 00:01:09,502
+Click Play.
+
+29
+00:01:09,542 --> 00:01:12,729
+That click also hands your mouse and keyboard to the game.
+
+30
+00:01:13,300 --> 00:01:14,902
+There's the gem where you moved it,
+
+31
+00:01:14,902 --> 00:01:16,685
+spinning faster than the others.
+
+32
+00:01:16,829 --> 00:01:19,587
+W, A, S and D walk over to collect it.
+
+33
+00:01:20,167 --> 00:01:23,482
+Press Shift and Escape to take the mouse back from the game.
+
+34
+00:01:24,033 --> 00:01:26,819
+F8 stops the game, and the 3D View is back,
+
+35
+00:01:26,819 --> 00:01:28,509
+ready for the next change.
+
+36
+00:01:29,067 --> 00:01:30,019
+That's the loop:
+
+37
+00:01:30,019 --> 00:01:33,130
+change something in Blender, press F5 to try it,
+
+38
+00:01:33,130 --> 00:01:35,447
+F8 to stop, and go again.

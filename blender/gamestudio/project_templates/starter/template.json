@@ -1,0 +1,7 @@
+{
+  "label": "Starter",
+  "description": "A blank slate: a player, a follow camera and three pickups on a lawn",
+  "icon": "FILE_NEW",
+  "order": 0,
+  "starterUi": true
+}

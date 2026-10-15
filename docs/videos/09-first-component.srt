@@ -1,0 +1,179 @@
+1
+00:00:03,400 --> 00:00:05,211
+Let's give a gem some new behaviour,
+
+2
+00:00:05,211 --> 00:00:06,488
+written in TypeScript.
+
+3
+00:00:06,488 --> 00:00:08,480
+Open the GameStudio menu.
+
+4
+00:00:09,033 --> 00:00:10,583
+Choose New Component.
+
+5
+00:00:10,670 --> 00:00:13,277
+A component is data you attach to objects.
+
+6
+00:00:13,833 --> 00:00:15,105
+Name it Bob.
+
+7
+00:00:17,367 --> 00:00:18,458
+Click Create.
+
+8
+00:00:18,458 --> 00:00:23,636
+GameStudio writes src/components/bob.ts from a template,
+
+9
+00:00:23,636 --> 00:00:25,930
+and opens it in your code editor.
+
+10
+00:00:26,500 --> 00:00:28,909
+Swap the example field for two of your own:
+
+11
+00:00:28,996 --> 00:00:31,162
+how far it bobs, and how fast.
+
+12
+00:00:31,167 --> 00:00:32,648
+Then save the file.
+
+13
+00:00:33,200 --> 00:00:34,547
+Bob holds the data.
+
+14
+00:00:34,547 --> 00:00:36,376
+The behaviour goes in a system.
+
+15
+00:00:36,462 --> 00:00:38,605
+Open the GameStudio menu again,
+
+16
+00:00:39,167 --> 00:00:40,810
+and choose New System.
+
+17
+00:00:42,167 --> 00:00:43,590
+Name it Bob as well.
+
+18
+00:00:43,595 --> 00:00:45,854
+GameStudio calls it Bob System.
+
+19
+00:00:46,433 --> 00:00:48,854
+Query picks the objects the system works on.
+
+20
+00:00:48,894 --> 00:00:50,212
+Open the list,
+
+21
+00:00:50,767 --> 00:00:51,957
+and choose Bob:
+
+22
+00:00:52,044 --> 00:00:54,361
+every object with a Bob component.
+
+23
+00:00:54,933 --> 00:00:55,920
+Click Create.
+
+24
+00:00:55,920 --> 00:00:57,986
+The new system's update runs every frame,
+
+25
+00:00:57,986 --> 00:00:59,734
+for each of those objects.
+
+26
+00:01:00,300 --> 00:01:02,442
+Swap the example for a few lines.
+
+27
+00:01:02,529 --> 00:01:04,352
+wave gives the height at any moment,
+
+28
+00:01:04,352 --> 00:01:07,632
+and each frame the object moves by how much the wave changed.
+
+29
+00:01:07,719 --> 00:01:08,723
+Save it.
+
+30
+00:01:09,700 --> 00:01:12,179
+Back in Blender, click a gem to select it.
+
+31
+00:01:12,733 --> 00:01:15,073
+In the Properties, click Add Component.
+
+32
+00:01:16,067 --> 00:01:18,180
+Bob is in the list now, under Gameplay.
+
+33
+00:01:18,180 --> 00:01:19,196
+Choose it.
+
+34
+00:01:19,767 --> 00:01:20,702
+Scroll down.
+
+35
+00:01:20,707 --> 00:01:22,182
+There's Bob, with the description
+
+36
+00:01:22,182 --> 00:01:24,336
+from its file, and your two fields.
+
+37
+00:01:24,900 --> 00:01:26,822
+Set its Height to half a metre.
+
+38
+00:01:27,467 --> 00:01:28,971
+Press F5 to play.
+
+39
+00:01:30,200 --> 00:01:32,029
+Click Play on the title screen.
+
+40
+00:01:33,567 --> 00:01:35,965
+And the gem bobs up and down.
+
+41
+00:01:36,052 --> 00:01:38,612
+Change the system and save it while the game runs:
+
+42
+00:01:38,617 --> 00:01:41,805
+it hot-reloads, and you see the change right away.
+
+43
+00:01:42,367 --> 00:01:43,523
+That's the pattern:
+
+44
+00:01:43,563 --> 00:01:46,698
+a component holds the data, a system holds the behaviour,
+
+45
+00:01:46,698 --> 00:01:48,886
+and you tune the fields in Blender.

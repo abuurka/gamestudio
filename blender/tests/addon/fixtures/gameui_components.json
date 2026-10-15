@@ -1,0 +1,541 @@
+{
+  "format": "gamestudio.registry",
+  "formatVersion": 1,
+  "generatedAt": "2026-10-11T12:00:00.000Z",
+  "components": [
+    {
+      "name": "UiAnchor",
+      "description": "Where a top-level UI element stays on screens of other shapes.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "anchor",
+          "type": "enum",
+          "options": [
+            "auto",
+            "center",
+            "top-left",
+            "top",
+            "top-right",
+            "left",
+            "right",
+            "bottom-left",
+            "bottom",
+            "bottom-right"
+          ],
+          "default": "auto"
+        },
+        {
+          "name": "stretch",
+          "type": "enum",
+          "options": [
+            "none",
+            "width",
+            "height",
+            "both",
+            "cover"
+          ],
+          "default": "none"
+        }
+      ]
+    },
+    {
+      "name": "UiBar",
+      "description": "A bar whose fill grows with a value.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "value",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "max",
+          "type": "float",
+          "default": 1,
+          "min": 0
+        },
+        {
+          "name": "fill",
+          "type": "entity"
+        },
+        {
+          "name": "direction",
+          "type": "enum",
+          "options": [
+            "right",
+            "left",
+            "up",
+            "down"
+          ],
+          "default": "right"
+        },
+        {
+          "name": "smoothing",
+          "type": "float",
+          "default": 0,
+          "min": 0,
+          "unit": "time"
+        }
+      ]
+    },
+    {
+      "name": "UiButton",
+      "description": "A button.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "action",
+          "type": "enum",
+          "options": [
+            "event",
+            "close",
+            "resume",
+            "open",
+            "previous",
+            "restart",
+            "load",
+            "locale",
+            "none"
+          ],
+          "default": "event"
+        },
+        {
+          "name": "target",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "disabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "order",
+          "type": "int",
+          "default": 0,
+          "min": 0
+        },
+        {
+          "name": "focusScale",
+          "type": "float",
+          "default": 1.06,
+          "min": 0
+        },
+        {
+          "name": "sound",
+          "type": "asset",
+          "default": "",
+          "extensions": [
+            ".ogg",
+            ".mp3",
+            ".wav"
+          ]
+        },
+        {
+          "name": "focusSound",
+          "type": "asset",
+          "default": "",
+          "extensions": [
+            ".ogg",
+            ".mp3",
+            ".wav"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UiCanvas",
+      "description": "Makes this camera's scene a game UI screen.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "kind",
+          "type": "enum",
+          "options": [
+            "menu",
+            "hud"
+          ],
+          "default": "menu"
+        },
+        {
+          "name": "open",
+          "type": "enum",
+          "options": [
+            "manual",
+            "start",
+            "firstStart"
+          ],
+          "default": "manual"
+        },
+        {
+          "name": "pause",
+          "type": "bool",
+          "default": true
+        },
+        {
+          "name": "pauseMenu",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "back",
+          "type": "enum",
+          "options": [
+            "none",
+            "close",
+            "resume",
+            "previous",
+            "restart"
+          ],
+          "default": "none"
+        },
+        {
+          "name": "scaleMode",
+          "type": "enum",
+          "options": [
+            "fit",
+            "width",
+            "height",
+            "fixed"
+          ],
+          "default": "fit"
+        },
+        {
+          "name": "backdrop",
+          "type": "color",
+          "default": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "layer",
+          "type": "int",
+          "default": 0
+        },
+        {
+          "name": "focus",
+          "type": "entity"
+        }
+      ]
+    },
+    {
+      "name": "UiModel",
+      "description": "A 3D model inside the UI.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "size",
+          "type": "vec2",
+          "default": [
+            320,
+            320
+          ],
+          "min": 1
+        },
+        {
+          "name": "view",
+          "type": "enum",
+          "options": [
+            "threeQuarter",
+            "front",
+            "side",
+            "top"
+          ],
+          "default": "threeQuarter"
+        },
+        {
+          "name": "zoom",
+          "type": "float",
+          "default": 1,
+          "min": 0.05
+        },
+        {
+          "name": "spin",
+          "type": "float",
+          "default": 0.6,
+          "unit": "angle"
+        },
+        {
+          "name": "clip",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "light",
+          "type": "enum",
+          "options": [
+            "studio",
+            "soft",
+            "flat"
+          ],
+          "default": "studio"
+        },
+        {
+          "name": "background",
+          "type": "color",
+          "default": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UiShow",
+      "description": "Shows this element only while a value compares as set.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "value",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "compare",
+          "type": "enum",
+          "options": [
+            "atLeast",
+            "below",
+            "equals",
+            "notEquals"
+          ],
+          "default": "atLeast"
+        },
+        {
+          "name": "than",
+          "type": "float",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "name": "UiSlice",
+      "description": "9-slice art.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "left",
+          "type": "float",
+          "default": 16,
+          "min": 0
+        },
+        {
+          "name": "right",
+          "type": "float",
+          "default": 16,
+          "min": 0
+        },
+        {
+          "name": "top",
+          "type": "float",
+          "default": 16,
+          "min": 0
+        },
+        {
+          "name": "bottom",
+          "type": "float",
+          "default": 16,
+          "min": 0
+        }
+      ]
+    },
+    {
+      "name": "UiSlider",
+      "description": "A slider.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "value",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "min",
+          "type": "float",
+          "default": 0
+        },
+        {
+          "name": "max",
+          "type": "float",
+          "default": 1
+        },
+        {
+          "name": "step",
+          "type": "float",
+          "default": 0.1,
+          "min": 0
+        },
+        {
+          "name": "fill",
+          "type": "entity"
+        },
+        {
+          "name": "handle",
+          "type": "entity"
+        },
+        {
+          "name": "direction",
+          "type": "enum",
+          "options": [
+            "right",
+            "left",
+            "up",
+            "down"
+          ],
+          "default": "right"
+        },
+        {
+          "name": "disabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "order",
+          "type": "int",
+          "default": 0,
+          "min": 0
+        },
+        {
+          "type": "asset",
+          "default": "",
+          "extensions": [
+            ".ogg",
+            ".mp3",
+            ".wav"
+          ],
+          "name": "sound"
+        }
+      ]
+    },
+    {
+      "name": "UiState",
+      "description": "Art inside a button that only shows in one of the button's states.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "show",
+          "type": "enum",
+          "options": [
+            "normal",
+            "focused",
+            "pressed",
+            "disabled",
+            "focusedOrPressed"
+          ],
+          "default": "focused"
+        }
+      ]
+    },
+    {
+      "name": "UiText",
+      "description": "Outline, shadow and shrink-to-fit for a UI text object.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "outline",
+          "type": "float",
+          "default": 0,
+          "min": 0
+        },
+        {
+          "name": "outlineColor",
+          "type": "color",
+          "default": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "name": "shadow",
+          "type": "vec2",
+          "default": [
+            0,
+            0
+          ]
+        },
+        {
+          "name": "shadowBlur",
+          "type": "float",
+          "default": 0,
+          "min": 0
+        },
+        {
+          "name": "shadowColor",
+          "type": "color",
+          "default": [
+            0,
+            0,
+            0,
+            0.6
+          ]
+        },
+        {
+          "name": "fit",
+          "type": "bool",
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "UiToggle",
+      "description": "An on/off switch.",
+      "category": "UI",
+      "builtin": true,
+      "fields": [
+        {
+          "name": "value",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "name": "on",
+          "type": "entity"
+        },
+        {
+          "name": "off",
+          "type": "entity"
+        },
+        {
+          "name": "disabled",
+          "type": "bool",
+          "default": false
+        },
+        {
+          "name": "order",
+          "type": "int",
+          "default": 0,
+          "min": 0
+        },
+        {
+          "type": "asset",
+          "default": "",
+          "extensions": [
+            ".ogg",
+            ".mp3",
+            ".wav"
+          ],
+          "name": "sound"
+        }
+      ]
+    }
+  ],
+  "shaders": []
+}

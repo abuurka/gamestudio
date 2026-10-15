@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameStudio</title>
+<meta name="description" content="GameStudio is a Blender 5.2+ extension that lets any MCP-capable AI agent build 3D web games inside Blender: the art, the levels and the code in one place, played in any browser.">
+<meta name="theme-color" content="#05090b">
+<meta property="og:title" content="GameStudio: let your AI agent build your game inside Blender">
+<meta property="og:description" content="Model the art, build the levels and write the game in one place. The result runs in any browser.">
+<link rel="icon" href="images/logo-mark.svg" type="image/svg+xml">
+<meta property="og:image" content="https://abuurka.github.io/gamestudio/media/promo.jpg">
+<link rel="preload" href="fonts/Inter.woff2" as="font" type="font/woff2" crossorigin>
+<script>document.documentElement.classList.add("js")</script>
+<style>
+@font-face{font-family:"InterGS";src:url(fonts/Inter.woff2) format("woff2");font-weight:100 900;font-display:swap}
+:root{
+  --bg:#05090b;--bg-2:#0a1215;--surface:rgba(255,255,255,.035);--surface-2:rgba(255,255,255,.06);
+  --line:rgba(255,255,255,.09);--line-2:rgba(255,255,255,.16);
+  --text:#e9f2f1;--muted:#93a9aa;--faint:#5f7576;
+  --mint:#8ee1d1;--teal:#26ab9f;--deep:#087b78;--amber:#edaa4f;
+  --grad:linear-gradient(100deg,#8ee1d1 0%,#26ab9f 48%,#edaa4f 100%);
+  --radius:20px;--wrap:1200px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 "InterGS",Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-feature-settings:"cv05","cv08","ss01";-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,video{display:block;max-width:100%}
+a{color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:4px;border-radius:8px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+.nowrap{white-space:nowrap}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{font-size:13px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;color:var(--mint)}
+h1,h2,h3{font-variation-settings:"opsz" 32;margin:0}
+h2{font-size:clamp(34px,4.6vw,60px);line-height:1.02;letter-spacing:-.045em;font-weight:780;margin:14px 0 18px}
+h3{font-size:22px;line-height:1.25;letter-spacing:-.02em;font-weight:700}
+.lead{font-size:clamp(17px,1.6vw,20px);color:var(--muted);max-width:640px;margin:0}
+section{position:relative;padding:104px 0}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border-radius:999px;font-weight:650;font-size:16px;text-decoration:none;
+  border:1px solid var(--line-2);background:var(--surface-2);color:var(--text);transition:transform .2s,background .2s,border-color .2s;backdrop-filter:blur(8px)}
+.btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.28);transform:translateY(-1px)}
+.btn.primary{background:var(--grad);color:#05211f;border:0;box-shadow:0 10px 40px -10px rgba(142,225,209,.55)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* nav */
+.nav{position:fixed;inset:0 0 auto 0;z-index:20;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.nav.scrolled{background:rgba(5,9,11,.72);backdrop-filter:blur(18px) saturate(1.4);border-color:var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:72px}
+.nav .logo img{height:30px;width:auto}
+.nav .links{display:flex;gap:26px;margin-left:12px}
+.nav .links a{color:var(--muted);text-decoration:none;font-size:15px;font-weight:500;transition:color .2s}
+.nav .links a:hover{color:var(--text)}
+.nav .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.nav .btn{padding:9px 18px;font-size:14px}
+.nav .gh{color:var(--muted);display:flex;padding:8px}
+.nav .gh:hover{color:var(--text)}
+.nav .gh svg{width:22px;height:22px}
+
+/* hero */
+.hero{padding:168px 0 40px;overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:-20% -10% auto;height:1100px;z-index:-2;
+  background:radial-gradient(40% 50% at 22% 28%,rgba(38,171,159,.32),transparent 70%),
+             radial-gradient(34% 40% at 82% 18%,rgba(237,170,79,.20),transparent 70%),
+             radial-gradient(50% 50% at 55% 75%,rgba(8,123,120,.28),transparent 70%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:64px 64px;-webkit-mask-image:radial-gradient(70% 55% at 50% 30%,#000,transparent);mask-image:radial-gradient(70% 55% at 50% 30%,#000,transparent)}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:7px 14px 7px 10px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.04);
+  font-size:13.5px;color:var(--muted);backdrop-filter:blur(8px)}
+.pill b{color:var(--text);font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 12px var(--mint)}
+.hero h1{font-size:clamp(44px,7.4vw,104px);line-height:.96;letter-spacing:-.047em;font-weight:820;margin:26px 0 26px;max-width:1050px}
+.hero .lead{max-width:680px}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin:34px 0 18px}
+.hero .works{font-size:14px;color:var(--faint)}
+.hero .works b{color:var(--muted);font-weight:600}
+
+.window{position:relative;margin-top:72px;border-radius:18px;padding:1px;background:linear-gradient(160deg,rgba(142,225,209,.55),rgba(255,255,255,.08) 35%,rgba(237,170,79,.45));
+  box-shadow:0 60px 160px -40px rgba(38,171,159,.45),0 30px 80px -30px rgba(0,0,0,.8)}
+.window .inner{border-radius:17px;overflow:hidden;background:#0b1114}
+.window .bar{display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-bottom:1px solid var(--line);background:#0e161a;font-size:13px;color:var(--faint)}
+.window .bar i{width:11px;height:11px;border-radius:50%;background:#2a3639;display:block}
+.window .bar span{margin-left:12px}
+.window video{width:100%;aspect-ratio:16/9;object-fit:cover;background:#0b1114}
+.player{position:relative}
+.sound{position:absolute;right:16px;bottom:16px;display:inline-flex;align-items:center;gap:8px;padding:10px 16px 10px 12px;border-radius:999px;cursor:pointer;
+  font:inherit;font-size:14px;font-weight:650;color:var(--text);background:rgba(5,9,11,.62);border:1px solid var(--line-2);backdrop-filter:blur(10px);transition:background .2s}
+.sound:hover{background:rgba(5,9,11,.85)}
+.sound svg{width:20px;height:20px}
+.sound .on{display:none}
+.sound[aria-pressed="true"] .on{display:inline}
+.sound[aria-pressed="true"] .off{display:none}
+
+/* stack strip */
+.strip{padding:56px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.015),transparent)}
+.strip .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 40px}
+.strip .label{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.strip ul{display:flex;flex-wrap:wrap;gap:12px 36px;list-style:none;margin:0;padding:0}
+.strip li{font-size:19px;font-weight:650;letter-spacing:-.02em;color:#b9caca}
+
+/* why */
+.why h2{max-width:900px}
+.why h2 em{font-style:normal;color:var(--faint)}
+.catches{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.catch{padding:26px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line)}
+.catch .x{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;background:rgba(237,110,79,.12);color:#f0917a;font-size:15px;margin-bottom:16px}
+.catch h3{font-size:19px;margin-bottom:8px}
+.catch p{margin:0;color:var(--muted);font-size:15.5px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.answer{position:relative;padding:36px;border-radius:var(--radius);overflow:hidden;background:linear-gradient(160deg,rgba(38,171,159,.16),rgba(255,255,255,.02) 60%);border:1px solid rgba(142,225,209,.22)}
+.answer .n{font-size:64px;font-weight:850;line-height:1;letter-spacing:-.05em;font-variation-settings:"opsz" 32}
+.answer h3{font-size:28px;margin:16px 0 10px}
+.answer p{margin:0;color:var(--muted)}
+
+/* feature rows */
+.features{padding-top:40px;padding-bottom:24px}
+.row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.25fr);gap:72px;align-items:center;padding:56px 0}
+.row.flip{grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr)}
+.row.flip .text{order:2}
+.row .text h2{font-size:clamp(32px,3.6vw,48px)}
+.row .text p{color:var(--muted);margin:0 0 22px}
+.checks{list-style:none;margin:0 0 26px;padding:0;display:grid;gap:10px}
+.checks li{display:flex;gap:12px;align-items:flex-start;color:#c9d8d7;font-size:16px}
+.checks li::before{content:"";flex:none;width:18px;height:18px;margin-top:3px;border-radius:6px;background:var(--grad);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/%3E%3C/svg%3E") center/contain no-repeat}
+.more{display:inline-flex;align-items:center;gap:8px;color:var(--mint);font-weight:600;text-decoration:none}
+.more:hover{gap:12px}
+.more{transition:gap .2s}
+.media{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line-2);background:#0b1114;box-shadow:0 40px 120px -40px rgba(38,171,159,.35)}
+.media video{width:100%;aspect-ratio:16/9;object-fit:cover}
+.media::after{content:"";position:absolute;inset:0;border-radius:18px;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.glow{position:absolute;z-index:-1;width:520px;height:520px;border-radius:50%;filter:blur(120px);opacity:.28;pointer-events:none}
+
+/* compare */
+.compare-box{position:relative;margin-top:48px;border-radius:20px;overflow:hidden;border:1px solid var(--line-2);aspect-ratio:16/9;background:#0b1114;--pos:50%;
+  box-shadow:0 60px 140px -50px rgba(237,170,79,.3)}
+.compare-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.compare-box .top{clip-path:inset(0 calc(100% - var(--pos)) 0 0)}
+.compare-box .handle{position:absolute;top:0;bottom:0;left:var(--pos);width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.5);pointer-events:none}
+.compare-box .handle::after{content:"⟷";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:#fff;color:#05211f;
+  display:grid;place-items:center;font-size:20px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.compare-box input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.compare-box .tag{position:absolute;bottom:18px;padding:7px 14px;border-radius:999px;background:rgba(5,9,11,.7);backdrop-filter:blur(8px);font-size:13px;font-weight:600;border:1px solid var(--line-2);pointer-events:none}
+.compare-box .tag.l{left:18px}.compare-box .tag.r{right:18px}
+.note{color:var(--faint);font-size:14.5px;margin:18px 0 0;max-width:820px}
+
+/* stats */
+.stats{padding:90px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:radial-gradient(60% 120% at 50% 0%,rgba(38,171,159,.12),transparent 70%)}
+.stats ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:24px}
+.stats li{text-align:left}
+.stats b{display:block;font-size:clamp(46px,5.5vw,76px);font-weight:820;letter-spacing:-.05em;line-height:1;font-variation-settings:"opsz" 32}
+.stats span{display:block;color:var(--muted);margin-top:10px;font-size:15px}
+
+/* templates */
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:48px}
+.tcard{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);aspect-ratio:3/4;background:#0b1114}
+.tcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.tcard:hover img{transform:scale(1.06)}
+.tcard::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(5,9,11,.92) 85%)}
+.tcard div{position:absolute;left:0;right:0;bottom:0;padding:22px;z-index:1}
+.tcard small{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mint);font-weight:650;margin-bottom:6px}
+.tcard h3{font-size:22px;margin-bottom:6px}
+.tcard p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.5}
+.aside{margin-top:22px;color:var(--muted);font-size:15.5px}
+
+/* demo */
+.demo{text-align:center;overflow:hidden;isolation:isolate}
+.demo::before{content:"";position:absolute;inset:10% 0 auto;height:700px;z-index:-1;background:radial-gradient(45% 50% at 50% 50%,rgba(38,171,159,.22),transparent 70%)}
+.demo .lead{margin:0 auto}
+.demo .window{max-width:1040px;margin:56px auto 0;text-align:left}
+
+/* tutorials */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:40px 0 28px}
+.tabs button{font:inherit;font-size:14.5px;font-weight:600;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 18px;cursor:pointer;transition:all .2s}
+.tabs button:hover{color:var(--text);border-color:var(--line-2)}
+.tabs button[aria-selected="true"]{color:#05211f;background:var(--grad);border-color:transparent}
+.lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.lessons[hidden]{display:none}
+.lesson{display:block;text-decoration:none;border-radius:16px;overflow:hidden;background:var(--surface);border:1px solid var(--line);transition:transform .25s,border-color .25s}
+.lesson:hover{transform:translateY(-3px);border-color:rgba(142,225,209,.4)}
+.lesson .thumb{position:relative}
+.lesson img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.lesson .thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(5,9,11,.6))}
+.lesson .time{position:absolute;right:10px;bottom:10px;z-index:1;font-size:12px;font-weight:650;padding:3px 8px;border-radius:6px;background:rgba(5,9,11,.75);font-variant-numeric:tabular-nums}
+.lesson .body{padding:14px 16px 18px}
+.lesson small{color:var(--mint);font-size:12px;font-weight:650;letter-spacing:.12em}
+.lesson strong{display:block;font-size:16.5px;line-height:1.3;margin:4px 0;letter-spacing:-.01em}
+.lesson span.sub{display:block;font-size:14px;color:var(--muted);line-height:1.45}
+.no-js-group{margin:30px 0 14px;color:var(--mint);font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:650}
+
+/* docs */
+.docs-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px}
+.doc{padding:32px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line)}
+.doc h3{font-size:24px;margin-bottom:8px}
+.doc h3 a{text-decoration:none}
+.doc h3 a:hover{color:var(--mint)}
+.doc > p{color:var(--muted);margin:0 0 18px}
+.doc ul{list-style:none;margin:0;padding:0}
+.doc li{border-top:1px solid var(--line)}
+.doc li a{display:flex;align-items:baseline;gap:16px;padding:12px 0;text-decoration:none;color:#cddbda;font-size:15.5px;transition:color .2s}
+.doc li a:hover{color:var(--mint)}
+.doc li a span{margin-left:auto;color:var(--faint);font-size:14px;text-align:right}
+.doc li a::after{content:"→";margin-left:auto;color:var(--faint);transition:transform .2s}
+.doc li a:has(span)::after{margin-left:0}
+.doc li a:hover::after{transform:translateX(3px);color:var(--mint)}
+
+/* steps */
+.steps{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
+.steps li{counter-increment:s;padding:28px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);color:var(--muted);font-size:15.5px}
+.steps li::before{content:"0" counter(s);display:block;font-size:14px;font-weight:700;letter-spacing:.1em;margin-bottom:18px;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.steps strong{display:block;color:var(--text);font-size:19px;letter-spacing:-.02em;margin-bottom:8px}
+.steps a{color:var(--mint)}
+
+/* final cta */
+.cta{padding:40px 0 120px}
+.cta .box{position:relative;overflow:hidden;isolation:isolate;border-radius:28px;padding:88px 48px;text-align:center;border:1px solid rgba(142,225,209,.25);
+  background:radial-gradient(60% 90% at 20% 0%,rgba(38,171,159,.45),transparent 70%),radial-gradient(50% 80% at 90% 100%,rgba(237,170,79,.32),transparent 70%),#081013}
+.cta h2{font-size:clamp(38px,5.6vw,76px);margin:0 0 18px}
+.cta p{color:#b7cbcb;margin:0 auto 34px;max-width:560px;font-size:18px}
+.cta .ctas{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:56px 0 40px;color:var(--faint);font-size:14px}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px}
+footer img{height:28px;width:auto;margin-bottom:14px}
+footer h4{margin:0 0 12px;color:var(--text);font-size:14px;font-weight:650}
+footer ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+footer a{text-decoration:none;color:var(--muted)}
+footer a:hover{color:var(--text)}
+footer .legal{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);font-size:13px;line-height:1.6}
+footer .legal p{margin:4px 0;max-width:900px}
+
+/* reveal */
+.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+  .tcard img,.lesson,.btn{transition:none}
+}
+
+/* responsive */
+@media (max-width:1000px){
+  .nav .links{display:none}
+  .row,.row.flip{grid-template-columns:1fr;gap:36px;padding:44px 0}
+  .row.flip .text{order:0}
+  .catches{grid-template-columns:1fr}
+  .answers,.docs-grid{grid-template-columns:1fr}
+  .stats ul{grid-template-columns:repeat(3,1fr);row-gap:40px}
+  .tgrid{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:1fr 1fr}
+  footer .cols{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding:0 16px}
+  section{padding:80px 0}
+  .hero{padding:120px 0 24px}
+  .nav .wrap{gap:12px}
+  .nav .btn{display:none}
+  .window{margin-top:48px}
+  .window .bar{height:32px}
+  .answer,.doc,.catch{padding:22px}
+  .stats ul{grid-template-columns:1fr 1fr}
+  .tgrid,.steps{grid-template-columns:1fr}
+  .tcard{aspect-ratio:4/3}
+  .cta .box{padding:56px 22px}
+  .compare-box .tag{bottom:10px;font-size:12px}
+  footer .cols{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="./" aria-label="GameStudio home"><img src="images/logo-dark.svg" alt="GameStudio" width="313" height="64"></a>
+    <nav class="links" aria-label="Site">
+      <a href="#features">Features</a>
+      <a href="#templates">Templates</a>
+      <a href="#tutorials">Tutorials</a>
+      <a href="#docs">Docs</a>
+    </nav>
+    <div class="right">
+      <a class="gh" href="https://github.com/abuurka/gamestudio" aria-label="GameStudio on GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg></a>
+      <a class="btn primary" href="https://github.com/abuurka/gamestudio/releases/latest">Download</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap">
+    <span class="pill reveal"><span class="dot"></span><b>Blender 5.2+ extension</b> · free and open source · early preview</span>
+    <h1 class="reveal">Let your AI agent<br> build your game <span class="grad nowrap">inside Blender.</span></h1>
+    <p class="lead reveal">Model the art, build the levels and write the game in one place. Any agent that speaks MCP drives Blender and your TypeScript, plays the game, looks at it and fixes what's wrong. What you make runs in any browser.</p>
+    <div class="ctas reveal">
+      <a class="btn primary" href="https://github.com/abuurka/gamestudio/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>Download free</a>
+      <a class="btn" href="#demo"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Watch the demo</a>
+    </div>
+    <p class="works reveal">Works with <b>Claude Code</b>, <b>Codex</b> and <b>any MCP client</b>.</p>
+
+    <div class="window reveal">
+      <div class="inner">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>GameStudio · one minute</span></div>
+        <div class="player">
+          <video id="promo" data-autoplay muted loop playsinline preload="metadata" poster="media/promo.jpg" aria-label="GameStudio promo: an agent builds a game in Blender, playtests it and ships it to the web">
+            <source src="media/promo.webm" type="video/webm"><source src="media/promo.mp4" type="video/mp4">
+          </video>
+          <button class="sound" id="sound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="off" d="m16 9 6 6m0-6-6 6"/></svg><span>Sound on</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="strip">
+  <div class="wrap">
+    <span class="label">Built on open tools</span>
+    <ul><li>Blender 5.2</li><li>three.js</li><li>Rapier</li><li>TypeScript</li><li>Vite</li><li>Model Context Protocol</li></ul>
+  </div>
+</div>
+
+<section class="why" id="why">
+  <div class="wrap">
+    <div class="eyebrow reveal">Why GameStudio</div>
+    <h2 class="reveal">AI agents can build 3D games now. <em>The usual ways each have a catch.</em></h2>
+    <div class="catches">
+      <div class="catch reveal"><span class="x" aria-hidden="true">✕</span><h3>Vibe-code straight into three.js</h3><p>Quick to start, but every model has to be written as code. No modeling tools, and nothing on screen you can grab and fix by hand.</p></div>
+      <div class="catch reveal"><span class="x" aria-hidden="true">✕</span><h3>Use a game engine</h3><p>Unity, Godot and Unreal are built to run games, not to make 3D art, so the models still come from somewhere else, usually Blender.</p></div>
+      <div class="catch reveal"><span class="x" aria-hidden="true">✕</span><h3>Split the work across tools</h3><p>Every change means export, import, fix the scale and materials, and find the code that uses it. You and the agent both lose time switching.</p></div>
+    </div>
+    <div class="answers">
+      <div class="answer reveal"><div class="n grad">01</div><h3>One platform</h3><p>Blender is where you model, build levels and give objects their game behaviour, and TypeScript holds the rules. Your agent works on all of it through one MCP server, and you can change anything by hand at any time.</p></div>
+      <div class="answer reveal"><div class="n grad">02</div><h3>The web as the target</h3><p>The game runs on three.js in any modern browser, on any operating system, and ships as a static web build you can host anywhere or share as a link. No engine to install, no per-platform builds.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="row">
+      <div class="text reveal">
+        <div class="eyebrow">01 · Describe</div>
+        <h2>Say what you want. Watch Blender build it.</h2>
+        <p>Your agent writes a short plan, then makes it real: the terrain, the props, colliders, the player and the camera. Every step lands in Blender as an undo step you can see.</p>
+        <ul class="checks"><li>64 MCP tools, each returning something to check</li><li>Every action listed live, with Undo to Here</li><li>Pause the agent, or protect what it must not touch</li></ul>
+        <a class="more" href="videos/index.html#15-idea-to-game">Watch: from one line to a playable game →</a>
+      </div>
+      <div class="media reveal"><video data-autoplay muted loop playsinline preload="none" poster="media/agent.jpg" aria-label="The agent writes a plan in its terminal while a floating island appears in Blender"><source src="media/agent.webm" type="video/webm"><source src="media/agent.mp4" type="video/mp4"></video></div>
+    </div>
+
+    <div class="row flip">
+      <div class="text reveal">
+        <div class="eyebrow">02 · Build</div>
+        <h2>Worlds in seconds that stay editable.</h2>
+        <p>Geometry-nodes builders lay rivers, roads, cliffs, villages and forests. Every part stays a live recipe you can change by hand or by asking, and repeated objects export as GPU instances.</p>
+        <ul class="checks"><li>22 parametric kits, from rocks to rigged characters</li><li>Asset libraries linked into levels as prefabs</li><li>Python in Blender for anything else</li></ul>
+        <a class="more" href="videos/index.html#06-procedural-world">Watch: a procedural world in two minutes →</a>
+      </div>
+      <div class="media reveal"><video data-autoplay muted loop playsinline preload="none" poster="media/world.jpg" aria-label="A valley with a river, bridge, cliffs, cottages and a forest builds up in Blender"><source src="media/world.webm" type="video/webm"><source src="media/world.mp4" type="video/mp4"></video></div>
+    </div>
+
+    <div class="row">
+      <div class="text reveal">
+        <div class="eyebrow">03 · Make it a game</div>
+        <h2>From scene to game without leaving Blender.</h2>
+        <p>Attach components in the Properties, write systems in TypeScript with hot reload, and lay out menus and HUDs in Blender itself. Press F5 and it plays right in the viewport.</p>
+        <ul class="checks"><li>Animation state machines, navigation meshes, audio</li><li>Title, pause and end screens made in Blender</li><li>33 ready-made game shaders: water, lava, foliage and more</li></ul>
+        <a class="more" href="videos/index.html#10-menus-and-hud">Watch: menus and HUD made in Blender →</a>
+      </div>
+      <div class="media reveal"><video data-autoplay muted loop playsinline preload="none" poster="media/game.jpg" aria-label="A title screen made in Blender, then the game plays in the viewport"><source src="media/game.webm" type="video/webm"><source src="media/game.mp4" type="video/mp4"></video></div>
+    </div>
+
+    <div class="row flip">
+      <div class="text reveal">
+        <div class="eyebrow">04 · Play, look, fix</div>
+        <h2>It plays its own game.</h2>
+        <p>Scripted playtests run in a headless browser and return screenshots, game state and logs. The agent finds what's wrong, fixes it, and runs the same test again to prove it.</p>
+        <ul class="checks"><li>Screenshots through the game's own renderer</li><li>Frame time, draw calls and triangle counts</li><li>Checkpoints, undo and crash recovery</li></ul>
+        <a class="more" href="videos/index.html#16-playtest-and-fix">Watch: playtest and fix →</a>
+      </div>
+      <div class="media reveal"><video data-autoplay muted loop playsinline preload="none" poster="media/fix.jpg" aria-label="The agent playtests a level in a browser, finds a gem out of reach and adds stairs"><source src="media/fix.webm" type="video/webm"><source src="media/fix.mp4" type="video/mp4"></video></div>
+    </div>
+
+    <div class="row">
+      <div class="text reveal">
+        <div class="eyebrow">05 · Ship</div>
+        <h2>Publish to the web.</h2>
+        <p>Build Web writes a static site with compressed geometry, WebP textures and the licence notices included. Host it anywhere, or zip it up for itch.io.</p>
+        <ul class="checks"><li>Runs in any modern browser, on any system</li><li>Several levels per game, with saved progress</li><li>Your game is yours: an MIT runtime, no credit needed</li></ul>
+        <a class="more" href="videos/index.html#19-publish-web">Watch: publish your game to the web →</a>
+      </div>
+      <div class="media reveal"><video data-autoplay muted loop playsinline preload="none" poster="media/web.jpg" aria-label="The finished game opens in a browser and plays"><source src="media/web.webm" type="video/webm"><source src="media/web.mp4" type="video/mp4"></video></div>
+    </div>
+  </div>
+</section>
+
+<section class="compare" aria-labelledby="compare-title">
+  <div class="wrap">
+    <div class="eyebrow reveal">What you build is what you play</div>
+    <h2 id="compare-title" class="reveal">The same level, in Blender and in the browser.</h2>
+    <p class="lead reveal">Drag across to compare. Procedural materials are baked and scatters export as GPU instances, so the game matches Blender.</p>
+    <div class="compare-box reveal" id="compare">
+      <img src="images/procedural-valley-game.png" alt="The valley running as a game in the browser" loading="lazy">
+      <img class="top" src="images/procedural-valley-blender.png" alt="The valley in Blender, built with geometry nodes" loading="lazy">
+      <div class="handle" aria-hidden="true"></div>
+      <span class="tag l">Blender</span><span class="tag r">Browser</span>
+      <input type="range" min="0" max="100" value="50" aria-label="Compare Blender and the browser">
+    </div>
+    <p class="note">A 150 m valley built in about 2 seconds: cliffs, a river with a bridge, a fenced road with lamps, a village and 273 trees.</p>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="wrap">
+    <ul>
+      <li class="reveal"><b class="grad">64</b><span>MCP tools for your agent</span></li>
+      <li class="reveal"><b class="grad">22</b><span>parametric kits</span></li>
+      <li class="reveal"><b class="grad">33</b><span>ready-made game shaders</span></li>
+      <li class="reveal"><b class="grad">5</b><span>playable templates</span></li>
+      <li class="reveal"><b class="grad">20</b><span>video lessons</span></li>
+    </ul>
+  </div>
+</div>
+
+<section id="templates">
+  <div class="wrap">
+    <div class="eyebrow reveal">Templates</div>
+    <h2 class="reveal">Start from a game that already plays.</h2>
+    <p class="lead reveal">Each one has a title screen made in Blender, pause and options menus, a win or game-over screen, sound, particles, a sky and fog.</p>
+    <div class="tgrid">
+      <div class="tcard reveal"><img src="images/templates/platformer.png" alt="Sky Garden: floating islands with coins and a goal" loading="lazy"><div><small>Platformer</small><h3>Sky Garden</h3><p>Floating islands, coins, a bounce pad, moving platforms and checkpoints.</p></div></div>
+      <div class="tcard reveal"><img src="images/templates/shooter.png" alt="The Pit: a top-down arena with enemy waves" loading="lazy"><div><small>Arena Shooter</small><h3>The Pit</h3><p>Top-down, mouse aim, enemy waves spawned as prefabs, health and score.</p></div></div>
+      <div class="tcard reveal"><img src="images/templates/driving.png" alt="Pine Valley Circuit: an arcade car on a forest track" loading="lazy"><div><small>Time Trial</small><h3>Pine Valley Circuit</h3><p>An arcade car, a 390 m track, gates, laps and a chase camera.</p></div></div>
+      <div class="tcard reveal"><img src="images/templates/runner.png" alt="Sunset Skyway: a three-lane runner at sunset" loading="lazy"><div><small>Endless Runner</small><h3>Sunset Skyway</h3><p>Three lanes, coins, obstacles and power-ups, on a track built from prefabs.</p></div></div>
+    </div>
+    <p class="aside reveal">Or start from the small Starter. And any game you make can become a template for your next one.</p>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="eyebrow reveal">Demo</div>
+    <h2 class="reveal">From one line to a playable game.</h2>
+    <p class="lead reveal">"A small 3D game: collect all the gems on a floating island before the timer runs out." Two minutes, with sound.</p>
+    <div class="window reveal">
+      <div class="inner">
+        <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>Lesson 15 · From one line to a playable game</span></div>
+        <video controls playsinline preload="none" poster="media/demo.jpg" aria-label="Demo: an AI agent builds a game in Blender from one line">
+          <source src="videos/15-idea-to-game.webm" type="video/webm"><source src="media/demo.mp4" type="video/mp4">
+          <track kind="subtitles" src="videos/15-idea-to-game.vtt" srclang="en" label="English">
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tutorials">
+  <div class="wrap">
+    <div class="eyebrow reveal">Video tutorials</div>
+    <h2 class="reveal">Learn it click by click.</h2>
+    <p class="lead reveal">20 short lessons with a voiceover and captions, from installing the extension to publishing a game.</p>
+    <div class="tabs" role="tablist" aria-label="Lesson topics" hidden>
+      <button role="tab" aria-selected="true" aria-controls="t-start" id="tab-start">Getting started</button>
+      <button role="tab" aria-selected="false" aria-controls="t-world" id="tab-world">Building the world</button>
+      <button role="tab" aria-selected="false" aria-controls="t-game" id="tab-game">Making it a game</button>
+      <button role="tab" aria-selected="false" aria-controls="t-agent" id="tab-agent">Working with an AI agent</button>
+      <button role="tab" aria-selected="false" aria-controls="t-ship" id="tab-ship">Shipping</button>
+    </div>
+
+    <h3 class="no-js-group">Getting started</h3>
+    <div class="lessons" role="tabpanel" id="t-start" aria-labelledby="tab-start">
+      <a class="lesson" href="videos/index.html#01-install"><div class="thumb"><img src="videos/thumbs/01-install.jpg" alt="" loading="lazy"><span class="time">1:27</span></div><div class="body"><small>LESSON 01</small><strong>Install GameStudio</strong><span class="sub">From the zip to a ready extension</span></div></a>
+      <a class="lesson" href="videos/index.html#02-first-project"><div class="thumb"><img src="videos/thumbs/02-first-project.jpg" alt="" loading="lazy"><span class="time">1:39</span></div><div class="body"><small>LESSON 02</small><strong>Your first project</strong><span class="sub">New Project, a look around, and Play</span></div></a>
+      <a class="lesson" href="videos/index.html#03-edit-and-play"><div class="thumb"><img src="videos/thumbs/03-edit-and-play.jpg" alt="" loading="lazy"><span class="time">1:40</span></div><div class="body"><small>LESSON 03</small><strong>The edit and play loop</strong><span class="sub">Change the level, play it, change it again</span></div></a>
+      <a class="lesson" href="videos/index.html#04-claude-code"><div class="thumb"><img src="videos/thumbs/04-claude-code.jpg" alt="" loading="lazy"><span class="time">1:41</span></div><div class="body"><small>LESSON 04</small><strong>Build with Claude Code</strong><span class="sub">Describe what you want and watch Blender build it</span></div></a>
+    </div>
+
+    <h3 class="no-js-group">Building the world</h3>
+    <div class="lessons" role="tabpanel" id="t-world" aria-labelledby="tab-world">
+      <a class="lesson" href="videos/index.html#05-kit-props"><div class="thumb"><img src="videos/thumbs/05-kit-props.jpg" alt="" loading="lazy"><span class="time">1:45</span></div><div class="body"><small>LESSON 05</small><strong>Props from kits</strong><span class="sub">Add game-ready props, change them, colour and place them</span></div></a>
+      <a class="lesson" href="videos/index.html#06-procedural-world"><div class="thumb"><img src="videos/thumbs/06-procedural-world.jpg" alt="" loading="lazy"><span class="time">1:28</span></div><div class="body"><small>LESSON 06</small><strong>A procedural world in two minutes</strong><span class="sub">Forests, paths, rivers and cliffs that stay editable</span></div></a>
+      <a class="lesson" href="videos/index.html#07-asset-libraries"><div class="thumb"><img src="videos/thumbs/07-asset-libraries.jpg" alt="" loading="lazy"><span class="time">1:59</span></div><div class="body"><small>LESSON 07</small><strong>Asset libraries and prefabs</strong><span class="sub">Make props once, place copies, edit them all at once</span></div></a>
+      <a class="lesson" href="videos/index.html#08-make-it-pretty"><div class="thumb"><img src="videos/thumbs/08-make-it-pretty.jpg" alt="" loading="lazy"><span class="time">1:53</span></div><div class="body"><small>LESSON 08</small><strong>Make it pretty</strong><span class="sub">A sea, a sunset and fog, without code</span></div></a>
+    </div>
+
+    <h3 class="no-js-group">Making it a game</h3>
+    <div class="lessons" role="tabpanel" id="t-game" aria-labelledby="tab-game">
+      <a class="lesson" href="videos/index.html#09-first-component"><div class="thumb"><img src="videos/thumbs/09-first-component.jpg" alt="" loading="lazy"><span class="time">1:53</span></div><div class="body"><small>LESSON 09</small><strong>Your first component and system</strong><span class="sub">Write game behaviour in TypeScript</span></div></a>
+      <a class="lesson" href="videos/index.html#10-menus-and-hud"><div class="thumb"><img src="videos/thumbs/10-menus-and-hud.jpg" alt="" loading="lazy"><span class="time">1:57</span></div><div class="body"><small>LESSON 10</small><strong>Menus and HUD made in Blender</strong><span class="sub">Lay out the game's screens, no code needed</span></div></a>
+      <a class="lesson" href="videos/index.html#11-animated-character"><div class="thumb"><img src="videos/thumbs/11-animated-character.jpg" alt="" loading="lazy"><span class="time">1:57</span></div><div class="body"><small>LESSON 11</small><strong>A character that walks and jumps</strong><span class="sub">A rigged character, its clips, and Locomotion</span></div></a>
+      <a class="lesson" href="videos/index.html#12-enemies-navmesh"><div class="thumb"><img src="videos/thumbs/12-enemies-navmesh.jpg" alt="" loading="lazy"><span class="time">2:01</span></div><div class="body"><small>LESSON 12</small><strong>Enemies that chase you</strong><span class="sub">A NavMesh, a NavAgent and a few lines of code</span></div></a>
+      <a class="lesson" href="videos/index.html#13-more-levels"><div class="thumb"><img src="videos/thumbs/13-more-levels.jpg" alt="" loading="lazy"><span class="time">1:49</span></div><div class="body"><small>LESSON 13</small><strong>More than one level</strong><span class="sub">A second level, the start level, and a goal that loads it</span></div></a>
+      <a class="lesson" href="videos/index.html#14-sound-and-music"><div class="thumb"><img src="videos/thumbs/14-sound-and-music.jpg" alt="" loading="lazy"><span class="time">1:51</span></div><div class="body"><small>LESSON 14</small><strong>Sound and music</strong><span class="sub">Sounds on objects, music, and the player's volume sliders</span></div></a>
+    </div>
+
+    <h3 class="no-js-group">Working with an AI agent</h3>
+    <div class="lessons" role="tabpanel" id="t-agent" aria-labelledby="tab-agent">
+      <a class="lesson" href="videos/index.html#15-idea-to-game"><div class="thumb"><img src="videos/thumbs/15-idea-to-game.jpg" alt="" loading="lazy"><span class="time">2:00</span></div><div class="body"><small>LESSON 15</small><strong>From one line to a playable game</strong><span class="sub">An agent builds a game in Blender from one brief</span></div></a>
+      <a class="lesson" href="videos/index.html#16-playtest-and-fix"><div class="thumb"><img src="videos/thumbs/16-playtest-and-fix.jpg" alt="" loading="lazy"><span class="time">1:32</span></div><div class="body"><small>LESSON 16</small><strong>Playtest and fix</strong><span class="sub">The agent plays your level, finds what's wrong and fixes it</span></div></a>
+      <a class="lesson" href="videos/index.html#17-staying-in-control"><div class="thumb"><img src="videos/thumbs/17-staying-in-control.jpg" alt="" loading="lazy"><span class="time">1:48</span></div><div class="body"><small>LESSON 17</small><strong>Staying in control</strong><span class="sub">Protect, pause, undo, and trust only what you know</span></div></a>
+      <a class="lesson" href="videos/index.html#18-codex"><div class="thumb"><img src="videos/thumbs/18-codex.jpg" alt="" loading="lazy"><span class="time">1:54</span></div><div class="body"><small>LESSON 18</small><strong>Using Codex instead of Claude Code</strong><span class="sub">Switch the coding agent and build with Codex</span></div></a>
+    </div>
+
+    <h3 class="no-js-group">Shipping</h3>
+    <div class="lessons" role="tabpanel" id="t-ship" aria-labelledby="tab-ship">
+      <a class="lesson" href="videos/index.html#19-publish-web"><div class="thumb"><img src="videos/thumbs/19-publish-web.jpg" alt="" loading="lazy"><span class="time">2:02</span></div><div class="body"><small>LESSON 19</small><strong>Publish your game to the web</strong><span class="sub">Build Web, the dist folder, and a test in a browser</span></div></a>
+      <a class="lesson" href="videos/index.html#20-save-template"><div class="thumb"><img src="videos/thumbs/20-save-template.jpg" alt="" loading="lazy"><span class="time">1:35</span></div><div class="body"><small>LESSON 20</small><strong>Save your game as a template</strong><span class="sub">Start new games from one of your own</span></div></a>
+    </div>
+
+    <p style="margin:32px 0 0"><a class="more" href="videos/index.html">Open the full video gallery →</a></p>
+  </div>
+</section>
+
+<section id="docs">
+  <div class="wrap">
+    <div class="eyebrow reveal">Documentation</div>
+    <h2 class="reveal">Everything, written down.</h2>
+    <div class="docs-grid">
+      <div class="doc reveal">
+        <h3><a href="manual.html">The illustrated user manual</a></h3>
+        <p>From installation to publishing, with screenshots. One page you can also read offline.</p>
+        <ul>
+          <li><a href="manual.html#chapter-01-installation--installation-and-setup">Installation and setup</a></li>
+          <li><a href="manual.html#chapter-02-editor--the-editor-and-play-controls">The editor and play controls</a></li>
+          <li><a href="manual.html#chapter-03-first-game--your-first-game">Your first game</a></li>
+          <li><a href="manual.html#chapter-04-projects--projects-and-templates">Projects and templates</a></li>
+          <li><a href="manual.html#chapter-05-gameplay--components-and-game-logic">Components and game logic</a></li>
+          <li><a href="manual.html#chapter-06-assets--assets-and-rendering">Assets and rendering</a></li>
+          <li><a href="manual.html#chapter-07-interface--menus-huds-and-audio">Menus, HUDs and audio</a></li>
+          <li><a href="manual.html#chapter-08-agents--working-with-coding-agents">Working with coding agents</a></li>
+          <li><a href="manual.html#chapter-09-publishing--testing-and-web-builds">Testing and web builds</a></li>
+          <li><a href="manual.html#chapter-10-reference--troubleshooting-and-reference">Troubleshooting and reference</a></li>
+        </ul>
+      </div>
+      <div class="doc reveal">
+        <h3>Reference</h3>
+        <p>For developers, and for the agents themselves. These open on GitHub.</p>
+        <ul>
+          <li><a href="https://github.com/abuurka/gamestudio/blob/main/docs/MCP.md">MCP tools <span>All 64, and connecting any client</span></a></li>
+          <li><a href="https://github.com/abuurka/gamestudio/blob/main/runtime/packages/engine/API.md">Engine API <span>Components, systems, physics, shaders</span></a></li>
+          <li><a href="https://github.com/abuurka/gamestudio/blob/main/docs/GAME-UI.md">Game UI <span>Menus and HUDs made in Blender</span></a></li>
+          <li><a href="https://github.com/abuurka/gamestudio/blob/main/docs/TEMPLATES.md">Templates <span>The built-in ones, and your own</span></a></li>
+          <li><a href="https://github.com/abuurka/gamestudio/blob/main/docs/WORKFLOWS.md">Workflows <span>Making games with an agent</span></a></li>
+          <li><a href="https://github.com/abuurka/gamestudio/blob/main/docs/ARCHITECTURE.md">Architecture <span>How the pieces fit together</span></a></li>
+          <li><a href="https://github.com/abuurka/gamestudio/blob/main/CHANGELOG.md">Changelog <span>What's new</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="start" style="padding-top:20px">
+  <div class="wrap">
+    <div class="eyebrow reveal">Quick start</div>
+    <h2 class="reveal">Playing in four steps.</h2>
+    <ol class="steps">
+      <li class="reveal"><strong>Install</strong>Download the zip, then in Blender 5.2+: Edit › Preferences › Get Extensions › Install from Disk. It sets up the rest after one question.</li>
+      <li class="reveal"><strong>Start a project</strong>GameStudio › New Project and pick a template, or open the demo game from GameStudio › Examples.</li>
+      <li class="reveal"><strong>Connect your agent</strong>Open in Claude Code or Open in Codex does it in one click; <a href="https://github.com/abuurka/gamestudio/blob/main/docs/MCP.md#other-agents">any other MCP client</a> starts the project's server.</li>
+      <li class="reveal"><strong>Press F5</strong>Describe your game, watch it appear, and play it right in Blender. Change anything, by hand or by asking.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="box reveal">
+      <h2>Start building <span class="grad">today.</span></h2>
+      <p>Free and open source, for Blender 5.2 or newer. Bring your own AI agent.</p>
+      <div class="ctas">
+        <a class="btn primary" href="https://github.com/abuurka/gamestudio/releases/latest">Download GameStudio</a>
+        <a class="btn" href="https://github.com/abuurka/gamestudio">View on GitHub</a>
+        <a class="btn" href="manual.html">Read the manual</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div><img src="images/logo-dark.svg" alt="GameStudio" width="313" height="64"><p>Let your AI agent build your game inside Blender.</p></div>
+      <div><h4>Product</h4><ul><li><a href="https://github.com/abuurka/gamestudio/releases/latest">Download</a></li><li><a href="videos/index.html">Tutorials</a></li><li><a href="manual.html">Manual</a></li><li><a href="https://github.com/abuurka/gamestudio/blob/main/CHANGELOG.md">Changelog</a></li></ul></div>
+      <div><h4>Developers</h4><ul><li><a href="https://github.com/abuurka/gamestudio">GitHub</a></li><li><a href="https://github.com/abuurka/gamestudio/blob/main/docs/MCP.md">MCP tools</a></li><li><a href="https://github.com/abuurka/gamestudio/blob/main/runtime/packages/engine/API.md">Engine API</a></li><li><a href="https://github.com/abuurka/gamestudio/blob/main/docs/ARCHITECTURE.md">Architecture</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="https://github.com/abuurka/gamestudio/blob/main/LICENSE.md">Licences</a></li><li><a href="fonts/Inter-OFL.txt">Font licence</a></li></ul></div>
+    </div>
+    <div class="legal">
+      <p>The extension is GPL-3.0-or-later; the game runtime is MIT; template code is MIT-0 and the starter's assets are CC0. Set in Inter (SIL Open Font License). Promo music: "Building Worlds", made with Suno.</p>
+      <p>GameStudio is based on Blender's open source code. Blender is a trademark of the Blender Foundation, and GameStudio is not affiliated with or endorsed by it.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // the nav gets a glass background once the page scrolls
+  var nav = document.getElementById('nav');
+  function onScroll() { nav.classList.toggle('scrolled', window.scrollY > 24); }
+  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+  // reveal on scroll, and play the silent loops only while they are on screen
+  var videos = [].slice.call(document.querySelectorAll('video[data-autoplay]'));
+  if ('IntersectionObserver' in window) {
+    var seen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); seen.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal').forEach(function (el) { seen.observe(el); });
+    var play = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (reduce) return;
+        if (e.isIntersecting) { var p = e.target.play(); if (p && p.catch) p.catch(function () {}); }
+        else e.target.pause();
+      });
+    }, { threshold: 0.25 });
+    videos.forEach(function (v) { play.observe(v); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+  }
+
+  // lesson tabs (without script every group shows, under its heading)
+  var tabs = [].slice.call(document.querySelectorAll('[role="tab"]'));
+  if (tabs.length) {
+    document.querySelector('.tabs').hidden = false;
+    document.querySelectorAll('.no-js-group').forEach(function (h) { h.hidden = true; });
+    function select(tab) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { select(t); });
+      t.addEventListener('keydown', function (e) {
+        var k = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (k) { var n = tabs[(i + k + tabs.length) % tabs.length]; select(n); n.focus(); }
+      });
+    });
+    select(tabs[0]);
+  }
+
+  // the promo starts muted (browsers only autoplay silent video); the button turns its music on
+  var promo = document.getElementById('promo'), sound = document.getElementById('sound');
+  if (promo && sound) {
+    var started = false;
+    sound.addEventListener('click', function () {
+      var on = promo.muted;
+      promo.muted = !on;
+      if (on && !started) { promo.currentTime = 0; started = true; }
+      if (on) { var p = promo.play(); if (p && p.catch) p.catch(function () {}); }
+      sound.setAttribute('aria-pressed', on);
+      sound.querySelector('span').textContent = on ? 'Sound off' : 'Sound on';
+    });
+  }
+
+  // Blender / browser comparison
+  var box = document.getElementById('compare');
+  if (box) {
+    var range = box.querySelector('input');
+    range.addEventListener('input', function () { box.style.setProperty('--pos', range.value + '%'); });
+  }
+})();
+</script>
+</body>
+</html>

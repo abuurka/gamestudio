@@ -1,0 +1,73 @@
+{
+  "description": "Real demonstration screenshots visually reviewed for publication without personal information. Hash changes require a fresh review.",
+  "images": [
+    {
+      "path": "docs/images/extension/01-welcome.png",
+      "sha256": "5881a59e6d75c0680e5a5bd474eed84ee775d3008960e6406f8fb015ed787812"
+    },
+    {
+      "path": "docs/images/extension/03-game-workspace.png",
+      "sha256": "9cbedc1957997e92d161e62b99dedd0834b94f623da7efaccb8f5b20531d4aa1"
+    },
+    {
+      "path": "docs/images/extension/04-object-game.png",
+      "sha256": "d2cb099f988c87bffcc61cddd4a746ec8bcb1ac435124413cc07bd957e0aba90"
+    },
+    {
+      "path": "docs/images/extension/06-console.png",
+      "sha256": "343488d04064f09e0df9b044519512913aae673abd54a1d46765a2868791ac26"
+    },
+    {
+      "path": "docs/images/extension/08-claude-connected.png",
+      "sha256": "552986a10c0fddd56e2308a778a33fdcafc04d5b68bfbbca9383321f8669eeec"
+    },
+    {
+      "path": "docs/images/extension/09-agent-popover.png",
+      "sha256": "fca2fcdc8c6e7f1f3b6c2c9b42e2c9140f6ef6c8e9d1baf01d5a4b825cb33c37"
+    },
+    {
+      "path": "docs/images/extension/10-game-assets.png",
+      "sha256": "a03c9f750e455daa1ba30b932fc1794408252430ff3ef592611f6f0ca60c5df1"
+    },
+    {
+      "path": "docs/images/extension/embedded-play.png",
+      "sha256": "509b956aa1a12dc468127f847ad293777a47f1ff98304a13d7e19fea984f2aec"
+    },
+    {
+      "path": "docs/images/procedural-valley-game.png",
+      "sha256": "73594c387ee13d365f345fad42cd02ef11fadbc9e2fa0c04e43c31bda3347aea"
+    },
+    {
+      "path": "docs/images/render-views-sheet.png",
+      "sha256": "15f3be9a06b59c26b235bc68dfd959d93ecd70acdc16bffae23ca8fc2e1be9cc"
+    },
+    {
+      "path": "docs/images/shaders/dissolve.png",
+      "sha256": "89b7ec1a68fc149ecd2ed3acb82c6ebc940564774419a6498dc6826b15903790"
+    },
+    {
+      "path": "docs/images/shaders/foliage-sway.png",
+      "sha256": "c3902e5dc10032ed45dbf31ae8606263caa462c42bc424870cfe1d95e0ddb585"
+    },
+    {
+      "path": "docs/images/shaders/water.png",
+      "sha256": "03188867ea604f2a46afc831b03af04b01a03ee8552886f9f580eb587e87b0a9"
+    },
+    {
+      "path": "docs/images/templates/driving.png",
+      "sha256": "3fcd37261ca18d291c23cf4b37b2a0a59bfed6b02d7c815a76f7ac7db9a643e6"
+    },
+    {
+      "path": "docs/images/templates/platformer.png",
+      "sha256": "066b82bf14f7c0e4faa7b8843d6e1fab67c26c7f9d515ed5bfd1ffdfc8087f37"
+    },
+    {
+      "path": "docs/images/templates/runner.png",
+      "sha256": "07601c043055c92b50334f0704b84534a365054a2a0de628774113394bee27d1"
+    },
+    {
+      "path": "docs/images/templates/shooter.png",
+      "sha256": "ac059d25c48858a4fe5c850a6e92f19dfab57102fe763590943a53333075b8ea"
+    }
+  ]
+}
