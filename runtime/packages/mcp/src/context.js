@@ -47,7 +47,7 @@ export class Context {
     if (!this.root) {
       throw new ToolError('No GameStudio project: the MCP server was not started inside a project folder (one with gamestudio.json).', {
         code: 'no_project',
-        hint: 'Start Claude Code in the game project folder, or pass --project <dir> to gamestudio-mcp in .mcp.json.',
+        hint: 'Start the coding agent in the game project folder, or pass --project <dir> to gamestudio-mcp in its MCP settings (.mcp.json for Claude Code, .codex/config.toml for Codex).',
       });
     }
     return this.root;

@@ -1,8 +1,9 @@
 # GameStudio architecture
 
-GameStudio lets **Claude Code build games inside Blender**. One app, Blender with the GameStudio
+GameStudio lets **a coding agent build games inside Blender**: Claude Code or Codex in one click,
+or any other MCP client. One app, Blender with the GameStudio
 extension, holds the 3D assets, the levels and the game objects. A TypeScript runtime plays the game
-in a browser. An MCP server gives Claude Code one set of tools across all of it, so the agent never
+in a browser. An MCP server gives the agent one set of tools across all of it, so the agent never
 switches between a modeling tool, an engine and an editor, and it can always see and test what it
 built.
 
@@ -25,7 +26,8 @@ Every step has a tool, and every tool returns something the agent can check:
 - game state;
 - a log line with file and line.
 
-The Claude Code skills that ship in each project (`.claude/skills/`) walk the loop for common tasks:
+The skills that ship in each project (`.claude/skills/`, copied to `.agents/skills/` for Codex) walk
+the loop for common tasks:
 - `new-game-from-brief`
 - `blockout-level`
 - `make-prop`
@@ -34,6 +36,7 @@ The Claude Code skills that ship in each project (`.claude/skills/`) walk the lo
 - `animate-character`
 - `playtest-and-fix`
 - `stylize-scene`
+- `design-ui`
 - `prepare-for-web`
 - `make-template`
 
@@ -45,13 +48,13 @@ The Claude Code skills that ship in each project (`.claude/skills/`) walk the lo
 | Agent bridge | `blender/gamestudio/bridge/` | Python | Localhost JSON-RPC server inside Blender (token handshake, main-thread execution, one undo step per change, checkpoints) |
 | Asset kits | `blender/gamestudio/kits/` | Python | 22 parametric generators for game-ready assets (props, terrain, water, sky, a rigged character with clips, and assemblies with named parts: vehicle, weapon, projectile, door, switch) and a 27-preset material palette |
 | Procedural toolkit | `blender/gamestudio/procedural/` | Python | Geometry-nodes builders made in code: scatter, objects along curves, roads, fences, rivers, cliffs, rock walls, modular buildings; their inputs stay editable |
-| MCP server | `runtime/packages/mcp/` | Node, MIT | Launched by Claude Code from the project's `.mcp.json`. Turns tool calls into bridge, hub and headless-browser actions. 64 tools; see `docs/MCP.md` |
+| MCP server | `runtime/packages/mcp/` | Node, MIT | Launched by the coding agent: Claude Code from the project's `.mcp.json`, Codex from `.codex/config.toml`. Turns tool calls into bridge, hub and headless-browser actions. 64 tools; see `docs/MCP.md` |
 | Engine | `runtime/packages/engine/` | TypeScript, MIT | ECS on three.js and Rapier: components, systems, game shaders on Blender materials (with a library of 31), Animator, Locomotion, AudioSource, prefabs (`ctx.spawn`), timers, HUD, UI screens, particles and post effects, seeded `ctx.random`, levels (`ctx.loadScene`) and saves, animation state machines, navigation meshes (Recast), lightmaps, 2.5D (axis locks, plane modes, orthographic and side cameras) |
 | Dev server | `runtime/packages/devserver/` | Node, MIT | Vite plugin: hot reload, component registry, the live-link hub between Blender, games and the MCP server |
 | Stream host | `runtime/packages/devserver/bin/gamestudio-stream.js` | Node, MIT | Play in Blender: runs the game in headless Edge or Chrome, or the Chrome Headless Shell GameStudio downloads when neither is installed (GPU, sound on), and sends its frames to Blender over TCP; Blender sends input back (`blender/gamestudio/core/stream.py`) |
 
 ```
- Claude Code ──stdio──► @gamestudio/mcp ──TCP + token──► Blender + extension (bridge)
+ Your agent  ──stdio──► @gamestudio/mcp ──TCP + token──► Blender + extension (bridge)
                               │                                  │ export .glb + manifest
                               ├──TCP──► dev-server hub ◄─────────┘ live edits
                               │              ▲
@@ -104,7 +107,7 @@ Mac with only Safari, a bare Linux): `devserver/bin/gamestudio-browser.js instal
 folder>/browser` fetches the build puppeteer-core is made for (155.0.8059.39; 100–125 MB per
 platform, SHA-256 pinned) with `@puppeteer/browsers`, runs it once (`--version`) and only then writes
 `browser.json`, the marker discovery looks for in `GAMESTUDIO_BROWSER_DIR` and in the GameStudio
-user folder of every Blender profile (so the MCP server, started by Claude Code without Blender's
+user folder of every Blender profile (so the MCP server, started by the agent without Blender's
 environment, finds it too). The shell has no window (the host's `offscreen` mode becomes headless)
 and draws with SwiftShader unless asked for the GPU, so both get `--enable-gpu` for it: then it uses
 the platform's own backend (D3D11 on Windows, Metal on macOS; on an RTX 4070, 60 fps at 960x540),
@@ -127,7 +130,8 @@ my-game/
   AGENTS.md              conventions and the loop, for the coding agent (Claude Code or Codex)
   CLAUDE.md              @AGENTS.md, plus Claude Code's own notes
   .claude/skills/        workflows; .claude/settings.json pre-approves the read-only tools
-  .mcp.json              starts @gamestudio/mcp
+  .mcp.json              starts @gamestudio/mcp for Claude Code
+  .codex/config.toml     the same for Codex, with .agents/skills/ (Open in Codex adds them)
   .gamestudio/           generated: exports, registry, logs, checkpoints, discovery files
 ```
 
@@ -136,7 +140,7 @@ my-game/
   never by editing bytes.
 - **Behaviour data:** components stored on Blender objects, defined by TypeScript schemas
   (`defineComponent`). The registry the dev server generates keeps both sides in step.
-- **Logic:** TypeScript systems, edited directly by Claude Code and hot-reloaded.
+- **Logic:** TypeScript systems, edited directly by the coding agent and hot-reloaded.
 - **Look:** Blender owns meshes, UVs, materials and static colour. A material can name a game shader
   (`defineShader` in `src/shaders/`) for what moves or reacts in the game; the engine applies it
   wherever the material is drawn, so code never finds materials by name. The engine's shader library
@@ -168,15 +172,16 @@ my-game/
 ## 5. Safety
 
 - The bridge listens on 127.0.0.1 only and requires the per-session token from the discovery file.
-- `run_python` can do anything Blender's Python can, so it is never pre-approved. Claude Code asks
-  before each call. Every call is one undo step and rolls back on error.
+- `run_python` can do anything Blender's Python can, so the project never pre-approves it: Claude Code
+  asks before each call, and Codex follows its own approval settings. Every call is one undo step and
+  rolls back on error.
 - `checkpoint` and `restore_checkpoint` give coarse rollback.
 - The person stays in control from Blender's **Agent panel** (`activity.py`, Game tab and status bar):
   - it shows each agent action live and logs it to `.gamestudio/agent-activity.jsonl`;
   - **Undo to Here** rewinds to just before any agent step;
   - **Pause** makes mutating calls fail with `paused_by_user` while reads keep working;
   - **Protect** locks objects against every tool, including `run_python`, which is rolled back if it touches one.
-- Claude Code's project settings pre-approve read-only tools and reversible edits: scene edits are undo steps, and asset-library writes are backed up first (`asset_library_restore` reverses them). `run_python`, `delete_objects`, `restore_checkpoint` and `open_scene` always ask.
+- Claude Code's project settings (`.claude/settings.json`) pre-approve read-only tools and reversible edits: scene edits are undo steps, and asset-library writes are backed up first (`asset_library_restore` reverses them). `run_python`, `delete_objects`, `restore_checkpoint` and `open_scene` always ask.
 - Tests and tools never touch the user's Blender profile: they always use a scratch profile.
 
 ## 6. History

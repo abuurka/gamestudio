@@ -58,7 +58,7 @@ my-game/
 
 `export` is optional; §4.6 lists its keys. `compression` is optional too, and §4.6 describes it. `post` is optional: screen effects for every scene, with the fields of the `PostEffects` component (§6.3); the dev server passes it to the game (§7.4), and a scene's `PostEffects` component replaces it for that scene.
 
-`template` is optional: the id of the project template New Project made the project from (the folder name in `blender/gamestudio/project_templates/` or in the user templates folder, e.g. `"shooter"`; see TEMPLATES.md), written once when the project is created. Open in Claude Code and Open in Codex add missing agent files (`AGENTS.md`, `CLAUDE.md`, `.claude/`, `.mcp.json`) from that template, composed with its base as New Project composes them; a project without it, or with a template this GameStudio does not have, gets the starter's. The same template's skills keep an existing project's `.claude/skills/` current when it opens (TEMPLATES.md, Instructions for coding agents). The runtime ignores it.
+`template` is optional: the id of the project template New Project made the project from (the folder name in `blender/gamestudio/project_templates/` or in the user templates folder, e.g. `"shooter"`; see TEMPLATES.md), written once when the project is created. Open in Claude Code and Open in Codex add missing agent files (`AGENTS.md`, `CLAUDE.md`, `.claude/`, and `.mcp.json` for Claude Code) from that template, composed with its base as New Project composes them; a project without it, or with a template this GameStudio does not have, gets the starter's. The same template's skills keep an existing project's `.claude/skills/` current when it opens (TEMPLATES.md, Instructions for coding agents). The runtime ignores it.
 
 `engine` is optional: the `@gamestudio/engine` version New Project made the project with, written once when the project is created (Save as Template leaves it out). Nothing reads it yet; it is there so a later GameStudio can tell which engine a project was written for. The runtime ignores it.
 
@@ -876,6 +876,6 @@ The **Scene view** is a 3D View that shows the level drawn by the game's rendere
 
 ### 7.5 Assistant tool bridge
 
-> Coding agents such as Claude Code now use the **agent bridge** instead (`docs/MCP.md`): the `@gamestudio/mcp` server talks to Blender directly over a token-protected localhost socket and acts without proposals, with undo steps and checkpoints. The hub path below remains for the in-Blender assistant's proposal workflow.
+> Coding agents (Claude Code, Codex or any other MCP client) now use the **agent bridge** instead (`docs/MCP.md`): the `@gamestudio/mcp` server talks to Blender directly over a token-protected localhost socket and acts without proposals, with undo steps and checkpoints. The hub path below remains for the in-Blender assistant's proposal workflow.
 
 `gamestudio/assistant/tools.py` keeps one tool registry, and the in-Blender agent loop and external MCP clients use the same one. External clients connect as `role: "tool"` to the hub and send `tool.list` and `tool.call`. The editor runs the call on its main thread and replies. Write tools only ever stage proposals, which the user applies with a click in Blender.

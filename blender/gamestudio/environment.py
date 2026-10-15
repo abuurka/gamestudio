@@ -19,10 +19,10 @@ Node.js or a browser by hand.
                   packages.
 
 ensure_ready(root, purpose, then) is the one readiness check. Play, the Scene view, New Project,
-Open Project (Open Recent, Examples), Open in Claude Code and loading a project's scene call it (the
-last one from a timer, check_later). With nothing missing it costs a few cached file checks and
-returns READY; else it starts the setup job, or asks first, and calls then(ok, message) when the job
-ends, so the action goes on: Play plays, the Scene view turns on, Claude Code opens.
+Open Project (Open Recent, Examples), Open in Claude Code, Open in Codex and loading a project's scene
+call it (the last one from a timer, check_later). With nothing missing it costs a few cached file
+checks and returns READY; else it starts the setup job, or asks first, and calls then(ok, message)
+when the job ends, so the action goes on: Play plays, the Scene view turns on, the coding agent opens.
 
 Consent: the first plan of a session that downloads anything asks once (GAMESTUDIO_OT_setup: what,
 about how big, where it goes). Local work (links, the registry, the copy after an update) never asks.

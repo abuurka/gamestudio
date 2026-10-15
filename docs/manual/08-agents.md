@@ -4,7 +4,7 @@
 
 ## What an agent does in GameStudio
 
-A coding agent can inspect the open Blender scene, create and change assets through GameStudio's MCP tools, edit project code, run the game and inspect screenshots or state. You can continue to edit manually and use the same project files.
+Any coding agent that supports MCP can inspect the open Blender scene, create and change assets through GameStudio's MCP tools, edit project code, run the game and inspect screenshots or state. Claude Code and Codex have one-click setup in the GameStudio menu; other MCP clients connect to the same server by hand. You can continue to edit manually and use the same project files.
 
 The **agent bridge** connects Blender to the project's MCP server. The MCP server also talks to the dev server and automated game browser. A connected bridge, a running dev server and a working browser are separate parts of the workflow; a failure in one does not necessarily mean the whole installation failed.
 
@@ -14,19 +14,21 @@ The **agent bridge** connects Blender to the project's MCP server. The MCP serve
 
 ## Connect from the project
 
+These steps use the one-click setup for Claude Code, the default, or Codex:
+
 1. Open the intended game project's level in Blender.
 2. Choose **GameStudio > Open in Claude Code** or **GameStudio > Open in Codex**.
-3. Follow the install prompt if the chosen tool is absent, and complete that tool's sign-in or project-trust flow when requested.
+3. Follow the install prompt if the chosen agent is absent, and complete that agent's sign-in or project-trust flow when requested.
 4. Let GameStudio prepare missing project integration files and enable the bridge.
 5. Ask the agent to inspect the project and summarize the open scene before making changes.
 
-The **Coding agent** preference chooses the default launcher and top-bar action. You can also start an already installed agent in the project folder yourself. GameStudio supplies `.mcp.json` for Claude Code and its Codex integration uses `.codex/config.toml`; see [MCP setup](../MCP.md) for the exact project configuration.
+The **Coding agent** preference (Claude Code unless you change it) chooses the default launcher and top-bar action. You can also start an already installed agent in the project folder yourself. GameStudio supplies `.mcp.json` for Claude Code and `.codex/config.toml` for Codex. Any other MCP client can start the same server over stdio from the project folder. See [MCP setup](../MCP.md) for the exact project configuration and the command for other agents.
 
 No authentication details are needed in a game brief or screenshot. Use the coding tool's own sign-in flow. Keep credentials out of project instructions, source code and shared diagnostics.
 
 ## Instructions and reusable skills
 
-New projects contain `AGENTS.md` for project conventions. `CLAUDE.md` imports that shared guidance for Claude Code. Workflow skills live under `.claude/skills/`, with copies under `.agents/skills/` for Codex.
+New projects contain `AGENTS.md` for project conventions, shared by every agent: Codex reads it, `CLAUDE.md` imports it for Claude Code, and you can give it to any other agent as its instructions. Workflow skills live under `.claude/skills/`, with copies under `.agents/skills/` for Codex; point other agents at `.claude/skills/`.
 
 | Workflow | Useful request |
 |---|---|

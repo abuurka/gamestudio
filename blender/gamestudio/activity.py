@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """What the agent does in Blender, and the person's controls over it.
 
-The agent (Claude Code, through the MCP server and the agent bridge) acts directly. This module
-keeps the person in charge; activity_ui.py draws it.
+The agent (Claude Code, Codex or another MCP client, through the MCP server and the agent bridge)
+acts directly. This module keeps the person in charge; activity_ui.py draws it.
 
 * The activity log. Every bridge call passes through observe() (bridge.api.call_hook): its method,
   a short summary of its arguments, when it started, how long it took, ok or the error, and the

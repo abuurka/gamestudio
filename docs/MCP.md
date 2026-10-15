@@ -1,6 +1,6 @@
 # GameStudio for coding agents (MCP)
 
-`@gamestudio/mcp` is an [MCP](https://modelcontextprotocol.io) server that lets a coding agent such as Claude Code or Codex work on a GameStudio game in a closed loop: **build** assets and levels in Blender, **play** the game, **look** at it, **measure** it, and **fix** it. The agent writes the game's TypeScript itself; the server gives it Blender and the running game.
+`@gamestudio/mcp` is an [MCP](https://modelcontextprotocol.io) server that lets a coding agent (Claude Code, Codex or any other MCP client) work on a GameStudio game in a closed loop: **build** assets and levels in Blender, **play** the game, **look** at it, **measure** it, and **fix** it. The agent writes the game's TypeScript itself; the server gives it Blender and the running game.
 
 Agents **act directly**. Nothing waits for a click. What protects your work:
 
@@ -18,7 +18,7 @@ The in-Blender assistant ([AI-ASSISTANT.md](AI-ASSISTANT.md)) is separate and ke
 ## How it fits together
 
 ```
-Claude Code ──stdio (MCP)──> gamestudio-mcp (Node, runs in the project folder)
+Your agent  ──stdio (MCP)──> gamestudio-mcp (Node, runs in the project folder)
                                │
                                ├─ TCP 127.0.0.1, NDJSON JSON-RPC + token ──> Blender: GameStudio extension, agent bridge
                                │                                             (scene, assets, components, export)
@@ -36,7 +36,7 @@ Claude Code ──stdio (MCP)──> gamestudio-mcp (Node, runs in the project f
 ## Setup
 
 1. **Install GameStudio and enable the extension in Blender (5.2+).** The **Agent bridge (MCP)** preference (Edit > Preferences > Add-ons > GameStudio > Agent bridge) is **on by default**. The same box shows the port and the number of connected clients.
-2. **Register the server with Claude Code.** New projects ship a `.mcp.json`; Claude Code starts the server with the project as its working directory:
+2. **Register the server with your agent.** New projects ship a `.mcp.json` for Claude Code, which starts the server with the project as its working directory (Codex: [below](#codex); any other MCP client: [Other agents](#other-agents)):
 
    ```json
    {
@@ -127,7 +127,7 @@ Results are compact by default: the essentials, with a `hint` saying how to get 
 | `list_checkpoints` | R | `limit?` | Newest first. |
 | `restore_checkpoint` | D | `id`, `backup?` (default true) | Opens the checkpoint and saves it over the scene it came from. The current state is checkpointed first (`before restore <id>`). |
 | `undo` / `redo` | W | `steps?` | Blender's undo stack. The history starts when a file is opened (`launch_blender`, `open_scene`, `restore_checkpoint`) and keeps the last 32 steps (Preferences > System > Undo Steps); `save` keeps it. The first change after opening a file can be undone, in a background session too. Past the start, `undo` says so and points at `restore_checkpoint`. Undo changes Blender, not the last export: the game, and `game_screenshot` in mode `game`, keep what was exported until the next `play`, `playtest` (unless `export: false`) or `export_scene`, which exports the undone state as a full export (the export journal treats undo and redo as a change to anything). With the live link on, a running game also gets the undone transforms and component values right away. |
-| `save_template` | W | `id`, `label?`, `description?`, `overwrite?` | Saves the project as a template that New Project lists under "Your templates" ([TEMPLATES.md](TEMPLATES.md)): `src/`, `scenes/`, `assets/`, `.claude/` (custom skills included) and the project files, copied to `Documents/GameStudio/Templates/<id>/` (or `GAMESTUDIO_TEMPLATES`) with the game's name and package paths turned back into placeholders. Writes nothing in the project and is no undo step. Refuses unsaved changes, a built-in id, and an existing template unless `overwrite`; the template it overwrites moves to `.backups/<id>@<time>` (five kept). Returns `path`, `placeholders`, `left_out`, `warnings` and `replaced` (the backup, or null). |
+| `save_template` | W | `id`, `label?`, `description?`, `overwrite?` | Saves the project as a template that New Project lists under "Your templates" ([TEMPLATES.md](TEMPLATES.md)): `src/`, `scenes/`, `ui/`, `assets/`, `.claude/` (custom skills included), `.codex/` and `.agents/` (without GameStudio's copies of the skills) and the project files, copied to `Documents/GameStudio/Templates/<id>/` (or `GAMESTUDIO_TEMPLATES`) with the game's name and package paths turned back into placeholders. Writes nothing in the project and is no undo step. Refuses unsaved changes, a built-in id, and an existing template unless `overwrite`; the template it overwrites moves to `.backups/<id>@<time>` (five kept). Returns `path`, `placeholders`, `left_out`, `warnings` and `replaced` (the backup, or null). |
 
 ```json
 {"name": "checkpoint", "arguments": {"label": "before terrain rework"}}
@@ -867,7 +867,7 @@ save
 - **Who can connect.** The token is in `<project>/.gamestudio/blender.json` and in the extension's user folder. Anything running as you can read them, the same trust level as the dev server's `session.json`. Other users on the machine cannot read your profile. The game's dev server does not serve `.gamestudio/` (nor `.claude/`, `.codex/` or `.agents/`), so the game's page and other local web pages cannot read the tokens.
 - **Trusted projects.** GameStudio runs a project's own code (its npm scripts and packages, its `tools/` scripts, the game's dev server) only once the project is trusted. Projects you create or copy, your recent projects and projects Blender would auto-run scripts for are trusted; any other project asks once (GameStudio › Trust This Project). A call from an agent never asks: it is refused with a message to pass on to you.
 - **Turning it off.** Untick **Agent bridge (MCP)** in the add-on preferences, and the bridge stops and removes its discovery files. Blender never starts the bridge by itself in `--background`. A Blender launched by `launch_blender` starts it even when the preference is off, because it was started for the agent.
-- **`run_python`** is full code execution in Blender (see above). In Claude Code, keep it out of the auto-approved tools so you see each call. The template's `.claude/settings.json` pre-approves read tools, checkpoints and play controls, not `run_python`, `delete_objects` or `restore_checkpoint`.
+- **`run_python`** is full code execution in Blender (see above). Keep it out of your agent's auto-approved tools so you see each call. For Claude Code, the template's `.claude/settings.json` pre-approves read tools, checkpoints, play controls and the scene edits that are one undo step, not `run_python`, `delete_objects` or `restore_checkpoint`. GameStudio writes no approvals for Codex, so Codex's own approval settings apply.
 - **What the server touches.** Blender, the dev server's hub on 127.0.0.1, and headless browser pages on the dev server's `localhost` URL. Headless pages use a throw-away browser profile. Nothing goes to the internet.
 - **Safety nets.** Locked (protected) objects stay locked to every tool, `run_python` included. **Pause** in the Agent panel refuses every change until you resume. Every scene edit is an undo step; every library write is backed up first (the last 20 per library) and `asset_library_restore` takes it back. `restore_checkpoint` checkpoints the current state first.
 

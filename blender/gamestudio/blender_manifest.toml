@@ -24,7 +24,7 @@ platforms = ["windows-x64", "windows-arm64", "macos-x64", "macos-arm64", "linux-
 [permissions]
 network = "Localhost links, Node.js and npm downloads, optional AI chat"
 files = "Creates game projects and reads and writes their files"
-clipboard = "Copies starter prompts and install commands for Claude Code"
+clipboard = "Copies starter prompts and install commands for coding agents"
 
 [build]
 # tools/build_extension.py stages the zip (adding the runtime packages and the demo game);

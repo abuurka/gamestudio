@@ -7,18 +7,20 @@ platforms and permissions; the website takes the rest from this page. Build the 
 
 ## Name and tagline
 
-**GameStudio**: Make 3D web games in Blender with Claude Code
+**GameStudio**: Make 3D web games in Blender with your AI agent
 
 ## Short description
 
-Build browser games inside Blender. Claude Code makes the levels, props and gameplay through the
-GameStudio MCP server while you watch Blender update; press F5 to play the game in a TypeScript
-runtime built on three.js and Rapier.
+Build browser games inside Blender with your AI agent. Any MCP-capable coding agent makes the
+levels, props and gameplay through the GameStudio MCP server while you watch Blender update (Claude
+Code and Codex connect in one click); press F5 to play the game in a TypeScript runtime built on
+three.js and Rapier.
 
 ## Long description
 
-GameStudio turns Blender into a game studio that a coding agent can drive. You describe the game.
-Claude Code builds it in your open Blender: it blocks out the level, makes props, attaches game
+GameStudio turns Blender into a game studio that a coding agent can drive: Claude Code and Codex
+connect in one click, and any other MCP client can use the same server. You describe the game.
+The agent builds it in your open Blender: it blocks out the level, makes props, attaches game
 components to objects, writes the gameplay in TypeScript, plays the game in a headless browser,
 looks at the screenshots, and fixes what is wrong. You watch every change land in the viewport,
 press **F5** to play, and change anything by hand at any time.
@@ -32,23 +34,26 @@ The loop takes three steps:
 
 1. **Open a project.** New Project sets everything up (it downloads Node.js if you have none), or
    open the demo game.
-2. **Open it in Claude Code.** One click opens a terminal in the project running `claude`. The
-   project already has the MCP server configuration, an `AGENTS.md` with the conventions (read by Claude Code and Codex), and
-   skills for the common jobs.
+2. **Open it in your coding agent.** One click, **Open in Claude Code** or **Open in Codex**, opens
+   a terminal in the project running the agent, and installs the agent first if it is missing. The
+   project already has the MCP server configuration, an `AGENTS.md` with the conventions (read by
+   Claude Code and Codex), and skills for the common jobs.
 3. **Ask, watch, play.** "Make a small game where...", "Add a pickup that...", "Make the level
-   prettier". The status bar shows when Claude Code is connected.
+   prettier". The status bar shows when the agent is connected.
 
-Claude Code is optional. Everything it does is also a button, a menu item or a panel: components
+The agent is optional. Everything it does is also a button, a menu item or a panel: components
 in the Inspector, Play and live editing, export, the dev server and the web build.
 
 ## Features
 
-- **Open in Claude Code**: a terminal in the project folder running Claude Code, from the
-  GameStudio menu, the launcher or the Project tab. Missing agent files are added to older
-  projects, and starter prompts are one click away.
+- **Open in Claude Code** and **Open in Codex**: a terminal in the project folder running the
+  agent, from the GameStudio menu, the Project tab or the launcher (the **Coding agent** preference
+  picks the one the launcher and the top bar open). Missing agent files are added to older
+  projects, and starter prompts are one click away. Any other MCP client connects to the same
+  server.
 - **An agent bridge that is safe by default**: 127.0.0.1 only, a fresh token every session, every
   agent edit one undo step, checkpoints to roll back, and objects you lock are refused.
-- **40 MCP tools**: scene queries, kits, materials, components, export, play, scripted playtests,
+- **64 MCP tools**: scene queries, kits, materials, components, export, play, scripted playtests,
   game state, logs and labelled multi-view renders the agent checks its own work with.
 - **Play in one key**: F5 Play, F6 Pause, F7 Step, F8 Stop. Edits stream into the running game.
 - **Components on objects**: add, edit and remove game components in the Inspector (Game tab).
@@ -59,9 +64,10 @@ in the Inspector, Play and live editing, export, the dev server and the web buil
   assets with real-world scale, UVs and materials.
 - **Project templates**: starter, platformer, arena shooter, time trial and endless runner, plus a
   playable demo game. Save your own games as templates too.
-- **Claude Code skills in every project**: new game from a brief, block out a level, make a prop,
-  build a procedural world, add a mechanic, animate a character, playtest and fix, stylize the scene,
-  prepare for the web, save the game as a template.
+- **Agent skills in every project** (for Claude Code, with a copy for Codex): new game from a brief,
+  block out a level, make a prop, build a procedural world, add a mechanic, animate a character,
+  playtest and fix, stylize the scene, design menus and the HUD, prepare for the web, save the game
+  as a template.
 - **Web builds**: Build Web in the Project tab makes a static site you can host anywhere.
 - **Optional in-Blender AI assistant** that proposes changes for you to apply (needs an Anthropic
   API key; off by default).
@@ -70,27 +76,34 @@ in the Inspector, Play and live editing, export, the dev server and the web buil
 
 | Permission | Why |
 |---|---|
-| **Network** | The live link between Blender, the dev server and the running game, and the agent bridge, all on `localhost` only. Downloads: Node.js from nodejs.org (a pinned, checksum-verified LTS release) when the system has no Node.js 22.12+, and the project's npm packages. The optional AI assistant calls the Anthropic API when you ask it something. Downloads respect Preferences > System > Network > Allow Online Access. |
+| **Network** | The live link between Blender, the dev server and the running game, and the agent bridge, all on `localhost` only. Downloads: Node.js from nodejs.org (a pinned, checksum-verified LTS release) when the system has no Node.js 22.12+, the project's npm packages, a game browser (Chrome Headless Shell) when the system has no Chrome, Edge or Chromium, and, when you click Install, Claude Code or Codex through its maker's official installer. The optional AI assistant calls the Anthropic API when you ask it something. Downloads respect Preferences > System > Network > Allow Online Access. |
 | **Files** | Creates game projects in a folder you choose, and reads and writes their files: scenes, TypeScript, exports under `.gamestudio/`, checkpoints. Examples are copied to `Documents/GameStudio/Examples` before they open, so the installation is never changed. Settings and the shared runtime live in the extension's user folder. |
-| **Clipboard** | Copies a starter prompt or the Claude Code install command when you click its copy button. GameStudio never reads the clipboard. |
+| **Clipboard** | Copies a starter prompt or a coding agent's install command (Claude Code, Codex) when you click its copy button. GameStudio never reads the clipboard. |
 
 Programs it starts, only when you ask: Node.js and npm (installing packages, the dev server, the
-web build), your browser or an app window (Play), your code editor, and a terminal running Claude
-Code (Open in Claude Code). Claude Code then starts the GameStudio MCP server from the project's
-`.mcp.json`.
+web build), your browser or an app window (Play), your code editor, a terminal running Claude Code
+or Codex (Open in Claude Code, Open in Codex), and that agent's official installer when you click
+Install. The agent then starts the GameStudio MCP server from the project's `.mcp.json` (Claude
+Code) or `.codex/config.toml` (Codex).
 
 ## Requirements
 
 - **Blender 5.2 or newer**, on Windows, macOS or Linux (x64 or arm64).
 - **Node.js 22.12 or newer.** Optional: GameStudio downloads Node.js 24 LTS the first time it is
   needed if the system has none.
-- **Claude Code**: optional, recommended. It needs a Claude Pro, Max, Team or Enterprise plan, or a
-  Claude Console account. Install it with the official installer
-  ([code.claude.com/docs/en/setup](https://code.claude.com/docs/en/setup)); GameStudio finds it on
-  the PATH or where the installer puts it, and shows the install command if it is missing.
-- **Microsoft Edge or Google Chrome** for the agent's headless playtests and screenshots.
+- **A coding agent**: optional, recommended. Any MCP client works. Claude Code and Codex install in
+  one click from the GameStudio menu, with their makers' official installers, and GameStudio also
+  finds them on the PATH or where those installers put them:
+  - **Claude Code** ([code.claude.com/docs/en/setup](https://code.claude.com/docs/en/setup)) needs
+    a Claude Pro, Max, Team or Enterprise plan, or a Claude Console account;
+  - **Codex** ([developers.openai.com/codex/cli](https://developers.openai.com/codex/cli)) needs a
+    ChatGPT account or an OpenAI API key.
+
+  Any other MCP client can use the GameStudio MCP server too.
+- **Microsoft Edge, Google Chrome or Chromium** for Play and the agent's headless playtests and
+  screenshots. Optional: GameStudio downloads Chrome Headless Shell the first time if there is none.
 - An internet connection the first time (Node.js and npm packages); after that, everything runs
-  offline except Claude Code itself.
+  offline except the coding agent itself.
 
 ## Licence
 
