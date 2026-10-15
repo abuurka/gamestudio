@@ -333,7 +333,8 @@ _install_state = {"running": False, "message": ""}
 class GS_OT_ai_install_sdk(bpy.types.Operator):
     bl_idname = "gamestudio.ai_install_sdk"
     bl_label = "Install AI Support"
-    bl_description = "Download the Anthropic Python SDK (about 15 MB) into this add-on's folder"
+    bl_description = ("Download the Anthropic Python SDK (about 15 MB), which the Anthropic (Claude) provider "
+                      "needs, into this add-on's folder")
 
     @classmethod
     def poll(cls, context):

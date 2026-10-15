@@ -75,7 +75,7 @@ If this game taught a workflow worth repeating (add an enemy type, add a level s
 Read the result:
 
 - `placeholders`: the files where the game's name and package paths became placeholders, which New Project fills in for each new game. In code, only `title: "<name>"` is replaced; other strings may name objects.
-- `left_out`: top-level files and folders that were not copied. Only `src/`, `scenes/`, `ui/`, `assets/`, `public/`, `audio/`, `tools/`, `.claude/` and the project files travel. Move what a new game needs into one of them, then save again with `"overwrite": true`.
+- `left_out`: top-level files and folders that were not copied. Only `src/`, `scenes/`, `ui/`, `assets/`, `public/`, `audio/`, `tools/`, `.claude/`, `.codex/`, `.agents/` (your own Codex skills: GameStudio's copies of the skills stay behind) and the project files travel. Move what a new game needs into one of them, then save again with `"overwrite": true`.
 - `warnings`: a missing start scene, a library linked from outside the project, or a file that names this project's folder. Fix each one and save again.
 
 ## 7. Report

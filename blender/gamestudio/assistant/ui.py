@@ -11,8 +11,8 @@ import textwrap
 import bpy
 
 from ..prefs import get_prefs
-from . import deps, proposals
-from .agent import SESSION
+from . import deps, proposals, providers
+from .agent import SESSION, price_for
 from .ops import install_status
 from .proposals import STORE
 
@@ -53,9 +53,26 @@ def _narrow(context) -> bool:
     return context.region.width < 420 * ui_scale
 
 
-def _has_credentials(prefs) -> bool:
-    return bool(os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")
-                or prefs.api_key)
+def _key_hint(prefs) -> str:
+    """What to tell the developer about the API key, or "" when nothing is missing."""
+    if providers.provider(prefs) == providers.OPENAI:
+        if providers.is_local(providers.base_url(prefs)) or providers.openai_api_key(prefs):
+            return ""  # a server on this computer needs no key
+        return "Set OPENAI_API_KEY, or add a key in the add-on preferences."
+    if os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN") or prefs.api_key:
+        return ""
+    return "Set ANTHROPIC_API_KEY, or add a key in the add-on preferences."
+
+
+def _needs_sdk(prefs) -> bool:
+    """Only the Anthropic provider uses the SDK; the OpenAI-compatible one needs nothing installed."""
+    return providers.provider(prefs) == providers.ANTHROPIC and not deps.sdk_available()
+
+
+def _cost_text(prefs) -> str:
+    if SESSION.cost_unknown or price_for(providers.provider(prefs), providers.model(prefs)) is None:
+        return "cost unknown"
+    return f"${SESSION.cost:.3f}"
 
 
 class _AssistantPanel:
@@ -68,8 +85,9 @@ class _AssistantPanel:
 
 
 def ready() -> bool:
-    """True when the assistant is enabled and its SDK is installed."""
-    return bool(get_prefs().assistant_enabled and deps.sdk_available())
+    """True when the assistant is enabled and its provider has what it needs installed."""
+    prefs = get_prefs()
+    return bool(prefs.assistant_enabled and not _needs_sdk(prefs))
 
 
 def draw_setup(layout, context) -> bool:
@@ -84,20 +102,22 @@ def draw_setup(layout, context) -> bool:
         row.scale_y = 1.3
         row.operator("gamestudio.ai_enable", icon="CHECKMARK")
         return False
-    if not deps.sdk_available():
+    if _needs_sdk(prefs):
         layout.label(text="AI support is not installed", icon="ERROR")
-        draw_wrapped(_muted(layout), "The assistant needs the Anthropic Python SDK (about 15 MB).", width)
+        draw_wrapped(_muted(layout), "Claude needs the Anthropic Python SDK (about 15 MB). An OpenAI-compatible "
+                                     "provider, chosen in the add-on preferences, needs no install.", width)
         row = layout.row()
         row.scale_y = 1.3
         row.operator("gamestudio.ai_install_sdk", icon="IMPORT")
         if install_status():
             draw_wrapped(layout, install_status(), width)
         return False
-    if not bpy.app.online_access:
+    local = providers.provider(prefs) == providers.OPENAI and providers.is_local(providers.base_url(prefs))
+    if not bpy.app.online_access and not local:
         draw_wrapped(layout, "Online access is off (Preferences > System).", width, icon="ERROR")
-    if not _has_credentials(prefs):
-        draw_wrapped(layout, "Set ANTHROPIC_API_KEY, or add a key in the add-on preferences.",
-                     width, icon="KEYINGSET")
+    hint = _key_hint(prefs)
+    if hint:
+        draw_wrapped(layout, hint, width, icon="KEYINGSET")
     return True
 
 
@@ -131,7 +151,7 @@ def draw_prompt(layout, context, lines: int = 3) -> None:
     status.label(text=SESSION.status, icon="SORTTIME" if SESSION.busy else "NONE")
     meta = status.row()
     meta.alignment = "RIGHT"
-    meta.label(text=f"{prefs.model}  ${SESSION.cost:.3f}")
+    meta.label(text=f"{providers.model(prefs)}  {_cost_text(prefs)}")
 
 
 def draw_main(layout, context) -> None:

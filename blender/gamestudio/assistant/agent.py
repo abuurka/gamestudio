@@ -14,6 +14,9 @@ Threading model (research/04 section 9):
 The loop is a manual tool-use loop rather than the SDK tool runner. Write tools
 only stage proposals, so the loop never blocks on the developer: it ends its
 turn, and the developer's decisions are reported at the start of the next turn.
+
+The loop works on Anthropic-shaped data. The OpenAI-compatible provider
+(providers.py) converts to and from it, so the loop is the same for both.
 """
 
 import json
@@ -26,9 +29,10 @@ import bpy
 
 from ..core import project
 from ..prefs import get_prefs
-from . import audit, deps, prompts, proposals, tools
+from . import audit, deps, prompts, proposals, providers, tools
 
-# USD per million tokens: input, output, cache read, cache write.
+# USD per million tokens: input, output, cache read, cache write. Claude models only: a model
+# with no price here (every OpenAI-compatible one) counts tokens, and its cost shows as unknown.
 PRICES = {
     "claude-opus-5-5": (4.0, 20.0, 0.20, 5.0),
     "claude-sonnet-5-5": (2.0, 10.0, 0.20, 2.5),
@@ -99,10 +103,12 @@ class Session:
         self.messages: list = []  # API history; only the worker writes while busy
         self.transcript: list[dict] = []  # {"role", "text"}; main thread only
         self.role = "general"
+        self.provider = providers.ANTHROPIC  # the provider the messages so far were made with
         self.status = "Idle"
         self.busy = False
         self.live_text = ""
         self.cost = 0.0
+        self.cost_unknown = False  # a model with no known price answered in this conversation
         self.total_cost = 0.0
         self.tokens = {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0}
         self.project_root = None
@@ -118,6 +124,7 @@ class Session:
         self.messages.clear()
         self.transcript.clear()
         self.cost = 0.0
+        self.cost_unknown = False
         if note:
             self.transcript.append({"role": "system", "text": note})
 
@@ -135,15 +142,32 @@ class Session:
         prefs = get_prefs()
         if not prefs.assistant_enabled:
             raise AssistantError("The assistant is disabled. Enable it in the add-on preferences.")
+        provider = providers.provider(prefs)
+        model = providers.model(prefs)
+        base_url = providers.base_url(prefs)
+        if provider == providers.OPENAI and not base_url:
+            raise AssistantError("Set the base URL of the OpenAI-compatible server in the add-on preferences.")
+        if not model:
+            raise AssistantError("Choose a model in the add-on preferences.")
 
         if role != self.role and self.messages:
             self.new_conversation(f"Started a new conversation for the {role} role.")
+        if provider != self.provider and self.messages:
+            # Anthropic history holds blocks (thinking, ...) that the other provider cannot take.
+            self.new_conversation(f"Started a new conversation for the {providers.LABELS[provider]} provider.")
         self.role = role
+        self.provider = provider
         self.project_root = project.project_root()
         proposals.set_project_root(self.project_root)
 
         factory = self.llm_factory
-        if factory is None:
+        if factory is None and provider == providers.OPENAI:
+            if not bpy.app.online_access and not providers.is_local(base_url):
+                raise AssistantError("Online access is off. Enable it in Preferences > System, "
+                                     "or use a model server on this computer.")
+            api_key = providers.openai_api_key(prefs)
+            factory = lambda: providers.OpenAICompatibleLLM(base_url, api_key)  # noqa: E731
+        elif factory is None:
             if not bpy.app.online_access:
                 raise AssistantError("Online access is off. Enable it in Preferences > System.")
             if not deps.sdk_available():
@@ -151,10 +175,14 @@ class Session:
             api_key = _api_key(prefs)
             factory = lambda: AnthropicLLM(api_key)  # noqa: E731
 
+        prices = price_for(provider, model)
+        if prices is None:
+            self.cost_unknown = True
         tool_list = tools.tools_for(role)
         allowed = tools.allowed_names(role, mode)
         request = {
-            "model": prefs.model,
+            "model": model,
+            "prices": prices,
             "effort": prefs.effort,
             "max_turns": int(prefs.max_turns),
             "system": prompts.build_system(role, teach, self.project_root),
@@ -168,7 +196,7 @@ class Session:
         self.messages.append({"role": "user", "content": content})
         self.transcript.append({"role": "user", "text": prompt})
         audit.log(self.project_root, "user_message", role=role, mode=mode, teach=teach,
-                  model=prefs.model, text=prompt, proposal_updates=updates or None)
+                  provider=provider, model=model, text=prompt, proposal_updates=updates or None)
 
         self.busy = True
         self.status = "Thinking..."
@@ -211,7 +239,8 @@ class Session:
                     response = llm.stream({**params, "messages": self.messages},
                                           self._on_text, self._on_thinking, self._cancel)
                 except ValueError:
-                    # The SDK could not parse a streamed tool input at all; re-issue the turn.
+                    # A streamed tool input could not be parsed at all (the SDK, or
+                    # providers.BadToolInput); re-issue the turn.
                     json_retries += 1
                     if json_retries > 2:
                         raise
@@ -221,7 +250,7 @@ class Session:
                     self._post(self._note, "system", "Stopped.")
                     break
                 turn += 1
-                self._post(self._account, req["model"], response.usage)
+                self._post(self._account, req["model"], response.usage, req["prices"])
                 self.messages.append({"role": "assistant", "content": response.content})
 
                 text = "".join(b.text for b in response.content if b.type == "text").strip()
@@ -343,7 +372,10 @@ class Session:
             self.live_text = ""
         self.transcript.append({"role": role, "text": text})
 
-    def _account(self, model: str, usage) -> None:
+    def _account(self, model: str, usage, prices) -> None:
+        """Count the tokens of one response; prices is None when the model's price is unknown."""
+        if prices is None:
+            self.cost_unknown = True
         if usage is None:
             return
         fields = {
@@ -354,12 +386,15 @@ class Session:
         }
         for key, value in fields.items():
             self.tokens[key] += value
-        p_in, p_out, p_read, p_write = PRICES.get(model, PRICES["claude-opus-5-5"])
-        cost = (fields["input"] * p_in + fields["output"] * p_out
-                + fields["cache_read"] * p_read + fields["cache_write"] * p_write) / 1_000_000
-        self.cost += cost
-        self.total_cost += cost
-        audit.log(self.project_root, "model_response", model=model, usage=fields, cost_usd=round(cost, 5))
+        cost = None
+        if prices is not None:
+            p_in, p_out, p_read, p_write = prices
+            cost = (fields["input"] * p_in + fields["output"] * p_out
+                    + fields["cache_read"] * p_read + fields["cache_write"] * p_write) / 1_000_000
+            self.cost += cost
+            self.total_cost += cost
+        audit.log(self.project_root, "model_response", model=model, usage=fields,
+                  cost_usd=round(cost, 5) if cost is not None else None)
 
     def _finish(self) -> None:
         self.busy = False
@@ -395,6 +430,12 @@ def _describe_call(name: str, args) -> str:
     brief = ", ".join(f"{k}={v!r}"[:60] for k, v in args.items()
                       if k not in ("operations", "edits", "content", "rationale"))
     return f"-> {name}({brief})"
+
+
+def price_for(provider: str, model: str):
+    """USD per million tokens (input, output, cache read, cache write) for the model, or None when
+    its price is not known: every OpenAI-compatible model, whose price depends on the server."""
+    return PRICES.get(model) if provider == providers.ANTHROPIC else None
 
 
 def _api_key(prefs) -> str | None:

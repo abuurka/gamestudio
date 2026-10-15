@@ -193,6 +193,6 @@ Last full run: 15 October 2026, Windows 11, Blender 5.2.2. The CI workflows in `
 
 ## Status
 
-GameStudio is an early preview ([CHANGELOG.md](CHANGELOG.md) lists what's new). Developed on Windows with Blender 5.2.2, and the full test matrix also passes on Linux (Ubuntu 24.04, in WSL). macOS paths are written but untested. The in-Blender AI assistant (Claude API, proposal workflow) is still included; an AI agent through MCP is the main way to work.
+GameStudio is an early preview ([CHANGELOG.md](CHANGELOG.md) lists what's new). Developed on Windows with Blender 5.2.2, and the full test matrix also passes on Linux (Ubuntu 24.04, in WSL). macOS paths are written but untested. The in-Blender AI assistant (Claude or any OpenAI-compatible API, proposal workflow) is still included; an AI agent through MCP is the main way to work.
 
 GameStudio is based on Blender's open source code; Blender is a trademark of the Blender Foundation, and GameStudio is not affiliated with or endorsed by it.

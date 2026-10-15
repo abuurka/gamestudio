@@ -13,6 +13,18 @@ MODEL_ITEMS = [
     ("claude-fable-5-1", "Claude Fable 5.1", "Most capable; slower and more expensive"),
 ]
 
+AI_PROVIDER_ITEMS = [
+    ("ANTHROPIC", "Anthropic (Claude)",
+     "Claude models through the Anthropic API. Needs the Anthropic SDK (Install AI Support) and an API key"),
+    ("OPENAI", "OpenAI-compatible",
+     "OpenAI, or any server with an OpenAI-compatible Chat Completions API (OpenRouter, Ollama, LM Studio, ...). "
+     "Nothing to install"),
+]
+# OpenAI's recommended starting model, with function calling on Chat Completions:
+# https://developers.openai.com/api/docs/models/gpt-6-astra (checked 2026-10-15).
+OPENAI_DEFAULT_MODEL = "gpt-6-astra"
+OPENAI_DEFAULT_BASE_URL = "https://api.openai.com/v1"
+
 CODE_EDITOR_ITEMS = [
     ("AUTO", "Automatic", "VS Code if it is installed, else Cursor, else the system default"),
     ("VSCODE", "VS Code", "Open the project folder and the file at the line in Visual Studio Code"),
@@ -162,6 +174,12 @@ class GSPreferences(bpy.types.AddonPreferences):
         description="Show the AI assistant panel. Off by default; the assistant only acts when you ask",
         default=False,
     )
+    ai_provider: EnumProperty(
+        name="Provider",
+        description="Where the assistant's model runs",
+        items=AI_PROVIDER_ITEMS,
+        default="ANTHROPIC",
+    )
     api_key: StringProperty(
         name="Anthropic API key",
         description=(
@@ -172,6 +190,28 @@ class GSPreferences(bpy.types.AddonPreferences):
         default="",
     )
     model: EnumProperty(name="Model", items=MODEL_ITEMS, default="claude-opus-5-5")
+    openai_base_url: StringProperty(
+        name="Base URL",
+        description=("The server's OpenAI-compatible API address, ending in /v1. OpenAI: https://api.openai.com/v1. "
+                     "OpenRouter: https://openrouter.ai/api/v1. Ollama: http://localhost:11434/v1. "
+                     "LM Studio: http://localhost:1234/v1"),
+        default=OPENAI_DEFAULT_BASE_URL,
+    )
+    openai_api_key: StringProperty(
+        name="API key",
+        description=(
+            "Used only if the OPENAI_API_KEY environment variable is not set. Not needed for a server on this "
+            "computer (Ollama, LM Studio). Stored in Blender's user preferences in plain text"
+        ),
+        subtype="PASSWORD",
+        default="",
+    )
+    openai_model: StringProperty(
+        name="Model",
+        description=("The model id as the server names it, for example gpt-6-astra (OpenAI) or the name of a "
+                     "model you pulled in Ollama. It must support function calling (tools)"),
+        default=OPENAI_DEFAULT_MODEL,
+    )
     effort: EnumProperty(name="Effort", items=EFFORT_ITEMS, default="high")
     max_turns: IntProperty(
         name="Max tool turns",
@@ -277,15 +317,29 @@ class GSPreferences(bpy.types.AddonPreferences):
         keymap.draw_preferences(layout, context)
 
         box = _section(layout, "AI assistant (optional)", "LIGHT",
-                       "A chat panel in Blender that proposes changes for you to apply. Uses your API key")
+                       "A chat panel in Blender that proposes changes for you to apply. Uses your API key or a "
+                       "local model server")
         box.prop(self, "assistant_enabled")
         col = box.column()
         col.enabled = self.assistant_enabled
-        col.prop(self, "api_key")
-        col.prop(self, "model")
-        col.prop(self, "effort")
+        col.row().prop(self, "ai_provider", expand=True)
+        needs_online = True
+        if self.ai_provider == "OPENAI":
+            from .assistant import providers
+
+            col.prop(self, "openai_base_url")
+            col.prop(self, "openai_api_key")
+            col.prop(self, "openai_model")
+            if providers.is_openai(self.openai_base_url):  # reasoning_effort goes to OpenAI's API only
+                col.prop(self, "effort")
+            needs_online = not providers.is_local(self.openai_base_url)
+            _hint(col, "The model must support function calling (tools)")
+        else:
+            col.prop(self, "api_key")
+            col.prop(self, "model")
+            col.prop(self, "effort")
         col.prop(self, "max_turns")
-        if not bpy.app.online_access:
+        if needs_online and not bpy.app.online_access:
             col.label(text="Online access is disabled in Preferences > System.", icon="ERROR")
 
 
@@ -373,8 +427,12 @@ class _DefaultPrefs:
     code_editor = "AUTO"
     code_editor_command = ""
     assistant_enabled = True
+    ai_provider = "ANTHROPIC"
     api_key = ""
     model = "claude-opus-5-5"
+    openai_base_url = OPENAI_DEFAULT_BASE_URL
+    openai_api_key = ""
+    openai_model = OPENAI_DEFAULT_MODEL
     effort = "high"
     max_turns = 16
     bridge_enabled = True
