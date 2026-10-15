@@ -20,7 +20,7 @@ tags = ["Game Engine", "Development", "Import-Export"]
 platforms = ["windows-x64", "windows-arm64", "macos-x64", "macos-arm64", "linux-x64", "linux-arm64"]
 
 # Each is at most 64 characters (`blender --command extension validate`); docs/EXTENSION-LISTING.md
-# explains them in full. No website yet: add `website = "..."` once one exists.
+# explains them in full.
 [permissions]
 network = "Localhost links, Node.js and npm downloads, optional AI chat"
 files = "Creates game projects and reads and writes their files"

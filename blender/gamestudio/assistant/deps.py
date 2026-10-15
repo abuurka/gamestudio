@@ -1,6 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Optional dependency handling for the Anthropic SDK.
 
+Only the Anthropic (Claude) provider needs it. The OpenAI-compatible provider
+(providers.py) uses the standard library, so it needs nothing installed.
+
 The assistant is optional, so the SDK is not bundled with the add-on. On request
 it is installed with Blender's own Python into a private folder, which keeps it
 out of Blender's shared extension site-packages (see research/04 section 10).

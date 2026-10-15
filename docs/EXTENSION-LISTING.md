@@ -70,13 +70,14 @@ in the Inspector, Play and live editing, export, the dev server and the web buil
   as a template.
 - **Web builds**: Build Web in the Project tab makes a static site you can host anywhere.
 - **Optional in-Blender AI assistant** that proposes changes for you to apply (needs an Anthropic
-  API key; off by default).
+  API key, or an OpenAI-compatible server such as OpenAI, OpenRouter or a local Ollama; off by
+  default).
 
 ## Permissions
 
 | Permission | Why |
 |---|---|
-| **Network** | The live link between Blender, the dev server and the running game, and the agent bridge, all on `localhost` only. Downloads: Node.js from nodejs.org (a pinned, checksum-verified LTS release) when the system has no Node.js 22.12+, the project's npm packages, a game browser (Chrome Headless Shell) when the system has no Chrome, Edge or Chromium, and, when you click Install, Claude Code or Codex through its maker's official installer. The optional AI assistant calls the Anthropic API when you ask it something. Downloads respect Preferences > System > Network > Allow Online Access. |
+| **Network** | The live link between Blender, the dev server and the running game, and the agent bridge, all on `localhost` only. Downloads: Node.js from nodejs.org (a pinned, checksum-verified LTS release) when the system has no Node.js 22.12+, the project's npm packages, a game browser (Chrome Headless Shell) when the system has no Chrome, Edge or Chromium, and, when you click Install, Claude Code or Codex through its maker's official installer. The optional AI assistant calls the model provider you chose (the Anthropic API, or an OpenAI-compatible server, which can be one on this computer) when you ask it something. Downloads respect Preferences > System > Network > Allow Online Access. |
 | **Files** | Creates game projects in a folder you choose, and reads and writes their files: scenes, TypeScript, exports under `.gamestudio/`, checkpoints. Examples are copied to `Documents/GameStudio/Examples` before they open, so the installation is never changed. Settings and the shared runtime live in the extension's user folder. |
 | **Clipboard** | Copies a starter prompt or a coding agent's install command (Claude Code, Codex) when you click its copy button. GameStudio never reads the clipboard. |
 
@@ -128,17 +129,17 @@ packages and Edge or Chrome are needed), and the Console shows the game's own me
 
 | File | Shows |
 |---|---|
-| `01-welcome.png` | The welcome after the extension is first enabled: the three steps, New Project, Open Demo, Open in Claude Code (greyed until a project is open), Node.js and Claude Code |
-| `02-launcher.png` | The launcher with a project open: start, examples, recent projects, Node.js and Claude Code |
+| `01-welcome.png` | The welcome after the extension is first enabled: the three steps, New Project, Open Demo, Open in Claude Code (the default coding agent; greyed until a project is open), Node.js and Claude Code |
+| `02-launcher.png` | The launcher with a project open: start, examples, recent projects, Node.js and Claude Code; behind it, Game Project with Open in Claude Code and Open in Codex |
 | `03-game-workspace.png` | The Game workspace: the level in the 3D View, the player selected with its components in Properties, the game's messages in the Console, Play / Pause / Step / Stop and the agent button in the top bar, the status bar |
 | `04-object-game.png` | Properties > Object > Game: the entity ID, Add Component and the player's components with their fields |
-| `05-scene-project.png` | Properties > Scene > Game Project: the project, the dev server, the component registry, Open in VS Code, Open in Claude Code, Live Link, Levels with Export All, Scripts and Build |
+| `05-scene-project.png` | Properties > Scene > Game Project: the project, the dev server, the component registry, Open in VS Code, Open in Claude Code, Open in Codex, Live Link, Levels with Export All, Scripts, Lighting and Build |
 | `06-console.png` | The Console: the game's messages with an error, and its header with the filters, the newest error, Dismiss and Clear |
 | `07-install-claude-code.png` | When Claude Code is missing: the install dialog with the official commands, and "Claude Code is not installed" in Game Project |
 | `08-claude-connected.png` | The objects the agent just built, selected, with the agent in the top bar and "Claude: idle" in the status bar |
 | `09-agent-popover.png` | The agent popover from the top bar: Pause, Claude Code connected, Protect, the recent actions with Undo, the newest one's details with Undo to Here, Open Activity Log |
 | `10-game-assets.png` | The Game Assets popover in the 3D View header: a `props` library made from the agent's objects, with Place and Replace |
-| `11-preferences.png` | The preferences, grouped: Claude Code, Agent bridge, Node.js, Play, Code editor, Interface (the optional sidebar tab) |
+| `11-preferences.png` | The preferences, grouped: Coding agent (Claude Code or Codex), Agent bridge, Setup (Node.js), Play |
 | `embedded-play.png` | Play with the Embedded game display: the demo game running inside the Game workspace's 3D View at 60 fps, with Scene / Game and "Click the game to play" in its header, Play pressed and the game display icon in the top bar |
 
 ## Before submitting

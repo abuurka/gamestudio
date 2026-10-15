@@ -93,7 +93,7 @@ You can disable **Agent bridge (MCP)** in GameStudio preferences when you are no
 
 ## The separate built-in assistant
 
-GameStudio also has an optional assistant inside Blender. It is disabled by default and is distinct from the external coding-agent workflow above. It reads context and proposes edits for you to preview, apply or reject. Its Ask mode is read-only; proposal mode stages changes.
+GameStudio also has an optional assistant inside Blender. It is disabled by default and is distinct from the external coding-agent workflow above. It reads context and proposes edits for you to preview, apply or reject. Its Ask mode is read-only; proposal mode stages changes. It uses Claude through the Anthropic API by default, or any OpenAI-compatible server, including one on your computer such as Ollama or LM Studio.
 
 The [AI assistant guide](../AI-ASSISTANT.md) explains configuration and proposal recovery. If using a provider key, prefer the documented environment-variable route to putting it in shared files. A key entered in Blender preferences is stored in that preferences file, so never include it in a screenshot or project attachment.
 

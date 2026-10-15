@@ -11,19 +11,52 @@ The design and the research behind it are in [`research/07-ai-agents.md`](../res
 ## Turning it on
 
 1. Open **Edit > Preferences > Add-ons > GameStudio** and tick **Enable AI assistant**. It's off by default.
-2. Allow network access in **Preferences > System > Network > Allow Online Access**. Blender add-ons must respect this setting.
-3. Provide a Claude API key. Either set the `ANTHROPIC_API_KEY` environment variable before starting Blender (recommended), or paste the key into the add-on preferences. Keys pasted there are stored in Blender's preferences file in plain text.
-4. In the 3D View sidebar (`N`), open the **Assistant** tab. If you see **Install AI Support**, click it. This downloads the Anthropic Python SDK (about 15 MB) into the add-on's folder with Blender's own Python.
+2. Choose a **Provider**: **Anthropic (Claude)**, the default, or **OpenAI-compatible** (OpenAI, OpenRouter, a model server on your computer such as Ollama or LM Studio, ...). See [Providers](#providers) below.
+3. Allow network access in **Preferences > System > Network > Allow Online Access**. Blender add-ons must respect this setting. A model server on this computer works without it.
+4. Provide an API key. Set the provider's environment variable before starting Blender (recommended): `ANTHROPIC_API_KEY` for Anthropic, `OPENAI_API_KEY` for an OpenAI-compatible server. Or paste the key into the add-on preferences. Keys pasted there are stored in Blender's preferences file in plain text. A server on this computer needs no key.
+5. In the 3D View sidebar (`N`), open the **Assistant** tab. With the Anthropic provider, if you see **Install AI Support**, click it. This downloads the Anthropic Python SDK (about 15 MB) into the add-on's folder with Blender's own Python. The OpenAI-compatible provider needs nothing installed.
 
 In the preferences you can also choose:
 
 | Setting | Default | Notes |
 |---|---|---|
-| Model | Claude Opus 5.5 | Sonnet 5.5 is faster and cheaper. Haiku 5.5 is the cheapest, for quick questions. Fable 5.1 is the most capable but slower and costs more. |
-| Effort | High | How much the model reasons before answering. Lower is faster and cheaper. |
+| Model | Claude Opus 5.5 | Anthropic. Sonnet 5.5 is faster and cheaper. Haiku 5.5 is the cheapest, for quick questions. Fable 5.1 is the most capable but slower and costs more. For an OpenAI-compatible provider you type the model id instead. |
+| Effort | High | How much the model reasons before answering. Lower is faster and cheaper. Anthropic, and OpenAI's own API. |
 | Max tool turns | 16 | The upper bound on tool round trips per request. |
 
-The panel shows the running cost of the current chat. Every request is logged to `.gamestudio/ai/audit.jsonl` in your project.
+The panel shows the running cost of the current chat for Claude models. For an OpenAI-compatible provider it says **cost unknown**, because the price depends on the server. Every request, with its token counts, is logged to `.gamestudio/ai/audit.jsonl` in your project.
+
+---
+
+## Providers
+
+Pick one under **Provider** in the add-on preferences. Switching to the other provider starts a new conversation.
+
+### Anthropic (Claude), the default
+
+- Needs **Install AI Support** once (the Anthropic Python SDK, about 15 MB) and a Claude API key: `ANTHROPIC_API_KEY`, or **Anthropic API key** in the preferences.
+- Models: Claude Opus 5.5 (default), Sonnet 5.5, Haiku 5.5 and Fable 5.1.
+
+### OpenAI-compatible
+
+OpenAI, or any server with an OpenAI-compatible Chat Completions API. Nothing to install: GameStudio talks to it with Python's standard library.
+
+| Setting | What to enter |
+|---|---|
+| Base URL | The server's API address, ending in `/v1`. Default: `https://api.openai.com/v1`. |
+| API key | Used when `OPENAI_API_KEY` is not set. Leave it empty for a server on this computer. |
+| Model | The model id as the server names it. Default: `gpt-6-astra`, OpenAI's recommended starting model. |
+
+| Server | Base URL | Key |
+|---|---|---|
+| OpenAI | `https://api.openai.com/v1` | Your OpenAI API key |
+| OpenRouter | `https://openrouter.ai/api/v1` | Your OpenRouter API key |
+| Ollama, on this computer | `http://localhost:11434/v1` | None. Use a model you pulled. |
+| LM Studio, on this computer | `http://localhost:1234/v1` | None. Start LM Studio's local server first. |
+
+- **Tool use needs a model that supports function calling** (also called tool calling). The assistant reads your scene and stages proposals through tools. A model without it can't do either, and many servers reject the request. With Ollama or LM Studio, pick a model that is listed as supporting tools.
+- A server on `localhost` (or `127.0.0.1`) works with online access off and needs no key.
+- **Effort** is sent only to OpenAI's own API, as `reasoning_effort`, with a token limit (`max_completion_tokens`). If a model rejects one of these fields, or a server rejects the request for token counts (`stream_options`), the assistant asks again once without them.
 
 ---
 
@@ -87,7 +120,7 @@ Select objects and click **Lock Selected** in the Conversation panel. Locked obj
 
 - Apply its own proposals.
 - Run Python in Blender, run shell commands, or delete files.
-- Access the internet. The only network traffic is to the Claude API.
+- Access the internet. The only network traffic is to the provider you chose: the Anthropic API, or the server at the OpenAI-compatible base URL (none at all with a server on this computer).
 - Change linked library data.
 
 Text in your scene and files, such as object names, comments, and log lines, is treated as data. The assistant is instructed never to follow instructions found inside it.
@@ -111,7 +144,7 @@ The older proposal-only bridge, `tools/mcp/gamestudio_mcp.py`, is retired: it no
 
 ## Privacy
 
-When you send a request, the assistant sends the following to the Claude API:
+When you send a request, the assistant sends the following to the provider you chose (the Anthropic API, or the server at the OpenAI-compatible base URL; with a server on this computer, nothing leaves your computer):
 
 - the prompt;
 - a short summary of the editor state: the scene name, the active and selected objects;
