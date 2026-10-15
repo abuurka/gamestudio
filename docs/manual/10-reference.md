@@ -89,7 +89,7 @@ When debugging collision, simplify the visual model and collider relationship be
 
 ## Preferences
 
-Open **GameStudio > Preferences**. These are the main user-facing controls; defaults below refer to the documented 0.1.0 implementation.
+Open **GameStudio > Preferences**. These are the main user-facing controls; defaults below refer to the documented 0.1.1 implementation.
 
 | Preference | Default or behavior | When to change it |
 |---|---|---|
