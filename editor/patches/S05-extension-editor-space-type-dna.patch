@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: gsfork <gsfork@localhost>
+Date: Fri, 9 Oct 2026 20:49:10 +0100
+Subject: [PATCH] S05: extension editor space type (DNA)
+
+Why:         Python cannot register editors, and editors must exist before startup.blend is
+             read. One generic native editor type lets providers (C++ or Python) supply the
+             content: Game View, Inspector, AI chat, console. The DNA struct is a new file,
+             so it never conflicts; stock Blender opens such areas as 3D Viewports.
+Hook-for:    editor/native/blender/space_extension.cc
+Upstream:    candidate, as part of a "custom editors" design task
+Test:        editor/tests/contract/test_extension_editor.py
+Remove-when: upstream ships registrable custom editors
+---
+ source/blender/CMakeLists.txt                 |  1 +
+ source/blender/makesdna/DNA_space_enums.h     |  7 +++-
+ .../makesdna/DNA_space_extension_types.h      | 37 +++++++++++++++++++
+ 3 files changed, 43 insertions(+), 2 deletions(-)
+ create mode 100644 source/blender/makesdna/DNA_space_extension_types.h
+
+diff --git a/source/blender/CMakeLists.txt b/source/blender/CMakeLists.txt
+index 70f307ec5daa72089e61410bd37d4448b239d175..f867a6dcd617f7df8380b66758885eb65974bf20 100644
+--- a/source/blender/CMakeLists.txt
++++ b/source/blender/CMakeLists.txt
+@@ -78,6 +78,7 @@ set(SRC_DNA_INC
+   ${CMAKE_CURRENT_SOURCE_DIR}/makesdna/DNA_shader_fx_types.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/makesdna/DNA_sound_types.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/makesdna/DNA_space_enums.h
++  ${CMAKE_CURRENT_SOURCE_DIR}/makesdna/DNA_space_extension_types.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/makesdna/DNA_space_types.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/makesdna/DNA_speaker_types.h
+   ${CMAKE_CURRENT_SOURCE_DIR}/makesdna/DNA_text_types.h
+diff --git a/source/blender/makesdna/DNA_space_enums.h b/source/blender/makesdna/DNA_space_enums.h
+index bb3995cbb7e7bfdbc21ccdb9317ca7b1c1a73ffc..260d628c98600af02f6714da60fa0abed2ba4094 100644
+--- a/source/blender/makesdna/DNA_space_enums.h
++++ b/source/blender/makesdna/DNA_space_enums.h
+@@ -1179,9 +1179,12 @@ enum eSpace_Type : char {
+   SPACE_CLIP = 20,
+   SPACE_TOPBAR = 21,
+   SPACE_STATUSBAR = 22,
+-  SPACE_SPREADSHEET = 23
++  SPACE_SPREADSHEET = 23,
++  /** Generic editor whose content comes from registered providers (#SpaceExtension).
++   * Kept far from the built-in values so new built-in editors never collide with it. */
++  SPACE_EXTENSION = 64
+ 
+-#define SPACE_TYPE_NUM (SPACE_SPREADSHEET + 1)
++#define SPACE_TYPE_NUM (SPACE_EXTENSION + 1)
+ };
+ 
+ /* use for function args */
+diff --git a/source/blender/makesdna/DNA_space_extension_types.h b/source/blender/makesdna/DNA_space_extension_types.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..7706a8d3d7c336508940f9c70966af4469f44797
+--- /dev/null
++++ b/source/blender/makesdna/DNA_space_extension_types.h
+@@ -0,0 +1,37 @@
++/* SPDX-FileCopyrightText: 2026 Blender Authors
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later */
++
++/** \file
++ * \ingroup DNA
++ *
++ * The extension editor: one generic editor type whose content comes from "providers"
++ * registered at runtime (by an out-of-tree module or a distribution of Blender). The space
++ * only stores which provider it shows, so files stay readable by any Blender: one without
++ * this editor reads the area as empty, and opens it as a 3D Viewport.
++ */
++
++#pragma once
++
++#include "DNA_listBase.h"
++#include "DNA_space_enums.h"
++
++namespace blender {
++
++struct ARegion;
++struct SpaceLink;
++
++struct SpaceExtension {
++  SpaceLink *next = nullptr, *prev = nullptr;
++  /** Storage of regions for inactive spaces. */
++  ListBaseT<ARegion> regionbase = {nullptr, nullptr};
++  char spacetype = 0;
++  eSpace_Link_Flag link_flag = {};
++  char _pad0[6] = {};
++  /* End 'SpaceLink' header. */
++
++  /** Identifier of the provider shown in this editor, e.g. "GAMESTUDIO_GAME_VIEW". */
++  char provider_idname[64] = "";
++};
++
++}  // namespace blender

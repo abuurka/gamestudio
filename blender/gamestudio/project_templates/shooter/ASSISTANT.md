@@ -1,0 +1,5 @@
+# {{name}}: conventions for the AI assistant
+
+{{base}}
+
+This project started from the Arena Shooter template: a top-down shooter. Components: `Shooter`, `Projectile`, `Enemy`, `Health`, `WaveSpawner`, `SpawnPoint`, `AimMarker`. Systems: `AimSystem`, `ShootingSystem`, `ProjectileSystem`, `EnemySystem`, `HealthSystem`, `WaveSystem`. Enemies and bullets are prefabs in the `Prefabs` scene, spawned with `ctx.spawn`. Shared state is in `src/lib/` (`arena.ts`, `health.ts`, `sfx.ts`); the score is `ctx.store.score`. The screens are Blender canvases in `ui/ui.blend` (`Title`, `Pause`, `Options`, `GameOver`, `HUD`; the `design-ui` skill edits them): the HUD binds the `ctx.store` values `score`, `health`, `healthLow`, `wave` and `enemiesLeft` that `HealthSystem` and `WaveSystem` keep, and `HealthSystem` opens `GameOver`. `ctx.hud` only draws what is pinned to enemies (their health bars, `+10`). The game opens on the title screen: playtests start with an Enter press. `tools/build_level.py` rebuilds the level from scratch and discards edits made in Blender.

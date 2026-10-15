@@ -1,0 +1,15 @@
+{
+  "comment": "The exact upstream GameStudio Editor is built from. Changed only by `gsfork upgrade`; see docs/ARCHITECTURE.md section 7.",
+  "gamestudio_version": "0.1.0",
+  "blender": {
+    "remote": "https://projects.blender.org/blender/blender.git",
+    "tag": "v5.2.2",
+    "commit": "d13f752e3b9c4f8c261cda552b1021f8bcc0382c"
+  },
+  "libs": {
+    "windows_x64": {
+      "remote": "https://projects.blender.org/blender/lib-windows_x64.git",
+      "commit": "60d6e96b917568278d400a4024c98da0fb777338"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "gamestudio",
+  "private": true,
+  "type": "module",
+  "description": "GameStudio: a game engine that uses Blender as its editor (runtime, dev server, examples).",
+  "workspaces": [
+    "runtime/packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "test": "vitest run --config runtime/vitest.config.ts",
+    "typecheck": "tsc -p runtime/packages/engine/tsconfig.json && tsc -p runtime/packages/devserver/tsconfig.json && tsc -p runtime/packages/mcp/tsconfig.json && tsc -p examples/demo-game/tsconfig.json && tsc -p blender/tests/templates.tsconfig.json",
+    "dev:demo": "npm run dev -w examples/demo-game",
+    "smoke": "node runtime/scripts/smoke.mjs",
+    "features": "node runtime/scripts/features.mjs",
+    "test:blender": "python tools/test_blender.py",
+    "build:level": "node tools/run_blender.mjs --python-exit-code 1 --python examples/demo-game/tools/build_level.py",
+    "e2e": "node tools/e2e/e2e.mjs",
+    "e2e:templates": "node tools/e2e/templates_e2e.mjs",
+    "gameview:probe": "editor\\native\\gameview\\tools\\probe.cmd",
+    "extension:build": "python tools/build_extension.py",
+    "extension:install": "python tools/install_extension.py",
+    "extension:workspaces": "python tools/build_workspaces.py",
+    "addon:install": "python tools/install_extension.py"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.4",
+    "puppeteer-core": "25.13.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

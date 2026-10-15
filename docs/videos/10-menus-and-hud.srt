@@ -1,0 +1,171 @@
+1
+00:00:03,400 --> 00:00:05,856
+Menus and HUDs are made right here in Blender.
+
+2
+00:00:05,861 --> 00:00:08,944
+With Gem Island open, open the GameStudio menu.
+
+3
+00:00:09,500 --> 00:00:11,050
+Choose Edit Game UI.
+
+4
+00:00:12,633 --> 00:00:14,316
+This is the game's UI file:
+
+5
+00:00:14,316 --> 00:00:16,424
+each scene in it is one screen.
+
+6
+00:00:16,429 --> 00:00:18,781
+Open the scene list in the top bar.
+
+7
+00:00:19,333 --> 00:00:21,458
+Title, Pause, Options, Win and HUD.
+
+8
+00:00:21,458 --> 00:00:23,391
+Type HUD and press Enter.
+
+9
+00:00:24,700 --> 00:00:26,784
+The view looks through the screen's camera.
+
+10
+00:00:26,825 --> 00:00:29,733
+Scroll to zoom out and see the screen's edges.
+
+11
+00:00:30,300 --> 00:00:32,541
+New elements land at the 3D cursor.
+
+12
+00:00:32,541 --> 00:00:35,287
+Shift right-click under the score to put it there.
+
+13
+00:00:35,867 --> 00:00:36,982
+Press Shift A.
+
+14
+00:00:36,982 --> 00:00:39,925
+In a UI file, the Add menu starts with Game UI.
+
+15
+00:00:40,500 --> 00:00:41,818
+Choose Text.
+
+16
+00:00:43,000 --> 00:00:44,875
+Press Tab to edit the text.
+
+17
+00:00:45,500 --> 00:00:48,176
+Type Gems, then score in curly braces.
+
+18
+00:00:48,217 --> 00:00:49,912
+Braces show a live value:
+
+19
+00:00:49,912 --> 00:00:52,112
+the score the starter's code keeps.
+
+20
+00:00:52,667 --> 00:00:54,403
+Press Tab again to finish.
+
+21
+00:00:55,167 --> 00:00:57,971
+In the Properties, scroll down to the Game panel.
+
+22
+00:00:59,100 --> 00:01:00,569
+Now pin it to the corner.
+
+23
+00:01:00,609 --> 00:01:03,715
+Under Game in the Properties, click Add Component.
+
+24
+00:01:04,533 --> 00:01:06,925
+In a UI file, the UI components come first.
+
+25
+00:01:06,925 --> 00:01:08,359
+Choose UiAnchor.
+
+26
+00:01:09,000 --> 00:01:10,504
+Open its Anchor menu.
+
+27
+00:01:12,000 --> 00:01:13,277
+Choose Top-left.
+
+28
+00:01:13,277 --> 00:01:14,949
+On any screen shape, the text now
+
+29
+00:01:14,949 --> 00:01:16,894
+keeps its distance to that corner.
+
+30
+00:01:17,467 --> 00:01:20,596
+To see it as the game draws it, turn on Game in the header.
+
+31
+00:01:20,799 --> 00:01:23,290
+Live values show as placeholders.
+
+32
+00:01:23,867 --> 00:01:25,162
+Press Control S.
+
+33
+00:01:25,167 --> 00:01:28,389
+Saving the UI file exports its screens for the game.
+
+34
+00:01:28,967 --> 00:01:30,366
+Now go back to the level.
+
+35
+00:01:30,407 --> 00:01:32,375
+Open the GameStudio menu
+
+36
+00:01:32,933 --> 00:01:34,669
+and choose Back to Level.
+
+37
+00:01:36,100 --> 00:01:37,604
+Press F5 to play.
+
+38
+00:01:38,833 --> 00:01:39,704
+Click Play.
+
+39
+00:01:39,704 --> 00:01:41,213
+The HUD opens with the game:
+
+40
+00:01:41,213 --> 00:01:43,402
+Gems zero, under the score.
+
+41
+00:01:43,967 --> 00:01:46,400
+Hold W to run into the gem ahead.
+
+42
+00:01:46,967 --> 00:01:49,637
+The moment you pick up a gem, the HUD counts it.
+
+43
+00:01:49,637 --> 00:01:52,558
+That's a HUD laid out in Blender, with no code.

@@ -1,0 +1,8 @@
+{
+  "label": "Platformer",
+  "description": "Third-person 3D platformer: jumps, coins, checkpoints, a ferry and a goal",
+  "icon": "OUTLINER_OB_ARMATURE",
+  "order": 1,
+  "base": "starter",
+  "exclude": ["src/components", "src/systems", "ui/locales"]
+}

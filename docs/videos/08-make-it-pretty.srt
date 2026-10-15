@@ -1,0 +1,167 @@
+1
+00:00:03,400 --> 00:00:05,577
+Here's Gem Island, the starter game.
+
+2
+00:00:05,583 --> 00:00:07,586
+Let's make it pretty, without any code.
+
+3
+00:00:07,789 --> 00:00:08,973
+First, a sea:
+
+4
+00:00:08,973 --> 00:00:12,056
+in the 3D View's header, open the Add menu.
+
+5
+00:00:12,633 --> 00:00:13,905
+Choose Mesh,
+
+6
+00:00:15,567 --> 00:00:16,699
+then Plane.
+
+7
+00:00:18,067 --> 00:00:19,699
+A small plane appears.
+
+8
+00:00:19,704 --> 00:00:22,311
+Open the Add Plane panel at the bottom left:
+
+9
+00:00:22,351 --> 00:00:24,401
+it adjusts what you just added.
+
+10
+00:00:24,967 --> 00:00:26,848
+Set its Size to two hundred metres:
+
+11
+00:00:26,848 --> 00:00:28,607
+water all around the island.
+
+12
+00:00:29,167 --> 00:00:31,686
+And set its Z to minus zero point three,
+
+13
+00:00:31,686 --> 00:00:33,968
+so the water sits just below the lawn.
+
+14
+00:00:34,533 --> 00:00:36,223
+Now turn on Game in the header.
+
+15
+00:00:36,367 --> 00:00:38,062
+The Scene view draws the level with the
+
+16
+00:00:38,062 --> 00:00:40,867
+game's own renderer, as players will see it.
+
+17
+00:00:41,433 --> 00:00:44,382
+The sky and sun come from GameStudio's sky kit,
+
+18
+00:00:44,382 --> 00:00:47,256
+which has no panel, so ask Claude Code:
+
+19
+00:00:47,296 --> 00:00:49,601
+a warm sunset with light fog.
+
+20
+00:00:49,688 --> 00:00:52,033
+It switches the sky to its sunset preset
+
+21
+00:00:52,033 --> 00:00:54,970
+with a lower sun, and turns on the world's mist,
+
+22
+00:00:54,970 --> 00:00:57,380
+which the game draws as fog.
+
+23
+00:00:57,933 --> 00:01:00,261
+There's the sunset, fading into the haze.
+
+24
+00:01:00,348 --> 00:01:02,003
+Now turn the plane into water.
+
+25
+00:01:02,008 --> 00:01:04,685
+In the Properties, open the Material tab
+
+26
+00:01:05,267 --> 00:01:06,539
+and click New.
+
+27
+00:01:08,333 --> 00:01:10,301
+Scroll down to the Game panel.
+
+28
+00:01:11,433 --> 00:01:12,698
+It picks the game shader that
+
+29
+00:01:12,698 --> 00:01:14,574
+draws this material in the game.
+
+30
+00:01:14,661 --> 00:01:16,559
+Open the Game Shader menu.
+
+31
+00:01:17,133 --> 00:01:20,123
+The library's thirty-three shaders come in groups.
+
+32
+00:01:20,163 --> 00:01:21,377
+Open Water
+
+33
+00:01:22,400 --> 00:01:23,857
+and choose Water.
+
+34
+00:01:24,900 --> 00:01:26,636
+Scroll down to its settings.
+
+35
+00:01:27,400 --> 00:01:29,055
+The defaults already look good.
+
+36
+00:01:29,060 --> 00:01:32,201
+For an open sea, set Wave Length to fifteen metres.
+
+37
+00:01:32,767 --> 00:01:34,596
+Now press F5 to play.
+
+38
+00:01:35,500 --> 00:01:37,422
+Click Play on the title screen.
+
+39
+00:01:38,867 --> 00:01:40,208
+There it is in the game:
+
+40
+00:01:40,214 --> 00:01:42,733
+warm sunset light, haze in the distance,
+
+41
+00:01:42,733 --> 00:01:46,466
+and waves rolling in around the island, all without code.
+
+42
+00:01:46,472 --> 00:01:48,544
+Press F8 to stop.

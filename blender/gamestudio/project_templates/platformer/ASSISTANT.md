@@ -1,0 +1,5 @@
+# {{name}}: conventions for the AI assistant
+
+{{base}}
+
+This project started from the Platformer template: a third-person 3D platformer. Components: `Coin`, `BouncePad`, `MovingPlatform`, `Checkpoint`, `KillZone`, `Goal`. Systems: `CoinSystem`, `BouncePadSystem`, `MovingPlatformSystem`, `RespawnSystem` (lives, game over), `GoalSystem` (the clock, the win), `DustSystem`; the rigged player's animation graph is `src/systems/player-animation.ts`. Shared helpers are in `src/lib/` (`contact.ts`, `level.ts`, `sfx.ts`); the run's values are in `ctx.store`. The menus and the HUD are Blender screens in `ui/ui.blend` (`Title`, `Pause`, `Options`, `Win`, `GameOver`, `HUD`) whose texts bind `ctx.store` keys (`coins`, `coinTotal`, `time`, `lives`, `newBest`) and `save.bestTime`; code only opens `Win` and `GameOver`. The game opens on the title screen: playtests start with an Enter press. The player jumps 1.4 m high and about 4.5 m far: keep gaps at 3 m or less. `tools/build_level.py` rebuilds the level from scratch and discards edits made in Blender.

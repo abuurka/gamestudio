@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shader Gallery</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #15171c; color: #d8dbe2; font: 14px/1.4 system-ui, sans-serif; }
+      canvas { display: block; width: 100vw; height: 100vh; }
+      #index { padding: 16px; display: none; }
+      #index h1 { font-size: 18px; margin: 0 0 12px; }
+      #index h2 { font-size: 14px; margin: 16px 0 6px; color: #9aa3b5; }
+      #index a { color: #8fc1ff; margin-right: 14px; text-decoration: none; }
+      #info { position: fixed; left: 8px; bottom: 8px; padding: 4px 8px; background: #000a; border-radius: 4px; font-size: 12px; white-space: pre; }
+    </style>
+  </head>
+  <body>
+    <div id="index"></div>
+    <script>
+      // capture.mjs falls back to SwiftShader when the page cannot start (no WebGL on this GPU).
+      addEventListener('error', (e) => { window.__galleryError = String(e.message || e.error || 'error'); });
+      addEventListener('unhandledrejection', (e) => { window.__galleryError = String(e.reason?.message || e.reason); });
+    </script>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

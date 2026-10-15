@@ -1,0 +1,8 @@
+{
+  "label": "Endless Runner",
+  "description": "Endless runner: three lanes, coins and power-ups on a track made of prefabs",
+  "icon": "MOD_ARRAY",
+  "order": 4,
+  "base": "starter",
+  "exclude": ["src/components", "src/systems", "ui/locales"]
+}

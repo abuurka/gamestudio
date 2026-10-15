@@ -1,0 +1,171 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: gsfork <gsfork@localhost>
+Date: Fri, 9 Oct 2026 19:01:19 +0100
+Subject: [PATCH] S02: overridable folder names for user and system data
+
+Why:         a distribution must never read or write the user's Blender preferences,
+             add-ons or caches. Defaults are unchanged; values come from compile definitions.
+Hook-for:    editor/native/CMakeLists.txt (BLENDER_APP_VENDOR_DIR, BLENDER_APP_DIR,
+             BLENDER_APP_DIR_MACOS, BLENDER_APP_DIR_UNIX)
+Upstream:    candidate (helps every Blender-based application)
+Test:        editor/tests/shell test_user_profile_is_isolated
+Remove-when: upstream makes the folder names configurable
+---
+ intern/ghost/intern/GHOST_SystemPathsCocoa.mm |  7 ++++++-
+ intern/ghost/intern/GHOST_SystemPathsUnix.cc  | 13 ++++++++----
+ intern/ghost/intern/GHOST_SystemPathsWin32.cc | 13 ++++++++++--
+ source/blender/blenkernel/intern/appdir.cc    | 21 +++++++++++++++----
+ 4 files changed, 43 insertions(+), 11 deletions(-)
+
+diff --git a/intern/ghost/intern/GHOST_SystemPathsCocoa.mm b/intern/ghost/intern/GHOST_SystemPathsCocoa.mm
+index 762e0726b79ace2f15259366bb539966e348cd1f..9941e1c94b1f9266ca507cbf049f5c25b2bf31c5 100644
+--- a/intern/ghost/intern/GHOST_SystemPathsCocoa.mm
++++ b/intern/ghost/intern/GHOST_SystemPathsCocoa.mm
+@@ -11,6 +11,11 @@
+ #include "GHOST_Debug.hh"
+ #include "GHOST_SystemPathsCocoa.hh"
+ 
++/* Application Support folder name; distributions of Blender can override it. */
++#ifndef BLENDER_APP_DIR_MACOS
++#  define BLENDER_APP_DIR_MACOS "Blender"
++#endif
++
+ /* --------------------------------------------------------------------
+  * Base directories retrieval.
+  */
+@@ -30,7 +35,7 @@ static const char *GetApplicationSupportDir(const char *versionstr,
+ 
+     snprintf(tempPath,
+              len_tempPath,
+-             "%s/Blender/%s",
++             "%s/" BLENDER_APP_DIR_MACOS "/%s",
+              [basePath cStringUsingEncoding:NSASCIIStringEncoding],
+              versionstr);
+   }
+diff --git a/intern/ghost/intern/GHOST_SystemPathsUnix.cc b/intern/ghost/intern/GHOST_SystemPathsUnix.cc
+index 81e9572d11130ab9a9d479540a925ee2b46d894f..d1b31a48fc3c9d7d9f4c0697a8bcbb2debdb534d 100644
+--- a/intern/ghost/intern/GHOST_SystemPathsUnix.cc
++++ b/intern/ghost/intern/GHOST_SystemPathsUnix.cc
+@@ -22,6 +22,11 @@
+ 
+ using std::string;
+ 
++/* Data folder name; distributions of Blender can override it. */
++#ifndef BLENDER_APP_DIR_UNIX
++#  define BLENDER_APP_DIR_UNIX "blender"
++#endif
++
+ #ifdef PREFIX
+ static const char *static_path = PREFIX "/share";
+ #else
+@@ -42,7 +47,7 @@ const char *GHOST_SystemPathsUnix::getSystemDir(int /*version*/, const char *ver
+ {
+   /* no prefix assumes a portable build which only uses bundled scripts */
+   if (static_path) {
+-    static string system_path = string(static_path) + "/blender/" + versionstr;
++    static string system_path = string(static_path) + "/" BLENDER_APP_DIR_UNIX "/" + versionstr;
+     return system_path.c_str();
+   }
+ 
+@@ -52,7 +57,7 @@ const char *GHOST_SystemPathsUnix::getSystemDir(int /*version*/, const char *ver
+ const char *GHOST_SystemPathsUnix::getSystemLibsDir(int /*version*/, const char *versionstr) const
+ {
+   if (static_libs_path) {
+-    static string system_libs_path = string(static_libs_path) + "/blender/" + versionstr;
++    static string system_libs_path = string(static_libs_path) + "/" BLENDER_APP_DIR_UNIX "/" + versionstr;
+     return system_libs_path.c_str();
+   }
+ 
+@@ -101,12 +106,12 @@ const char *GHOST_SystemPathsUnix::getUserDir(int version, const char *versionst
+     last_version = version;
+ 
+     if (home) {
+-      user_path = string(home) + "/blender/" + versionstr;
++      user_path = string(home) + "/" BLENDER_APP_DIR_UNIX "/" + versionstr;
+     }
+     else {
+       home = home_dir_get();
+       if (home) {
+-        user_path = string(home) + "/.config/blender/" + versionstr;
++        user_path = string(home) + "/.config/" BLENDER_APP_DIR_UNIX "/" + versionstr;
+       }
+       else {
+         return nullptr;
+diff --git a/intern/ghost/intern/GHOST_SystemPathsWin32.cc b/intern/ghost/intern/GHOST_SystemPathsWin32.cc
+index 71d6d45ace52c6a2cc1d5d42dadff33ede751f3d..eae9e0d1726d2beb43bdac78544c6f22761155ea 100644
+--- a/intern/ghost/intern/GHOST_SystemPathsWin32.cc
++++ b/intern/ghost/intern/GHOST_SystemPathsWin32.cc
+@@ -15,6 +15,15 @@
+ #include "utfconv.hh"
+ #include <shlobj.h>
+ 
++/* Folder names for user and system data. Distributions of Blender can override them so
++ * they never share preferences, add-ons or caches with an installed Blender. */
++#ifndef BLENDER_APP_VENDOR_DIR
++#  define BLENDER_APP_VENDOR_DIR "Blender Foundation"
++#endif
++#ifndef BLENDER_APP_DIR
++#  define BLENDER_APP_DIR "Blender"
++#endif
++
+ GHOST_SystemPathsWin32::GHOST_SystemPathsWin32() {}
+ 
+ GHOST_SystemPathsWin32::~GHOST_SystemPathsWin32() {}
+@@ -32,7 +41,7 @@ const char *GHOST_SystemPathsWin32::getSystemDir(int, const char *versionstr) co
+ 
+   if (hResult == S_OK) {
+     conv_utf_16_to_8(knownpath_16, knownpath, MAX_PATH * 3);
+-    strcat(knownpath, "\\Blender Foundation\\Blender\\");
++    strcat(knownpath, "\\" BLENDER_APP_VENDOR_DIR "\\" BLENDER_APP_DIR "\\");
+     strcat(knownpath, versionstr);
+     system_dir = knownpath;
+   }
+@@ -53,7 +62,7 @@ const char *GHOST_SystemPathsWin32::getUserDir(int, const char *versionstr) cons
+ 
+   if (hResult == S_OK) {
+     conv_utf_16_to_8(knownpath_16, knownpath, MAX_PATH * 3);
+-    strcat(knownpath, "\\Blender Foundation\\Blender\\");
++    strcat(knownpath, "\\" BLENDER_APP_VENDOR_DIR "\\" BLENDER_APP_DIR "\\");
+     strcat(knownpath, versionstr);
+     user_dir = knownpath;
+   }
+diff --git a/source/blender/blenkernel/intern/appdir.cc b/source/blender/blenkernel/intern/appdir.cc
+index a2c90560a210dd8383ac98ca9642dae3b3a66554..1eeb1e8775dbcef079ec1e86c6c562a59128ee7f 100644
+--- a/source/blender/blenkernel/intern/appdir.cc
++++ b/source/blender/blenkernel/intern/appdir.cc
+@@ -216,18 +216,31 @@ void BKE_appdir_folder_caches(char *path, const size_t path_maxncpy)
+     return;
+   }
+ 
++/* Cache folder names; distributions of Blender can override them (see GHOST_SystemPaths*). */
++#ifndef BLENDER_APP_VENDOR_DIR
++#  define BLENDER_APP_VENDOR_DIR "Blender Foundation"
++#endif
++#ifndef BLENDER_APP_DIR
++#  define BLENDER_APP_DIR "Blender"
++#endif
++#ifndef BLENDER_APP_DIR_MACOS
++#  define BLENDER_APP_DIR_MACOS "Blender"
++#endif
++#ifndef BLENDER_APP_DIR_UNIX
++#  define BLENDER_APP_DIR_UNIX "blender"
++#endif
+ #ifdef WIN32
+   BLI_path_join(path,
+                 path_maxncpy,
+                 caches_root_path->c_str(),
+-                "Blender Foundation",
+-                "Blender",
++                BLENDER_APP_VENDOR_DIR,
++                BLENDER_APP_DIR,
+                 "Cache",
+                 SEP_STR);
+ #elif defined(__APPLE__)
+-  BLI_path_join(path, path_maxncpy, caches_root_path->c_str(), "Blender", SEP_STR);
++  BLI_path_join(path, path_maxncpy, caches_root_path->c_str(), BLENDER_APP_DIR_MACOS, SEP_STR);
+ #else /* __linux__ */
+-  BLI_path_join(path, path_maxncpy, caches_root_path->c_str(), "blender", SEP_STR);
++  BLI_path_join(path, path_maxncpy, caches_root_path->c_str(), BLENDER_APP_DIR_UNIX, SEP_STR);
+ #endif
+ }
+ 

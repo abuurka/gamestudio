@@ -1,0 +1,106 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: gsfork <gsfork@localhost>
+Date: Fri, 9 Oct 2026 20:49:12 +0100
+Subject: [PATCH] S07: Python and RNA access to the extension editor
+
+Why:         Python panels/headers target the editor with bl_space_type='EXTENSION_EDITOR',
+             read context.space_data.provider_idname, and add draw handlers; the editor
+             redraws on its own notifier. All additions sit at list tails.
+Hook-for:    editor/shell (provider UI in Python), editor/native/blender/space_extension.cc
+Upstream:    candidate, with S05
+Test:        editor/tests/contract/test_extension_editor.py
+Remove-when: upstream ships registrable custom editors
+---
+ source/blender/makesrna/intern/rna_space.cc   | 22 +++++++++++++++++++
+ .../blender/python/intern/bpy_rna_callback.cc |  3 +++
+ source/blender/windowmanager/WM_types.hh      |  2 ++
+ 3 files changed, 27 insertions(+)
+
+diff --git a/source/blender/makesrna/intern/rna_space.cc b/source/blender/makesrna/intern/rna_space.cc
+index ef6c3a80f28e3c78c9ee5e07853e7e20cf931e13..4201cbabafd71bcfa9562fc3f82e6df74093bdaa 100644
+--- a/source/blender/makesrna/intern/rna_space.cc
++++ b/source/blender/makesrna/intern/rna_space.cc
+@@ -31,6 +31,7 @@
+ #include "DNA_layer_types.h"
+ #include "DNA_mask_types.h"
+ #include "DNA_object_types.h"
++#include "DNA_space_extension_types.h"
+ #include "DNA_space_types.h"
+ #include "DNA_view3d_types.h"
+ 
+@@ -183,6 +184,11 @@ const EnumPropertyItem rna_enum_space_type_items[] = {
+      ICON_PREFERENCES,
+      "Preferences",
+      "Edit persistent configuration settings"},
++    {SPACE_EXTENSION,
++     "EXTENSION_EDITOR",
++     ICON_WINDOW,
++     "Extension Editor",
++     "Editor whose content comes from a registered provider"},
+     {0, nullptr, 0, nullptr, nullptr},
+ };
+ 
+@@ -793,6 +799,8 @@ static StructRNA *rna_Space_refine(PointerRNA *ptr)
+       return RNA_SpaceClipEditor;
+     case SPACE_SPREADSHEET:
+       return RNA_SpaceSpreadsheet;
++    case SPACE_EXTENSION:
++      return RNA_SpaceExtensionEditor;
+ 
+       /* Currently no type info. */
+     case SPACE_SCRIPT:
+@@ -9520,6 +9528,19 @@ static void rna_def_space_spreadsheet(BlenderRNA *brna)
+   RNA_def_property_update(prop, NC_SPACE | ND_SPACE_SPREADSHEET, nullptr);
+ }
+ 
++static void rna_def_space_extension(BlenderRNA *brna)
++{
++  StructRNA *srna = RNA_def_struct(brna, "SpaceExtensionEditor", "Space");
++  RNA_def_struct_sdna(srna, "SpaceExtension");
++  RNA_def_struct_ui_text(
++      srna, "Space Extension Editor", "Editor whose content comes from a registered provider");
++
++  PropertyRNA *prop = RNA_def_property(srna, "provider_idname", PROP_STRING, PROP_NONE);
++  RNA_def_property_string_sdna(prop, nullptr, "provider_idname");
++  RNA_def_property_ui_text(prop, "Provider", "Identifier of the provider shown in this editor");
++  RNA_def_property_update(prop, NC_SPACE | ND_SPACE_EXTENSION, nullptr);
++}
++
+ void RNA_def_space(BlenderRNA *brna)
+ {
+   rna_def_space(brna);
+@@ -9548,6 +9569,7 @@ void RNA_def_space(BlenderRNA *brna)
+   rna_def_space_node(brna);
+   rna_def_space_clip(brna);
+   rna_def_space_spreadsheet(brna);
++  rna_def_space_extension(brna);
+ }
+ 
+ }  // namespace blender
+diff --git a/source/blender/python/intern/bpy_rna_callback.cc b/source/blender/python/intern/bpy_rna_callback.cc
+index bfcd328903938dbb1d43810d23ed6ed99c4beef5..333051674f00b78656be91e741b14d2b903021ab 100644
+--- a/source/blender/python/intern/bpy_rna_callback.cc
++++ b/source/blender/python/intern/bpy_rna_callback.cc
+@@ -246,6 +246,9 @@ static eSpace_Type rna_Space_refine_reverse(StructRNA *srna)
+   if (srna == RNA_SpaceSpreadsheet) {
+     return SPACE_SPREADSHEET;
+   }
++  if (srna == RNA_SpaceExtensionEditor) {
++    return SPACE_EXTENSION;
++  }
+   return SPACE_EMPTY;
+ }
+ 
+diff --git a/source/blender/windowmanager/WM_types.hh b/source/blender/windowmanager/WM_types.hh
+index 9e0ad28744380854747bf7e630cfa3dcb842324d..ad36ec2f9274474703f29378b0154eba6adc49c6 100644
+--- a/source/blender/windowmanager/WM_types.hh
++++ b/source/blender/windowmanager/WM_types.hh
+@@ -573,6 +573,8 @@ struct wmNotifier {
+ #define ND_SPACE_CLIP (20 << 16)
+ #define ND_SPACE_FILE_PREVIEW (21 << 16)
+ #define ND_SPACE_SPREADSHEET (22 << 16)
++/* Kept far from the values above, which upstream extends in order (like SPACE_EXTENSION). */
++#define ND_SPACE_EXTENSION (200 << 16)
+ /* Not a space itself, but a part of another space. */
+ #define ND_REGIONS_ASSET_SHELF (23 << 16)
+ 

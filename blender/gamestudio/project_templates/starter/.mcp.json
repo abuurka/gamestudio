@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "gamestudio": {
+      "command": "node",
+      "args": ["node_modules/@gamestudio/mcp/bin/gamestudio-mcp.js"]
+    }
+  }
+}

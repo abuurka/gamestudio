@@ -1,0 +1,15 @@
+These sounds, music and images came with the GameStudio starter template. GameStudio's own
+scripts made them, with no recordings, samples or downloaded art.
+
+To the extent possible under law, the GameStudio contributors have waived all copyright and
+related or neighboring rights to them (CC0 1.0 Universal, a public domain dedication):
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Use, change and sell them as you like. No credit is needed, and you may delete this note.
+It covers only the files listed here, not files you add to assets/.
+
+sfx/    click.wav, damage.wav, jump.wav, lose.wav, pickup.wav, whoosh.wav, win.wav
+music/  theme.ogg
+ui/     button.png, coin.png, gem.png, heart.png, heart-empty.png, key.png, panel.png,
+        panel-framed.png, panel-light.png, panel-solid.png, slider-fill.png, slider-knob.png,
+        slider-track.png, star.png, star-empty.png

@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: gsfork <gsfork@localhost>
+Date: Fri, 9 Oct 2026 19:01:21 +0100
+Subject: [PATCH] S04: overridable default app template
+
+Why:         GameStudio Editor opens in its IDE shell (the GameStudio app template) without
+             launcher arguments; a saved preference cannot do this (readfile.cc clears it).
+             `--app-template default` still starts plain Blender.
+Hook-for:    editor/native/CMakeLists.txt (WM_DEFAULT_APP_TEMPLATE)
+Upstream:    candidate (default template for distributions)
+Test:        editor/tests/shell test_template_is_active
+Remove-when: upstream supports a build-time default template
+---
+ source/blender/windowmanager/intern/wm_files.cc | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/source/blender/windowmanager/intern/wm_files.cc b/source/blender/windowmanager/intern/wm_files.cc
+index 39c8fa5df124a97b3dcdd390233af177fc048132..ba6d68bf8b4ddc126a1cd457981d3cce151ddd50 100644
+--- a/source/blender/windowmanager/intern/wm_files.cc
++++ b/source/blender/windowmanager/intern/wm_files.cc
+@@ -1156,10 +1156,15 @@ bool WM_file_read(bContext *C,
+   return success;
+ }
+ 
++/* Distributions of Blender can start in their own app template by default. */
++#ifndef WM_DEFAULT_APP_TEMPLATE
++#  define WM_DEFAULT_APP_TEMPLATE ""
++#endif
++
+ static struct {
+   char app_template[64];
+   bool override;
+-} wm_init_state_app_template = {{0}};
++} wm_init_state_app_template = {WM_DEFAULT_APP_TEMPLATE, sizeof(WM_DEFAULT_APP_TEMPLATE) > 1};
+ 
+ void WM_init_state_app_template_set(const char *app_template)
+ {

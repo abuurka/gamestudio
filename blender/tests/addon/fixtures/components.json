@@ -1,0 +1,97 @@
+{
+  "format": "gamestudio.registry",
+  "formatVersion": 1,
+  "generatedAt": "2026-10-09T12:00:00.000Z",
+  "components": [
+    {
+      "name": "RigidBody",
+      "description": "Physics body (Rapier).",
+      "category": "Physics",
+      "builtin": true,
+      "fields": [
+        { "name": "type", "type": "enum", "options": ["dynamic", "fixed", "kinematic"], "default": "dynamic" },
+        { "name": "mass", "type": "float", "default": 1, "min": 0 },
+        { "name": "linearDamping", "type": "float", "default": 0, "min": 0 },
+        { "name": "angularDamping", "type": "float", "default": 0.05, "min": 0 },
+        { "name": "gravityScale", "type": "float", "default": 1 },
+        { "name": "lockRotation", "type": "bool", "default": false },
+        { "name": "ccd", "type": "bool", "default": false }
+      ]
+    },
+    {
+      "name": "Collider",
+      "description": "Collision shape. 'auto' picks a box from the mesh bounds.",
+      "category": "Physics",
+      "builtin": true,
+      "fields": [
+        { "name": "shape", "type": "enum", "options": ["auto", "box", "sphere", "capsule", "convex", "mesh"], "default": "auto" },
+        { "name": "friction", "type": "float", "default": 0.5, "min": 0 },
+        { "name": "restitution", "type": "float", "default": 0, "min": 0, "max": 1 },
+        { "name": "sensor", "type": "bool", "default": false }
+      ]
+    },
+    {
+      "name": "CharacterController",
+      "description": "Walks and jumps with the keyboard.",
+      "category": "Gameplay",
+      "builtin": true,
+      "fields": [
+        { "name": "speed", "type": "float", "default": 5, "unit": "distance" },
+        { "name": "jumpSpeed", "type": "float", "default": 6 },
+        { "name": "gravity", "type": "float", "default": 20 },
+        { "name": "turnSpeed", "type": "float", "default": 10, "unit": "angle" }
+      ]
+    },
+    {
+      "name": "FollowCamera",
+      "description": "Smoothly follows a target entity.",
+      "category": "Camera",
+      "builtin": true,
+      "fields": [
+        { "name": "target", "type": "entity" },
+        { "name": "offset", "type": "vec3", "default": [0, 4, 8] },
+        { "name": "smoothing", "type": "float", "default": 5, "min": 0 },
+        { "name": "lookAtOffset", "type": "vec3", "default": [0, 1, 0] }
+      ]
+    },
+    {
+      "name": "Spin",
+      "description": "Rotates the entity continuously.",
+      "category": "Demo",
+      "builtin": true,
+      "fields": [
+        { "name": "speed", "type": "float", "default": 1, "min": 0, "max": 100, "step": 0.1, "description": "Radians per second" },
+        { "name": "axis", "type": "vec3", "default": [0, 1, 0] }
+      ]
+    },
+    {
+      "name": "Coin",
+      "description": "A collectible worth some points.",
+      "category": "Demo",
+      "builtin": false,
+      "source": "src/components/coin.ts",
+      "fields": [
+        { "name": "value", "type": "int", "default": 1, "min": 0, "max": 1000 },
+        { "name": "rarity", "type": "enum", "options": ["common", "rare", "epic"], "default": "common" },
+        { "name": "magnet", "type": "entity", "description": "Optional object that attracts the coin" }
+      ]
+    },
+    {
+      "name": "Showcase",
+      "description": "Uses every field type (test fixture).",
+      "category": "Demo",
+      "fields": [
+        { "name": "speed", "type": "float", "default": 2.5, "min": 0, "max": 10, "unit": "time" },
+        { "name": "count", "type": "int", "default": 3, "min": -5, "max": 5 },
+        { "name": "active", "type": "bool", "default": true },
+        { "name": "label", "type": "string", "default": "hello", "multiline": true },
+        { "name": "mode", "type": "enum", "options": ["walk", "run", "fly"], "default": "run" },
+        { "name": "size", "type": "vec2", "default": [1, 2], "min": 0 },
+        { "name": "direction", "type": "vec3", "default": [0, 0, -1] },
+        { "name": "tint", "type": "color", "default": [1, 0.5, 0.25, 1] },
+        { "name": "target", "type": "entity" },
+        { "name": "sound", "type": "asset", "default": "", "extensions": [".ogg", ".wav"] }
+      ]
+    }
+  ]
+}

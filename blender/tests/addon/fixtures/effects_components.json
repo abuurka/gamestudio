@@ -1,0 +1,320 @@
+[
+  {
+    "name": "ParticleEmitter",
+    "description": "Emits particles (sparkles, dust, smoke, sparks) from this object: a steady rate and/or a burst per cycle. ctx.vfx.play / stop / emit control it from code.",
+    "category": "Effects",
+    "builtin": true,
+    "fields": [
+      {
+        "name": "playOnStart",
+        "type": "bool",
+        "default": true,
+        "description": "Start emitting when the entity appears"
+      },
+      {
+        "name": "loop",
+        "type": "bool",
+        "default": true,
+        "description": "Repeat the cycle; off emits one cycle and stops"
+      },
+      {
+        "name": "duration",
+        "type": "float",
+        "default": 1,
+        "min": 0.01,
+        "unit": "time",
+        "description": "Seconds per cycle"
+      },
+      {
+        "name": "rate",
+        "type": "float",
+        "default": 20,
+        "min": 0,
+        "description": "Particles per second during a cycle"
+      },
+      {
+        "name": "burst",
+        "type": "int",
+        "default": 0,
+        "min": 0,
+        "description": "Particles emitted at once when a cycle starts"
+      },
+      {
+        "name": "maxParticles",
+        "type": "int",
+        "default": 200,
+        "min": 1,
+        "max": 10000,
+        "description": "Most particles alive at once; more wait until some die"
+      },
+      {
+        "name": "lifetime",
+        "type": "vec2",
+        "default": [
+          0.6,
+          1.2
+        ],
+        "min": 0,
+        "description": "Seconds a particle lives (min, max)"
+      },
+      {
+        "name": "speed",
+        "type": "vec2",
+        "default": [
+          1,
+          2
+        ],
+        "description": "Start speed in m/s (min, max)"
+      },
+      {
+        "name": "direction",
+        "type": "vec3",
+        "default": [
+          0,
+          1,
+          0
+        ],
+        "description": "Emission direction in the object’s space (Y-up)"
+      },
+      {
+        "name": "spread",
+        "type": "float",
+        "default": 0.4,
+        "min": 0,
+        "max": 3.141592653589793,
+        "unit": "angle",
+        "description": "Cone half-angle around the direction; 180° emits everywhere"
+      },
+      {
+        "name": "shape",
+        "type": "enum",
+        "default": "point",
+        "options": [
+          "point",
+          "sphere",
+          "box",
+          "cone"
+        ],
+        "description": "Where particles start: point; inside a sphere (moving outward); inside a box; on a disc (through the cone)"
+      },
+      {
+        "name": "radius",
+        "type": "float",
+        "default": 0.5,
+        "min": 0,
+        "unit": "distance",
+        "description": "Sphere and cone radius"
+      },
+      {
+        "name": "box",
+        "type": "vec3",
+        "default": [
+          1,
+          1,
+          1
+        ],
+        "min": 0,
+        "description": "Box size in metres"
+      },
+      {
+        "name": "gravity",
+        "type": "float",
+        "default": 0,
+        "description": "Multiplier of the scene gravity; negative rises"
+      },
+      {
+        "name": "drag",
+        "type": "float",
+        "default": 0,
+        "min": 0,
+        "description": "Slows particles down (per second)"
+      },
+      {
+        "name": "size",
+        "type": "vec2",
+        "default": [
+          0.2,
+          0.05
+        ],
+        "min": 0,
+        "description": "Size in metres at birth and at death"
+      },
+      {
+        "name": "colorStart",
+        "type": "color",
+        "default": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "description": "Colour and opacity at birth"
+      },
+      {
+        "name": "colorEnd",
+        "type": "color",
+        "default": [
+          1,
+          1,
+          1,
+          0
+        ],
+        "description": "Colour and opacity at death"
+      },
+      {
+        "name": "brightness",
+        "type": "float",
+        "default": 1,
+        "min": 0,
+        "description": "Colour multiplier; above 1 glows with bloom"
+      },
+      {
+        "name": "texture",
+        "type": "enum",
+        "default": "dot",
+        "options": [
+          "dot",
+          "spark",
+          "star",
+          "smoke",
+          "square"
+        ],
+        "description": "Built-in sprite"
+      },
+      {
+        "name": "image",
+        "type": "asset",
+        "default": "",
+        "extensions": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "description": "Sprite image instead of the built-in texture"
+      },
+      {
+        "name": "blending",
+        "type": "enum",
+        "default": "additive",
+        "options": [
+          "additive",
+          "alpha"
+        ],
+        "description": "additive glows (sparks, magic); alpha covers (smoke, dust, confetti)"
+      },
+      {
+        "name": "stretch",
+        "type": "float",
+        "default": 0,
+        "min": 0,
+        "description": "Stretch sprites along their velocity (sparks)"
+      },
+      {
+        "name": "spin",
+        "type": "float",
+        "default": 0,
+        "unit": "angle",
+        "description": "Sprite rotation speed per second (random direction)"
+      },
+      {
+        "name": "space",
+        "type": "enum",
+        "default": "world",
+        "options": [
+          "world",
+          "local"
+        ],
+        "description": "world: particles stay where they were emitted; local: they move with the object"
+      },
+      {
+        "name": "seed",
+        "type": "int",
+        "default": 0,
+        "description": "Random seed; emitters with the same seed repeat the same pattern"
+      }
+    ]
+  },
+  {
+    "name": "PostEffects",
+    "description": "Screen effects for this scene: bloom (glow), vignette and simple colour grading. Put it on any one object, such as the camera. Everything is off until you turn it on.",
+    "category": "Rendering",
+    "builtin": true,
+    "fields": [
+      {
+        "name": "bloom",
+        "type": "bool",
+        "default": false,
+        "description": "Bright parts glow"
+      },
+      {
+        "name": "bloomStrength",
+        "type": "float",
+        "default": 0.6,
+        "min": 0,
+        "description": "How strong the glow is"
+      },
+      {
+        "name": "bloomThreshold",
+        "type": "float",
+        "default": 0.85,
+        "min": 0,
+        "description": "Brightness from which things glow"
+      },
+      {
+        "name": "bloomRadius",
+        "type": "float",
+        "default": 0.4,
+        "min": 0,
+        "max": 1,
+        "description": "How far the glow spreads"
+      },
+      {
+        "name": "vignette",
+        "type": "bool",
+        "default": false,
+        "description": "Darken the corners"
+      },
+      {
+        "name": "vignetteAmount",
+        "type": "float",
+        "default": 0.35,
+        "min": 0,
+        "max": 1,
+        "description": "How dark the corners get"
+      },
+      {
+        "name": "exposure",
+        "type": "float",
+        "default": 1,
+        "min": 0,
+        "description": "Overall brightness (tone mapping exposure)"
+      },
+      {
+        "name": "contrast",
+        "type": "float",
+        "default": 1,
+        "min": 0,
+        "description": "1 = unchanged"
+      },
+      {
+        "name": "saturation",
+        "type": "float",
+        "default": 1,
+        "min": 0,
+        "description": "1 = unchanged, 0 = grey"
+      },
+      {
+        "name": "tint",
+        "type": "color",
+        "default": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "description": "Colour multiplier; white = unchanged"
+      }
+    ]
+  }
+]

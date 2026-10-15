@@ -1,0 +1,132 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# SHELVED: the GameStudio Editor fork (editor/, docs/fork/) is kept for reference and not maintained.
+# This workflow only runs when started by hand (workflow_dispatch); its push and nightly triggers are
+# off. The extension's CI is extension.yml.
+#
+# GameStudio Editor: build, test and (nightly) package the Blender-based editor.
+# Runs on a SELF-HOSTED Windows runner, because a Blender build needs ~15 GB of libraries, a
+# persistent build folder and sccache (research/11 section 4.1). Release steps: docs/fork/RELEASING.md.
+#
+# SECURITY: read before changing triggers, runners or permissions.
+#  * NEVER attach the self-hosted runner to a PUBLIC repository. Anyone can open a pull request from
+#    a fork, and a workflow would then run their code on this machine, with its files, network and
+#    any credentials on it (research/11 section 4.1; GitHub's self-hosted runner security guidance).
+#  * Keep this repository private. In Settings > Actions > General keep "Run workflows from fork pull
+#    requests" off. This workflow deliberately has no pull_request or pull_request_target trigger.
+#  * Run the runner as a service under a dedicated, non-administrator Windows account (not your daily
+#    account), in a runner group that only this repository can use, with only the labels below.
+#  * The job token is read-only (permissions: contents: read) and no secrets are used. Signing keys,
+#    when they arrive, belong in a protected "release" environment with required reviewers, never in
+#    a job that builds unreviewed commits.
+#  * Pin third-party actions to full commit SHAs once this is stable (Dependabot can keep them fresh).
+#  * CI uses its own mirror, worktree, build and sccache folders under GS_CI_ROOT, never a developer's
+#    F:\Development-games\blender-upstream or gs-build: two jobs in one Blender worktree corrupt it.
+#    The first run downloads Blender, its LFS files and lib/windows_x64 (~15 GB); later runs are
+#    incremental.
+
+name: editor (shelved fork)
+
+on:
+  # Shelved: was push to main (paths-ignore research/**, docs/**, **/*.md) and a nightly
+  # schedule (cron "30 1 * * *": build, test, package, upload).
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Also package (zip, GPL source archives, SHA256SUMS) and upload them"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # One Blender build at a time on the runner (canary.yml uses the same group). A newer push waits
+  # instead of killing a half-finished Ninja build.
+  group: gamestudio-editor-runner
+  cancel-in-progress: false
+
+env:
+  # Set the repository variable GS_CI_ROOT to move the CI folders. No spaces (Blender's build rule).
+  GS_CI_ROOT: ${{ vars.GS_CI_ROOT || 'F:\gs-ci' }}
+  PYTHONUTF8: "1"
+
+jobs:
+  editor:
+    name: Build and test the editor
+    runs-on: [self-hosted, windows, gamestudio-build]
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Point gsfork at the CI folders
+        shell: python
+        run: |
+          import json, os, pathlib
+          root = pathlib.Path(os.environ["GS_CI_ROOT"])
+          names = {"mirror": "blender-upstream", "work": "gs-blender", "build": "gs-build",
+                   "sccache": "gs-sccache", "userdata": "gs-userdata"}
+          cfg = {key: str(root / name) for key, name in names.items()}
+          pathlib.Path("editor/gsfork.local.json").write_text(json.dumps(cfg, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(cfg, indent=2))
+
+      - name: gsfork status
+        run: python editor/tools/gsfork.py status
+
+      - name: gsfork sync
+        run: python editor/tools/gsfork.py sync
+
+      - name: gsfork apply
+        run: python editor/tools/gsfork.py apply
+
+      - name: gsfork build
+        run: python editor/tools/gsfork.py build
+
+      - name: gsfork test (fork build)
+        run: python editor/tools/gsfork.py test
+
+      - name: gsfork test --stock (shell fallback on stock Blender)
+        # Set the repository variable GS_STOCK_BLENDER to a stock Blender 5.2 blender.exe to enable.
+        if: vars.GS_STOCK_BLENDER != ''
+        run: python editor/tools/gsfork.py test --stock "${{ vars.GS_STOCK_BLENDER }}"
+
+      - name: Packaging unit tests
+        run: python editor/tests/tools/test_package.py
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: npm ci
+        run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: "1" # the unit tests never start Electron
+
+      - name: npm run typecheck
+        run: npm run typecheck
+
+      - name: npm test
+        run: npm test
+
+      # ---- nightly (or on request): release candidate ------------------------------------------
+      - name: gsfork package --verify
+        if: github.event_name == 'schedule' || inputs.package
+        run: python editor/tools/gsfork.py package --verify
+
+      - name: Upload the release candidate
+        if: github.event_name == 'schedule' || inputs.package
+        uses: actions/upload-artifact@v4
+        with:
+          name: gamestudio-editor-nightly-${{ github.run_number }}
+          # The upstream source archive is part of the GPL Corresponding Source: never upload the zip
+          # without both source archives, even for testers.
+          path: |
+            dist/GameStudio-Editor-*-windows-x64.zip
+            dist/GameStudio-Editor-*-source.tar.gz
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          compression-level: 0 # everything is already compressed
+          # A nightly is ~0.5 GB. Private repositories have a small artifact storage quota
+          # (500 MB on Free, 2 GB on Pro/Team), so keep only a few days.
+          retention-days: 3

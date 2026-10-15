@@ -1,0 +1,29 @@
+{
+  "name": "@gamestudio/mcp",
+  "version": "0.1.0",
+  "description": "GameStudio MCP server: lets coding agents such as Claude Code drive Blender (scene, assets, components) and the running game.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "gamestudio-mcp": "./bin/gamestudio-mcp.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "blender",
+    "LICENSE"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "puppeteer-core": "25.13.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

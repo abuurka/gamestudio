@@ -1,0 +1,187 @@
+1
+00:00:03,400 --> 00:00:05,362
+Here's Gem Island, with Claude Code
+
+2
+00:00:05,362 --> 00:00:07,806
+running in the project, as in lesson four.
+
+3
+00:00:07,812 --> 00:00:09,611
+GameStudio's rigged character comes
+
+4
+00:00:09,611 --> 00:00:11,214
+from a kit that Claude builds,
+
+5
+00:00:11,214 --> 00:00:13,727
+so ask Claude to swap the player for one.
+
+6
+00:00:14,300 --> 00:00:15,763
+Claude deletes the old player,
+
+7
+00:00:15,763 --> 00:00:17,620
+builds a rigged character from the kit,
+
+8
+00:00:17,620 --> 00:00:20,076
+and gives it the player's components and the camera.
+
+9
+00:00:20,163 --> 00:00:21,835
+It's an armature called Player,
+
+10
+00:00:21,835 --> 00:00:23,420
+with a skinned mesh.
+
+11
+00:00:24,000 --> 00:00:26,433
+Its animations are Blender actions.
+
+12
+00:00:26,577 --> 00:00:28,261
+To see them, turn the Console into
+
+13
+00:00:28,261 --> 00:00:30,310
+the Nonlinear Animation editor:
+
+14
+00:00:30,397 --> 00:00:32,331
+click its Editor Type button.
+
+15
+00:00:32,900 --> 00:00:34,775
+Choose Nonlinear Animation.
+
+16
+00:00:35,567 --> 00:00:37,007
+Drag its top border up to
+
+17
+00:00:37,007 --> 00:00:38,743
+make room for every track.
+
+18
+00:00:39,533 --> 00:00:41,141
+Here are the character's clips:
+
+19
+00:00:41,147 --> 00:00:44,114
+Idle, Walk, Run, Jump, Fall and a few more.
+
+20
+00:00:44,316 --> 00:00:46,847
+Each one is a Blender action on its own track,
+
+21
+00:00:46,847 --> 00:00:48,932
+and the game plays them by name.
+
+22
+00:00:49,500 --> 00:00:51,480
+Now wire them up, with no code.
+
+23
+00:00:51,567 --> 00:00:52,995
+The armature is still selected,
+
+24
+00:00:52,995 --> 00:00:54,539
+and its Game panel in the Properties
+
+25
+00:00:54,539 --> 00:00:56,449
+lists the components Claude gave it.
+
+26
+00:00:56,536 --> 00:00:58,295
+Click Add Component.
+
+27
+00:00:59,000 --> 00:01:01,944
+The list is long, so scroll it up to Animation.
+
+28
+00:01:02,500 --> 00:01:05,026
+Choose Locomotion, under Animation.
+
+29
+00:01:05,600 --> 00:01:07,383
+Scroll down to its settings.
+
+30
+00:01:08,900 --> 00:01:11,356
+Locomotion names a clip for each gait:
+
+31
+00:01:11,443 --> 00:01:13,637
+Idle, Walk, Run, Jump and Fall,
+
+32
+00:01:13,637 --> 00:01:15,141
+the kit's own names.
+
+33
+00:01:15,146 --> 00:01:17,741
+It picks one from how the character moves.
+
+34
+00:01:18,300 --> 00:01:19,804
+Press F5 to play.
+
+35
+00:01:21,033 --> 00:01:22,879
+Click Play on the title screen.
+
+36
+00:01:22,879 --> 00:01:25,138
+That also hands your keyboard to the game.
+
+37
+00:01:25,700 --> 00:01:27,448
+Hold W, and it runs:
+
+38
+00:01:27,592 --> 00:01:29,125
+Locomotion plays the Run clip
+
+39
+00:01:29,125 --> 00:01:30,919
+as soon as it's fast enough.
+
+40
+00:01:31,500 --> 00:01:34,002
+Turn with D and press Space, and it jumps:
+
+41
+00:01:34,089 --> 00:01:36,260
+Locomotion plays the Jump clip on the way up,
+
+42
+00:01:36,260 --> 00:01:38,252
+and Fall on the way down.
+
+43
+00:01:38,833 --> 00:01:40,987
+Shift Escape gives you the mouse back,
+
+44
+00:01:41,567 --> 00:01:43,396
+and F8 stops the game.
+
+45
+00:01:44,067 --> 00:01:46,883
+That's an animated player, with no code.
+
+46
+00:01:47,155 --> 00:01:50,041
+For moves of your own, like a landing or an attack,
+
+47
+00:01:50,081 --> 00:01:52,583
+ask Claude for an animation graph.

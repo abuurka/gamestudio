@@ -1,0 +1,128 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# SHELVED: the GameStudio Editor fork (editor/, docs/fork/) is kept for reference and not maintained.
+# This workflow only runs when started by hand (workflow_dispatch); its weekly schedule is off.
+#
+# Weekly canary: apply GameStudio's patch series (editor/patches/series) to upstream Blender's next
+# release branch and to main, so that breakage shows up months before an LTS upgrade
+# (docs/fork/ARCHITECTURE.md sections 2 and 7, research/11 section 4.4). A failure opens an issue, or
+# comments on the open one for the same ref.
+#
+# Today the canary checks tier 1 (does each patch apply: clean, 3-way or conflict?) plus a static check
+# that the Blender headers editor/native includes still exist (--build-check). Building against main also needs the
+# lib/windows_x64 commit that main pins; add a build step once the CI runner keeps a second lib
+# checkout.
+#
+# SECURITY: same rules as editor.yml. This job runs on the SELF-HOSTED runner, so the repository must
+# stay private and must never accept workflows from fork pull requests. Only the issue step gets a
+# write permission (issues: write), and it uses the job's own GITHUB_TOKEN.
+
+name: canary (shelved fork)
+
+on:
+  # Shelved: was a weekly schedule (cron "0 4 * * 1", Mondays 04:00 UTC).
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  # The canary fetches into the same CI mirror editor.yml builds from (only into refs/gsfork/canary/*;
+  # it never checks out or adds a worktree there). Fetching still writes the mirror's object store
+  # and shallow list, so never run both at once.
+  group: gamestudio-editor-runner
+  cancel-in-progress: false
+
+env:
+  GS_CI_ROOT: ${{ vars.GS_CI_ROOT || 'F:\gs-ci' }}
+  PYTHONUTF8: "1"
+
+jobs:
+  canary:
+    name: Canary vs ${{ matrix.ref }}
+    runs-on: [self-hosted, windows, gamestudio-build]
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 1 # both refs use one mirror
+      matrix:
+        ref: [blender-v5.3-release, main]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Point gsfork at the CI folders
+        shell: python
+        run: |
+          import json, os, pathlib
+          root = pathlib.Path(os.environ["GS_CI_ROOT"])
+          names = {"mirror": "blender-upstream", "work": "gs-blender", "build": "gs-build",
+                   "sccache": "gs-sccache", "userdata": "gs-userdata"}
+          cfg = {key: str(root / name) for key, name in names.items()}
+          pathlib.Path("editor/gsfork.local.json").write_text(json.dumps(cfg, indent=2) + "\n", encoding="utf-8")
+
+      - name: gsfork sync (creates the CI mirror on the first run)
+        run: python editor/tools/gsfork.py sync
+
+      - name: gsfork canary ${{ matrix.ref }}
+        shell: python
+        env:
+          REF: ${{ matrix.ref }}
+        run: |
+          import os, pathlib, subprocess, sys
+          ref = os.environ["REF"]
+          # gsfork canary tries every patch (clean / 3-way / conflict, with the conflicting files) and
+          # checks that the Blender headers editor/native includes still exist. It exits 1 if any
+          # patch or the header check fails, so the exit code is the verdict.
+          proc = subprocess.run([sys.executable, "editor/tools/gsfork.py", "canary", ref, "--build-check"],
+                                capture_output=True, text=True, encoding="utf-8", errors="replace")
+          log = (proc.stdout or "") + (proc.stderr or "")
+          print(log)
+          pathlib.Path("canary.log").write_text(log, encoding="utf-8")
+          sys.exit(proc.returncode)
+
+      - name: Open or update the canary issue
+        if: failure()
+        uses: actions/github-script@v7
+        env:
+          REF: ${{ matrix.ref }}
+        with:
+          script: |
+            const fs = require('fs');
+            const ref = process.env.REF;
+            const { owner, repo } = context.repo;
+            let log;
+            try { log = fs.readFileSync('canary.log', 'utf8'); }
+            catch (e) { log = '(no canary.log: the job failed before the canary ran; see the run log)'; }
+            const tail = log.split(/\r?\n/).slice(-80).join('\n');
+            const run = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const title = `Canary: GameStudio patches break on upstream ${ref}`;
+            const body = [
+              `The weekly canary failed against upstream \`${ref}\` (commit ${context.sha.slice(0, 10)} of this repo).`,
+              '',
+              `Run: ${run}`,
+              '',
+              '```',
+              tail,
+              '```',
+              '',
+              'Next steps: reproduce with `python editor/tools/gsfork.py canary ' + ref + '`, fix the seam on a ',
+              'worktree of that ref, and record the cost in the upgrade notes (docs/fork/ARCHITECTURE.md section 7).',
+            ].join('\n');
+            const label = 'canary';
+            try { await github.rest.issues.getLabel({ owner, repo, name: label }); }
+            catch (e) {
+              if (e.status !== 404) throw e;
+              await github.rest.issues.createLabel({ owner, repo, name: label, color: 'd93f0b',
+                description: 'Upstream canary failures (patch series vs Blender branches)' });
+            }
+            const open = await github.paginate(github.rest.issues.listForRepo,
+              { owner, repo, state: 'open', labels: label, per_page: 100 });
+            const existing = open.find((issue) => issue.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
+              core.info(`Commented on #${existing.number}`);
+            } else {
+              const { data } = await github.rest.issues.create({ owner, repo, title, body, labels: [label] });
+              core.info(`Opened #${data.number}`);
+            }

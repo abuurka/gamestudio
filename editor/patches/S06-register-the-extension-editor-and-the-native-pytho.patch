@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: gsfork <gsfork@localhost>
+Date: Fri, 9 Oct 2026 20:49:11 +0100
+Subject: [PATCH] S06: register the extension editor and the native Python
+ module
+
+Why:         the out-of-tree module provides ED_spacetype_extension() and the `_gamestudio`
+             built-in Python module. Both calls are compiled only with WITH_GS_NATIVE, which
+             the module itself defines on these targets, so stock builds are unchanged.
+Hook-for:    editor/native/CMakeLists.txt, editor/native/blender/{space_extension,python_module}.cc
+Upstream:    not upstreamable as-is (module-specific); part of the custom-editors task
+Test:        editor/tests/shell test_host_reports_the_right_mode
+Remove-when: upstream ships registrable custom editors
+---
+ source/blender/editors/include/ED_space_api.hh | 2 ++
+ source/blender/editors/space_api/spacetypes.cc | 3 +++
+ source/blender/python/intern/bpy_interface.cc  | 8 ++++++++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/source/blender/editors/include/ED_space_api.hh b/source/blender/editors/include/ED_space_api.hh
+index 93d62bd7563d951f423e4e1ae587d9c2b740512f..64c159cb99332b783b9b797ea68ec5fa2cd0e788 100644
+--- a/source/blender/editors/include/ED_space_api.hh
++++ b/source/blender/editors/include/ED_space_api.hh
+@@ -43,6 +43,8 @@ void ED_spacetype_userpref();
+ void ED_spacetype_clip();
+ void ED_spacetype_statusbar();
+ void ED_spacetype_topbar();
++/** Provided by an out-of-tree module when built with `WITH_GS_NATIVE`. */
++void ED_spacetype_extension();
+ 
+ namespace ed::vse {
+ void ED_spacetype_sequencer();
+diff --git a/source/blender/editors/space_api/spacetypes.cc b/source/blender/editors/space_api/spacetypes.cc
+index ad21b369a725dff3ecebcd9ce5ddfd56ec336574..df75063955829c4796184bd9dacf7fafc422d967 100644
+--- a/source/blender/editors/space_api/spacetypes.cc
++++ b/source/blender/editors/space_api/spacetypes.cc
+@@ -86,6 +86,9 @@ void ED_spacetypes_init()
+   ED_spacetype_statusbar();
+   ED_spacetype_topbar();
+   spreadsheet::register_spacetype();
++#ifdef WITH_GS_NATIVE
++  ED_spacetype_extension();
++#endif
+ 
+   /* Register operator types for screen and all spaces. */
+   ED_operatortypes_userpref();
+diff --git a/source/blender/python/intern/bpy_interface.cc b/source/blender/python/intern/bpy_interface.cc
+index f0cb9f88e795ef9fd2a7a1ab253b241c12fa43a6..6d1ca00e28170a679be0546d3142d7cb51bbae3a 100644
+--- a/source/blender/python/intern/bpy_interface.cc
++++ b/source/blender/python/intern/bpy_interface.cc
+@@ -317,6 +317,11 @@ static PyObject *CCL_initPython()
+ PyObject *BPyInit_hydra();
+ #endif
+ 
++#ifdef WITH_GS_NATIVE
++/* Defined by the out-of-tree module (see `GS_NATIVE_DIR`). */
++PyObject *BPyInit__gamestudio();
++#endif
++
+ static _inittab bpy_internal_modules[] = {
+     {"mathutils", PyInit_mathutils},
+ #if 0
+@@ -347,6 +352,9 @@ static _inittab bpy_internal_modules[] = {
+     {"idprop", BPyInit_idprop},
+ #ifdef WITH_HYDRA
+     {"_bpy_hydra", BPyInit_hydra},
++#endif
++#ifdef WITH_GS_NATIVE
++    {"_gamestudio", BPyInit__gamestudio},
+ #endif
+     {nullptr, nullptr},
+ };

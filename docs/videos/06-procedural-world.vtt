@@ -1,0 +1,106 @@
+WEBVTT
+
+00:00:03.400 --> 00:00:06.082
+Claude Code is open in a new starter project.
+
+00:00:06.082 --> 00:00:07.510
+In its terminal, describe the
+
+00:00:07.510 --> 00:00:09.734
+world you want, in plain words.
+
+00:00:10.300 --> 00:00:11.983
+Claude looks at the scene first,
+
+00:00:11.983 --> 00:00:15.519
+then swaps the flat lawn for a terrain seventy metres across.
+
+00:00:16.100 --> 00:00:18.428
+Next, a dirt path along a curve.
+
+00:00:18.515 --> 00:00:20.291
+It's a geometry nodes road:
+
+00:00:20.291 --> 00:00:23.084
+it follows the ground and levels a bed into it.
+
+00:00:23.667 --> 00:00:26.390
+The river carves its own channel into the ground.
+
+00:00:26.767 --> 00:00:28.485
+Claude measures both banks and lays
+
+00:00:28.485 --> 00:00:30.790
+a wooden bridge across, with rails.
+
+00:00:31.367 --> 00:00:32.888
+Then cliffs, all the way round,
+
+00:00:32.888 --> 00:00:34.543
+along the terrain's edge.
+
+00:00:35.367 --> 00:00:37.445
+Two cottages go up beside the path,
+
+00:00:37.445 --> 00:00:40.447
+each one built from wall, window and door modules.
+
+00:00:41.000 --> 00:00:42.574
+Last, the forest.
+
+00:00:42.660 --> 00:00:44.228
+Trees are scattered over the ground,
+
+00:00:44.228 --> 00:00:45.876
+but they keep clear of the path,
+
+00:00:45.876 --> 00:00:48.262
+the river, the houses and the player.
+
+00:00:48.833 --> 00:00:50.557
+And it all stays editable.
+
+00:00:50.598 --> 00:00:53.669
+The whole forest is one object, still selected.
+
+00:00:53.756 --> 00:00:54.812
+In the Properties,
+
+00:00:54.812 --> 00:00:57.628
+open the Modifiers tab, the wrench.
+
+00:00:58.200 --> 00:00:59.878
+These are the scatter's inputs.
+
+00:00:59.883 --> 00:01:02.583
+Set Density to zero point zero eight.
+
+00:01:03.133 --> 00:01:05.153
+Blender fills in more trees at once,
+
+00:01:05.153 --> 00:01:07.040
+still clear of the path and the river.
+
+00:01:07.127 --> 00:01:09.838
+Now turn on Game in the 3D View's header.
+
+00:01:10.400 --> 00:01:11.799
+This is the Scene view:
+
+00:01:11.805 --> 00:01:13.268
+the game's own renderer,
+
+00:01:13.268 --> 00:01:15.340
+drawing your world while you build it.
+
+00:01:15.381 --> 00:01:17.059
+Scroll to get closer.
+
+00:01:17.633 --> 00:01:19.590
+Every part stays a live recipe.
+
+00:01:19.676 --> 00:01:21.685
+Change it by hand or ask Claude,
+
+00:01:21.685 --> 00:01:23.595
+then press F5 to play.

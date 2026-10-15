@@ -1,0 +1,102 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: gsfork <gsfork@localhost>
+Date: Fri, 9 Oct 2026 19:01:20 +0100
+Subject: [PATCH] S03: overridable application name and Windows app ID
+
+Why:         GameStudio Editor must not present itself as Blender (trademark policy) and
+             must not group with Blender in the taskbar. Defaults are unchanged.
+Hook-for:    editor/native/CMakeLists.txt (BLENDER_APP_NAME), editor/build/gamestudio.cmake
+             (BLENDER_WIN_APPID_PREFIX, BLENDER_WIN_APPID_FRIENDLY_PREFIX)
+Upstream:    candidate (branding hooks for Blender-based applications)
+Test:        editor/tests/shell (window title is checked by the GUI smoke test)
+Remove-when: upstream provides product branding settings
+---
+ CMakeLists.txt                                          | 9 +++++++--
+ source/blender/windowmanager/intern/wm_splash_screen.cc | 7 ++++++-
+ source/blender/windowmanager/intern/wm_window.cc        | 9 +++++++--
+ 3 files changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 141fdaf9fea7818ce8e74518b9287e65d1aacfe3..056fdbd64d07e9ebfe3008baf78a72c9b9f67a79 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -166,13 +166,18 @@ endif()
+ 
+ get_blender_version()
+ 
++# Distributions of Blender can override these so they get their own taskbar entry
++# and file registrations.
++set(BLENDER_WIN_APPID_PREFIX "blender" CACHE STRING "Windows app ID prefix")
++set(BLENDER_WIN_APPID_FRIENDLY_PREFIX "Blender" CACHE STRING "Windows app display name")
++mark_as_advanced(BLENDER_WIN_APPID_PREFIX BLENDER_WIN_APPID_FRIENDLY_PREFIX)
+ if(WIN32)
+   add_definitions(
+     # This is the app ID used for file registration, given it's used from several modules
+     # there really is no nice way to get this information consistent without a global define.
+-    -DBLENDER_WIN_APPID="blender.${BLENDER_VERSION_MAJOR}.${BLENDER_VERSION_MINOR}"
++    -DBLENDER_WIN_APPID="${BLENDER_WIN_APPID_PREFIX}.${BLENDER_VERSION_MAJOR}.${BLENDER_VERSION_MINOR}"
+     # This is the name that will be shown in the taskbar and OpenWith windows UI
+-    -DBLENDER_WIN_APPID_FRIENDLY_NAME="Blender ${BLENDER_VERSION_MAJOR}.${BLENDER_VERSION_MINOR}"
++    -DBLENDER_WIN_APPID_FRIENDLY_NAME="${BLENDER_WIN_APPID_FRIENDLY_PREFIX} ${BLENDER_VERSION_MAJOR}.${BLENDER_VERSION_MINOR}"
+   )
+ endif()
+ 
+diff --git a/source/blender/windowmanager/intern/wm_splash_screen.cc b/source/blender/windowmanager/intern/wm_splash_screen.cc
+index 92d1fdce61a286b4f94ee378ed5f3e006f9e5aee..c4cb72bd7aeae8d69f22ccf0d73a4ee0a5df351f 100644
+--- a/source/blender/windowmanager/intern/wm_splash_screen.cc
++++ b/source/blender/windowmanager/intern/wm_splash_screen.cc
+@@ -50,6 +50,11 @@
+ 
+ #include "wm.hh"
+ 
++/* Application name shown in the About box; distributions of Blender can override it. */
++#ifndef BLENDER_APP_NAME
++#  define BLENDER_APP_NAME "Blender"
++#endif
++
+ namespace blender {
+ 
+ /* -------------------------------------------------------------------- */
+@@ -477,7 +482,7 @@ static ui::Block *wm_block_about_create(bContext *C, ARegion *region, void * /*a
+ 
+   ui::Layout &col = layout.column(true);
+ 
+-  uiItemL_ex(&col, IFACE_("Blender"), ICON_NONE, true, false);
++  uiItemL_ex(&col, IFACE_(BLENDER_APP_NAME), ICON_NONE, true, false);
+ 
+   MenuType *mt = WM_menutype_find("WM_MT_splash_about", true);
+   if (mt) {
+diff --git a/source/blender/windowmanager/intern/wm_window.cc b/source/blender/windowmanager/intern/wm_window.cc
+index 4c0aa2cd5c6d2402459c5b4f2f83de8e493cb1a9..40d2dbe18090b1c18c11c19956d58b6892ffb5c6 100644
+--- a/source/blender/windowmanager/intern/wm_window.cc
++++ b/source/blender/windowmanager/intern/wm_window.cc
+@@ -106,6 +106,11 @@
+ #  include "BLI_threads.h"
+ #endif
+ 
++/* Application name shown in window titles; distributions of Blender can override it. */
++#ifndef BLENDER_APP_NAME
++#  define BLENDER_APP_NAME "Blender"
++#endif
++
+ namespace blender {
+ 
+ static void wm_window_csd_title_redraw_tag(wmWindowManager *wm, wmWindow *win);
+@@ -607,7 +612,7 @@ static std::string wm_window_title_text(
+     if (is_single && area && area->spacetype != SPACE_EMPTY) {
+       return IFACE_(ED_area_name(area).c_str());
+     }
+-    return "Blender";
++    return BLENDER_APP_NAME;
+   }
+ 
+   /* This path may contain invalid UTF8 byte sequences on UNIX systems,
+@@ -690,7 +695,7 @@ static std::string wm_window_title_text(
+     }
+   }
+ 
+-  win_title.append(fmt::format(" - Blender {}", BKE_blender_version_string()));
++  win_title.append(fmt::format(" - " BLENDER_APP_NAME " {}", BKE_blender_version_string()));
+ 
+   return win_title;
+ }

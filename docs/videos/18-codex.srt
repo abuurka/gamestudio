@@ -1,0 +1,175 @@
+1
+00:00:03,400 --> 00:00:05,165
+GameStudio works with Claude Code
+
+2
+00:00:05,165 --> 00:00:07,783
+or with Codex, OpenAI's coding agent.
+
+3
+00:00:07,870 --> 00:00:10,616
+To build with Codex, open the Edit menu,
+
+4
+00:00:11,167 --> 00:00:12,903
+and choose Preferences.
+
+5
+00:00:14,300 --> 00:00:15,572
+Go to Add-ons.
+
+6
+00:00:17,000 --> 00:00:20,129
+Click the arrow next to GameStudio to show its settings.
+
+7
+00:00:20,700 --> 00:00:22,970
+Under Coding agent, choose Codex.
+
+8
+00:00:23,057 --> 00:00:25,286
+From now on, the launcher, the welcome and
+
+9
+00:00:25,286 --> 00:00:28,288
+the agent button in the top bar open Codex.
+
+10
+00:00:28,867 --> 00:00:29,900
+That's all it takes.
+
+11
+00:00:29,900 --> 00:00:31,393
+Close the Preferences.
+
+12
+00:00:32,167 --> 00:00:35,169
+The agent button in the top bar now says Codex.
+
+13
+00:00:35,209 --> 00:00:37,943
+To start Codex, open the GameStudio menu,
+
+14
+00:00:38,500 --> 00:00:40,468
+and choose Open in Codex.
+
+15
+00:00:41,667 --> 00:00:44,616
+If Codex isn't installed yet, GameStudio offers
+
+16
+00:00:44,616 --> 00:00:47,594
+to install it, with OpenAI's official installer.
+
+17
+00:00:47,681 --> 00:00:49,573
+It needs no administrator rights,
+
+18
+00:00:49,573 --> 00:00:52,645
+and Codex opens in your project when it's ready.
+
+19
+00:00:53,200 --> 00:00:56,729
+The first time, GameStudio connects Codex to your project:
+
+20
+00:00:56,729 --> 00:01:00,068
+it adds Codex's copy of the skills and the link to Blender.
+
+21
+00:01:00,340 --> 00:01:01,531
+Click Open.
+
+22
+00:01:02,267 --> 00:01:05,013
+Codex starts in a terminal, in your project folder.
+
+23
+00:01:05,158 --> 00:01:07,236
+The first time, it asks you to sign in,
+
+24
+00:01:07,236 --> 00:01:08,601
+and to trust the folder.
+
+25
+00:01:08,641 --> 00:01:09,855
+Click Done.
+
+26
+00:01:10,600 --> 00:01:11,761
+Now, in the terminal,
+
+27
+00:01:11,761 --> 00:01:14,013
+tell Codex what you want in plain words.
+
+28
+00:01:14,013 --> 00:01:14,571
+Here:
+
+29
+00:01:14,571 --> 00:01:16,068
+put five mossy rocks of
+
+30
+00:01:16,068 --> 00:01:18,141
+different sizes around the lawn.
+
+31
+00:01:18,700 --> 00:01:21,469
+Codex looks at the scene first, then builds.
+
+32
+00:01:21,614 --> 00:01:23,774
+The rocks appear in Blender as it works,
+
+33
+00:01:23,774 --> 00:01:26,705
+and the status bar shows what Codex is doing.
+
+34
+00:01:27,267 --> 00:01:28,370
+Codex is done.
+
+35
+00:01:28,370 --> 00:01:29,972
+When you close it, the agent button
+
+36
+00:01:29,972 --> 00:01:32,039
+in the top bar still says Codex.
+
+37
+00:01:32,039 --> 00:01:33,043
+Click it.
+
+38
+00:01:33,600 --> 00:01:35,446
+It lists everything Codex did,
+
+39
+00:01:35,446 --> 00:01:37,368
+and each step can be undone.
+
+40
+00:01:37,640 --> 00:01:40,171
+Next time, click Open in Codex right here,
+
+41
+00:01:40,171 --> 00:01:42,581
+and Codex starts in your project again.
+
+42
+00:01:43,133 --> 00:01:45,786
+That's how to use Codex instead of Claude Code:
+
+43
+00:01:45,873 --> 00:01:47,429
+choose it once in the preferences,
+
+44
+00:01:47,429 --> 00:01:49,652
+and everything else works the same way.

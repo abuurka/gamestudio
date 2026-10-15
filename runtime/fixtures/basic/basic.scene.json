@@ -1,0 +1,162 @@
+{
+  "format": "gamestudio.scene",
+  "formatVersion": 1,
+  "scene": "basic",
+  "rev": 1,
+  "exportedAt": "2026-10-09T00:00:00.000Z",
+  "blenderVersion": "5.2.2 LTS",
+  "glb": "basic.glb",
+  "settings": {
+    "gravity": [
+      0,
+      -9.81,
+      0
+    ],
+    "background": [
+      0.05,
+      0.06,
+      0.09
+    ],
+    "activeCamera": "gs_000000a00007"
+  },
+  "entities": [
+    {
+      "id": "gs_000000a00001",
+      "name": "Ground",
+      "type": "MESH",
+      "parent": null,
+      "components": {
+        "Collider": {
+          "shape": "auto",
+          "friction": 0.5,
+          "restitution": 0,
+          "sensor": false
+        }
+      }
+    },
+    {
+      "id": "gs_000000a00002",
+      "name": "Crate",
+      "type": "MESH",
+      "parent": null,
+      "components": {
+        "RigidBody": {
+          "type": "dynamic",
+          "mass": 1,
+          "linearDamping": 0,
+          "angularDamping": 0.05,
+          "gravityScale": 1,
+          "lockRotation": false,
+          "ccd": false
+        },
+        "Collider": {
+          "shape": "auto",
+          "friction": 0.5,
+          "restitution": 0,
+          "sensor": false
+        }
+      }
+    },
+    {
+      "id": "gs_000000a00003",
+      "name": "CrateLamp",
+      "type": "MESH",
+      "parent": "gs_000000a00002",
+      "components": {}
+    },
+    {
+      "id": "gs_000000a00004",
+      "name": "Ramp",
+      "type": "MESH",
+      "parent": null,
+      "components": {
+        "Collider": {
+          "shape": "auto",
+          "friction": 0.5,
+          "restitution": 0,
+          "sensor": false
+        }
+      }
+    },
+    {
+      "id": "gs_000000a00005",
+      "name": "Player",
+      "type": "MESH",
+      "parent": null,
+      "components": {
+        "RigidBody": {
+          "type": "kinematic",
+          "mass": 1,
+          "linearDamping": 0,
+          "angularDamping": 0.05,
+          "gravityScale": 1,
+          "lockRotation": false,
+          "ccd": false
+        },
+        "Collider": {
+          "shape": "capsule",
+          "friction": 0.5,
+          "restitution": 0,
+          "sensor": false
+        },
+        "CharacterController": {
+          "speed": 5,
+          "jumpSpeed": 6,
+          "gravity": 20,
+          "turnSpeed": 10
+        }
+      }
+    },
+    {
+      "id": "gs_000000a00006",
+      "name": "Coin",
+      "type": "MESH",
+      "parent": null,
+      "components": {
+        "Spin": {
+          "speed": 2,
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        "Collider": {
+          "shape": "sphere",
+          "friction": 0.5,
+          "restitution": 0,
+          "sensor": true
+        }
+      }
+    },
+    {
+      "id": "gs_000000a00007",
+      "name": "Camera",
+      "type": "CAMERA",
+      "parent": null,
+      "components": {
+        "FollowCamera": {
+          "target": "gs_000000a00005",
+          "offset": [
+            0,
+            4,
+            8
+          ],
+          "smoothing": 5,
+          "lookAtOffset": [
+            0,
+            1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": "gs_000000a00008",
+      "name": "Sun",
+      "type": "LIGHT",
+      "parent": null,
+      "components": {}
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+1
+00:00:03,400 --> 00:00:04,718
+Let's make a first game.
+
+2
+00:00:04,805 --> 00:00:08,201
+In Blender, open the GameStudio menu in the top bar.
+
+3
+00:00:08,767 --> 00:00:10,271
+Choose New Project.
+
+4
+00:00:11,700 --> 00:00:12,942
+Give your game a name:
+
+5
+00:00:12,942 --> 00:00:14,086
+Gem Island.
+
+6
+00:00:16,033 --> 00:00:18,483
+It goes in your Documents folder, under GameStudio.
+
+7
+00:00:18,483 --> 00:00:19,487
+Keep that.
+
+8
+00:00:20,067 --> 00:00:21,530
+Pick the Starter template:
+
+9
+00:00:21,530 --> 00:00:25,007
+a player, a follow camera and three gems on a lawn.
+
+10
+00:00:25,567 --> 00:00:26,792
+Click Create.
+
+11
+00:00:28,067 --> 00:00:31,202
+GameStudio copies the template and sets the project up.
+
+12
+00:00:31,202 --> 00:00:32,729
+It takes a few seconds.
+
+13
+00:00:33,300 --> 00:00:35,826
+The project opens on the Game workspace.
+
+14
+00:00:35,970 --> 00:00:38,275
+The 3D Viewport shows your level:
+
+15
+00:00:38,281 --> 00:00:40,528
+a lawn, the player and three gems.
+
+16
+00:00:40,614 --> 00:00:42,559
+Click the player to select it.
+
+17
+00:00:43,133 --> 00:00:45,612
+The Outliner lists everything in the level.
+
+18
+00:00:46,867 --> 00:00:49,218
+In the Properties, scroll down to Game.
+
+19
+00:00:49,363 --> 00:00:51,250
+These are the player's components:
+
+20
+00:00:51,290 --> 00:00:54,780
+they make it a character you steer, that bumps into things.
+
+21
+00:00:55,333 --> 00:00:58,462
+And the Console at the bottom shows the game's messages.
+
+22
+00:00:59,033 --> 00:00:59,730
+Now play.
+
+23
+00:00:59,730 --> 00:01:02,086
+Press F5, or click Play in the top bar.
+
+24
+00:01:02,086 --> 00:01:04,484
+On a Mac, that's Fn F5.
+
+25
+00:01:05,067 --> 00:01:06,449
+The game runs right here in the
+
+26
+00:01:06,449 --> 00:01:08,138
+viewport, on its title screen.
+
+27
+00:01:08,225 --> 00:01:10,518
+Click it to give it the mouse and keyboard.
+
+28
+00:01:11,100 --> 00:01:12,232
+Click Play.
+
+29
+00:01:13,600 --> 00:01:15,057
+Hold W to run.
+
+30
+00:01:16,100 --> 00:01:18,695
+W A S D moves the player, and Space jumps.
+
+31
+00:01:18,735 --> 00:01:20,297
+Go and collect the gems.
+
+32
+00:01:20,867 --> 00:01:22,986
+When you're done, press Shift Escape.
+
+33
+00:01:22,992 --> 00:01:25,389
+Blender gets the mouse and keyboard back.
+
+34
+00:01:25,967 --> 00:01:28,353
+Then press F8 to stop the game.
+
+35
+00:01:28,933 --> 00:01:32,155
+The 3D Viewport is back, with your level ready to edit.
+
+36
+00:01:32,161 --> 00:01:34,663
+That's your first GameStudio project.

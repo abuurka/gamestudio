@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: gsfork <gsfork@localhost>
+Date: Fri, 9 Oct 2026 19:01:17 +0100
+Subject: [PATCH] S01: build hook for an out-of-tree native module
+
+Why:         compile GameStudio's native module (editor/native) into Blender without copying
+             it into the source tree; every bf_* target exists when it is added.
+Hook-for:    editor/native/CMakeLists.txt
+Upstream:    candidate (a generic "extra modules" hook for distributions)
+Test:        editor/tests/shell (host.info()["native"] is True on fork builds)
+Remove-when: never; this is the only build entry point for the native module
+---
+ source/blender/CMakeLists.txt | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/source/blender/CMakeLists.txt b/source/blender/CMakeLists.txt
+index 1332001aa7c71c298048fc8782d1b1aeec529228..70f307ec5daa72089e61410bd37d4448b239d175 100644
+--- a/source/blender/CMakeLists.txt
++++ b/source/blender/CMakeLists.txt
+@@ -170,3 +170,10 @@ endif()
+ if(WITH_CPU_CHECK)
+   add_subdirectory(cpucheck)
+ endif()
++
++# Optional out-of-tree module, added after every Blender module so it can extend
++# existing targets. Used by distributions such as GameStudio Editor.
++set(GS_NATIVE_DIR "" CACHE PATH "Optional out-of-tree module directory (empty to disable)")
++if(GS_NATIVE_DIR)
++  add_subdirectory(${GS_NATIVE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/gs_native)
++endif()

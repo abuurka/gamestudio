@@ -1,0 +1,94 @@
+WEBVTT
+
+00:00:03.400 --> 00:00:04.665
+To install GameStudio,
+
+00:00:04.665 --> 00:00:07.087
+start in Blender and open the Edit menu.
+
+00:00:07.667 --> 00:00:09.171
+Choose Preferences.
+
+00:00:10.800 --> 00:00:13.790
+In the Preferences window, go to Get Extensions.
+
+00:00:14.500 --> 00:00:16.933
+Blender asks about online access here.
+
+00:00:17.077 --> 00:00:18.865
+You don't need it to install from a file,
+
+00:00:18.865 --> 00:00:22.041
+so leave it, and open the small menu at the top right.
+
+00:00:22.600 --> 00:00:24.336
+Choose Install from Disk.
+
+00:00:25.100 --> 00:00:26.662
+A file browser opens.
+
+00:00:26.667 --> 00:00:28.415
+Go to your Downloads folder,
+
+00:00:28.967 --> 00:00:31.632
+select the GameStudio zip you downloaded,
+
+00:00:32.200 --> 00:00:34.075
+and click Install from Disk.
+
+00:00:34.900 --> 00:00:37.152
+GameStudio is installed, and it welcomes you
+
+00:00:37.152 --> 00:00:39.759
+with the three steps from a project to a game.
+
+00:00:39.799 --> 00:00:42.023
+To try it, click Open Demo.
+
+00:00:42.700 --> 00:00:44.558
+The demo opens, and GameStudio
+
+00:00:44.558 --> 00:00:46.294
+sets itself up the first time.
+
+00:00:46.380 --> 00:00:47.948
+It shows what it downloads:
+
+00:00:47.948 --> 00:00:50.850
+Node.js, the game packages and a game browser,
+
+00:00:50.850 --> 00:00:54.548
+about two hundred and thirty megabytes, once, into its own folder.
+
+00:00:54.635 --> 00:00:57.718
+Click Allow Online Access and Set Up.
+
+00:00:58.367 --> 00:00:59.841
+The setup runs in the background,
+
+00:00:59.841 --> 00:01:01.659
+with its progress in the status bar.
+
+00:01:01.699 --> 00:01:03.354
+First Node.js,
+
+00:01:03.933 --> 00:01:05.623
+then the game packages,
+
+00:01:06.933 --> 00:01:08.193
+then the game browser.
+
+00:01:08.233 --> 00:01:10.434
+You can keep working in Blender meanwhile.
+
+00:01:11.000 --> 00:01:13.793
+When the status bar is clear, the setup is done.
+
+00:01:13.798 --> 00:01:17.287
+Open the new GameStudio menu in the top bar to check.
+
+00:01:17.867 --> 00:01:19.510
+It says the setup is done.
+
+00:01:19.550 --> 00:01:22.947
+GameStudio is installed and ready, with the demo game open.

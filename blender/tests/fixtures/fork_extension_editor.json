@@ -1,0 +1,34 @@
+{
+  "workspace": "GSContract",
+  "provider_idname": "GAMESTUDIO_CONTRACT",
+  "areas": [
+    {
+      "index": 0,
+      "fork_type": "EXTENSION_EDITOR",
+      "stock_type": "",
+      "stock_ui_type": "VIEW_3D",
+      "provider_idname": "GAMESTUDIO_CONTRACT"
+    },
+    {
+      "index": 1,
+      "fork_type": "OUTLINER",
+      "stock_type": "OUTLINER",
+      "history": [
+        "OUTLINER",
+        "EXTENSION_EDITOR"
+      ]
+    },
+    {
+      "index": 2,
+      "fork_type": "DOPESHEET_EDITOR",
+      "stock_type": "DOPESHEET_EDITOR"
+    },
+    {
+      "index": 3,
+      "fork_type": "VIEW_3D",
+      "stock_type": "VIEW_3D"
+    }
+  ],
+  "made_with": "5.2.2 LTS",
+  "gamestudio": "0.1.0"
+}
