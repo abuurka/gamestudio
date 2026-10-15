@@ -33,7 +33,7 @@ Other folders are ignored, and so are folders whose names start with `.`.
 ## What New Project does
 
 1. It copies the template's files into the new folder. Text files (`.json`, `.ts`, `.md`, `.html`, `.css`, `.txt`, `.gitignore`) get their placeholders filled in. Other files are copied as they are.
-2. It records the template's id in the new `gamestudio.json` (`"template"`). Open in Claude Code uses it to restore missing agent files from the same template.
+2. It records the template's id in the new `gamestudio.json` (`"template"`). Open in Claude Code and Open in Codex use it to restore missing agent files from the same template.
 3. It sets up Node.js and the packages, links the project to GameStudio's packages and runs `npm run registry`.
 4. It opens the start scene, `scenes/<startScene>.blend`:
    - if the template ships that file, it opens the new project's copy and exports it, so Play works at once;
@@ -76,7 +76,7 @@ A text file can hold the line `{{base}}`. New Project replaces it with the base'
 
 ## Instructions for coding agents
 
-Every template gives its projects one set of instructions for Claude Code and Codex:
+Every template gives its projects one set of instructions for the coding agent, whichever it is: Claude Code and Codex read them as they are, and any other agent can be pointed at `AGENTS.md` and the skills ([MCP.md](MCP.md#other-agents)):
 
 - `AGENTS.md` holds them: what the game is, the build-play-look loop, the conventions. Codex reads it.
 - `CLAUDE.md` is the line `@AGENTS.md`, which makes Claude Code read `AGENTS.md`, and a short `## Claude Code` section for what only Claude Code needs (its `.claude/settings.json` pre-approvals, slash commands).
@@ -108,7 +108,7 @@ New Project drops `@gamestudio/*` dependencies that this GameStudio does not hav
 Finish a game until it is a good starting point. Then save it as a template in one of three ways:
 
 - **In Blender:** GameStudio menu, **Save as Template...** Give it an id, a label and a one-line description. If the scene has unsaved changes, the dialog saves them first, unless you untick that.
-- **With a coding agent** (Claude Code or Codex): ask for it, or use the `make-template` skill (`/make-template` in Claude Code). The skill tidies the scene, playtests it, writes a section in `AGENTS.md` that says what the template contains and how to extend it, can add a skill for the genre, and then saves it.
+- **With your coding agent:** ask for it, or use the `make-template` skill (`/make-template` in Claude Code). The skill tidies the scene, playtests it, writes a section in `AGENTS.md` that says what the template contains and how to extend it, can add a skill for the genre, and then saves it.
 - **The `save_template` tool:** `save_template {"id": "arena-shooter", "label": "Arena Shooter", "description": "..."}`. See [MCP.md](MCP.md).
 
 Saving copies the project into your templates folder. The project itself is not changed.
@@ -130,11 +130,12 @@ Save as Template copies these from the project:
 
 - `src/` (components, systems and game shaders), `scenes/` (the `.blend` files and their twins), `ui/` (the menus and HUD, and their translations in `ui/locales/`), `assets/`, and `public/`, `audio/` and `tools/` if they exist;
 - `.claude/`: the project's settings and **all its skills, your own included**;
+- `.codex/` (Codex's `config.toml`, made portable) and `.agents/` (skills you wrote for Codex only; GameStudio's copies of `.claude/skills/` stay behind), if they exist;
 - `AGENTS.md`, `CLAUDE.md`, `ASSISTANT.md`, `.mcp.json`, `gamestudio.json`, `package.json`, `index.html`, `tsconfig.json`, `vite.config.ts`, `.gitignore` and `.gitattributes`.
 
 It leaves out `node_modules/`, `.gamestudio/` (exports, checkpoints, backups), `dist/`, `.git/`, Blender's backups (`*.blend1`), `.claude/settings.local.json` (your personal permissions) and `.claude/skills/.gamestudio-skills.json` (GameStudio's record of the skills it put in this project). Other top-level files, such as `README.md` or `package-lock.json`, are left out too, and the result names them.
 
-Custom skills are the main point. A skill you wrote while making this game, such as "add an enemy type" or "tune the handling", is in every game made from the template, and Claude Code and Codex find it there.
+Custom skills are the main point. A skill you wrote while making this game, such as "add an enemy type" or "tune the handling", is in every game made from the template, and your coding agent finds it there (Claude Code in `.claude/skills/`, Codex in GameStudio's copy in `.agents/skills/`).
 
 Before saving, the project's own values become placeholders again, where the built-in templates have them:
 
@@ -158,7 +159,7 @@ It saves the file, which exports the screens, only when a text changed. If the f
 
 ## Permissions
 
-`save_template` writes only to your templates folder, never into the project. It replaces a template only when called with `overwrite: true`, and then keeps the old one in `.backups/`. The starter's `.claude/settings.json` pre-approves it, like `checkpoint`. The `make-template` skill tells the agent to ask you before it replaces a template.
+`save_template` writes only to your templates folder, never into the project. It replaces a template only when called with `overwrite: true`, and then keeps the old one in `.backups/`. The starter's `.claude/settings.json` pre-approves it for Claude Code, like `checkpoint`. The `make-template` skill tells the agent to ask you before it replaces a template.
 
 ## For maintainers
 

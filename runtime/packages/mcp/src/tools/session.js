@@ -157,7 +157,7 @@ async function status(ctx) {
     out.project = { root, name: config.name, startScene: config.startScene, scenes: projectScenes(root) };
   } else {
     out.project = null;
-    out.hint = 'Not inside a GameStudio project: start Claude Code in the game folder (with gamestudio.json).';
+    out.hint = 'Not inside a GameStudio project: start the coding agent in the game folder (with gamestudio.json).';
   }
 
   /** @type {string[]} */

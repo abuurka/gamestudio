@@ -1,26 +1,27 @@
-# Making games with GameStudio and Claude Code
+# Making games with GameStudio and your coding agent
 
-GameStudio turns Blender into a game editor. With Claude Code connected, you can describe what you want, and Claude builds the level and assets in your open Blender, writes the gameplay code, plays the game, looks at the result and fixes problems. You watch it happen, and you can step in at any time.
+GameStudio turns Blender into a game editor. With a coding agent connected (Claude Code or Codex in one click, or any other MCP client), you can describe what you want, and the agent builds the level and assets in your open Blender, writes the gameplay code, plays the game, looks at the result and fixes problems. You watch it happen, and you can step in at any time. The examples here use Claude Code, the default; where Codex differs, it says so.
 
 ```
- you ──► Claude Code ──MCP──► gamestudio MCP server ──► Blender (GameStudio extension)
+ you ──► your agent  ──MCP──► gamestudio MCP server ──► Blender (GameStudio extension)
               │                        └──────────────► running game (dev server, live link)
               └── edits src/*.ts in your project folder
 ```
 
 ## Setup
 
-1. Install **Blender 5.2+** with the GameStudio extension. **Claude Code** comes with one click: when it is missing, **GameStudio › Open in Claude Code** offers *Install Claude Code (about 250 MB)* and runs Anthropic's official installer (the command from [code.claude.com/docs/en/setup](https://code.claude.com/docs/en/setup), into your user folder, no administrator rights), with the progress in the status bar; then it carries on opening the project. **Codex**, OpenAI's coding agent, works the same way from **GameStudio › Open in Codex** (*Install Codex*, about 160 MB: OpenAI's standalone installer from [developers.openai.com/codex/cli](https://developers.openai.com/codex/cli), into your user folder, no administrator rights). The **Coding agent** preference (Claude Code by default) picks the one the launcher, the welcome and the top bar open. GameStudio sets up the rest itself the first time you open or play a game: Node.js when you have no 22.12+, its game packages, and a game browser when there is no Chrome, Edge or Chromium. It asks once, says how much it downloads and where it goes (the extension's folder in your Blender profile), and shows the progress in the status bar.
+1. Install **Blender 5.2+** with the GameStudio extension. Two coding agents install with one click. **Claude Code**: when it is missing, **GameStudio › Open in Claude Code** offers *Install Claude Code (about 250 MB)* and runs Anthropic's official installer (the command from [code.claude.com/docs/en/setup](https://code.claude.com/docs/en/setup), into your user folder, no administrator rights), with the progress in the status bar; then it carries on opening the project. **Codex**, OpenAI's coding agent, works the same way from **GameStudio › Open in Codex** (*Install Codex*, about 160 MB: OpenAI's standalone installer from [developers.openai.com/codex/cli](https://developers.openai.com/codex/cli), into your user folder, no administrator rights). The **Coding agent** preference (Claude Code by default) picks the one the launcher, the welcome and the top bar open. GameStudio sets up the rest itself the first time you open or play a game: Node.js when you have no 22.12+, its game packages, and a game browser when there is no Chrome, Edge or Chromium. It asks once, says how much it downloads and where it goes (the extension's folder in your Blender profile), and shows the progress in the status bar.
 2. Create a project: **New Project** in Blender. Every new project already contains:
    - `AGENTS.md`: the project rules the coding agent (Claude Code or Codex) reads in every session, and `CLAUDE.md`, which imports them for Claude Code (`@AGENTS.md`) and adds the few notes only Claude Code needs;
-   - `.mcp.json`: connects Claude Code to the `gamestudio` MCP server;
-   - `.claude/skills/`: step-by-step workflows;
-   - `.claude/settings.json`: enables the server and pre-approves its read-only tools, play controls, checkpoints and the scene edits that are one undo step each.
-3. Open the project's level in Blender. The extension's agent bridge starts with Blender. If Blender isn't running, Claude can start it (`launch_blender`), with a window or headless.
-4. **GameStudio › Open in Claude Code** opens a terminal in the project with Claude Code running (the first time, it asks you to log in and to trust the folder). Or start `claude` in the project folder yourself, from any terminal, VS Code or the desktop app: the project's `.mcp.json` works there too. `/mcp` shows whether the `gamestudio` server connected. Ask "what's the status?" to check that Claude can see Blender and the game.
+   - `.mcp.json`: connects Claude Code to the `gamestudio` MCP server (Open in Codex adds `.codex/config.toml`, the same for Codex);
+   - `.claude/skills/`: step-by-step workflows (copied to `.agents/skills/` for Codex);
+   - `.claude/settings.json`: Claude Code's settings, which enable the server and pre-approve its read-only tools, play controls, checkpoints and the scene edits that are one undo step each.
+3. Open the project's level in Blender. The extension's agent bridge starts with Blender. If Blender isn't running, the agent can start it (`launch_blender`), with a window or headless.
+4. Start your agent in the project. **GameStudio › Open in Claude Code** opens a terminal in the project with Claude Code running (the first time, it asks you to log in and to trust the folder). Or start `claude` in the project folder yourself, from any terminal, VS Code or the desktop app: the project's `.mcp.json` works there too. `/mcp` shows whether the `gamestudio` server connected. Ask "what's the status?" to check that the agent can see Blender and the game.
    **GameStudio › Open in Codex** does the same with Codex. The first time, Codex asks you to sign in (with your ChatGPT account, or an OpenAI API key) and whether to trust the folder: choose **Trust and continue**, because Codex reads the project's `.codex/config.toml`, where the `gamestudio` server is, only in a trusted folder. `/mcp` in Codex lists its servers too.
+   Any other MCP client: start the project's MCP server from it and give it `AGENTS.md` and the skills ([MCP.md](MCP.md#other-agents)).
 
-What Open in Claude Code does, in order: installs Claude Code if it is missing (after you click Install), connects the project to Claude when it is not yet (adds the missing `AGENTS.md` and `CLAUDE.md`, `.claude/`, `.mcp.json` and the `@gamestudio/mcp` package; your own files are never changed), turns the agent bridge on, lets GameStudio finish its setup, and opens the terminal. The terminal runs `.gamestudio/claude-code.cmd` (Windows), `.command` (macOS) or `.sh` (Linux), a small script it writes into the project: it goes to the project folder, puts GameStudio's Node.js first on `PATH`, and starts `claude`. Windows uses Windows Terminal, or Command Prompt without it; macOS opens Terminal with `open` (no Automation permission needed); Linux uses the desktop's terminal (`x-terminal-emulator`, GNOME Terminal, Konsole, xterm). To use another terminal, set **Terminal command** in the extension's preferences (Coding agent): on macOS just the app's name (`iTerm`, `Warp`), anywhere a command with `{project}`, `{agent}` (the agent's program; `{claude}` works too) or `{script}` (the launcher script), for example `kitty --directory {project} {script}`.
+What Open in Claude Code does, in order: installs Claude Code if it is missing (after you click Install), connects the project to Claude Code when it is not yet (adds the missing `AGENTS.md` and `CLAUDE.md`, `.claude/`, `.mcp.json` and the `@gamestudio/mcp` package; your own files are never changed), turns the agent bridge on, lets GameStudio finish its setup, and opens the terminal. The terminal runs `.gamestudio/claude-code.cmd` (Windows), `.command` (macOS) or `.sh` (Linux), a small script it writes into the project: it goes to the project folder, puts GameStudio's Node.js first on `PATH`, and starts `claude`. Windows uses Windows Terminal, or Command Prompt without it; macOS opens Terminal with `open` (no Automation permission needed); Linux uses the desktop's terminal (`x-terminal-emulator`, GNOME Terminal, Konsole, xterm). To use another terminal, set **Terminal command** in the extension's preferences (Coding agent): on macOS just the app's name (`iTerm`, `Warp`), anywhere a command with `{project}`, `{agent}` (the agent's program; `{claude}` works too) or `{script}` (the launcher script), for example `kitty --directory {project} {script}`.
 
 Open in Codex goes the same way and connects the project to Codex: `AGENTS.md` (the instructions; a project whose instructions are only in `CLAUDE.md` gets them moved there if you tick *Move the instructions to AGENTS.md*, else a marked copy), `.agents/skills/` (a copy of `.claude/skills/`, which Codex reads; edit the skills in `.claude/skills/`, and GameStudio copies them again when the project opens; folders there without a `.gamestudio-copy.json` are yours and never touched) and `.codex/config.toml` with `[mcp_servers.gamestudio]` (the same command and args as `.mcp.json`; the rest of the file is left as you wrote it). Its launcher script is `.gamestudio/codex.cmd`, `.command` or `.sh`, and it starts `codex`.
 
@@ -34,7 +35,7 @@ Describe the outcome, not the steps:
 
 > Make a small game where a fox collects berries on floating islands before the sun sets. Keep it cute.
 
-Claude follows a loop:
+The agent follows a loop (the project's `AGENTS.md` teaches it):
 
 1. **Inspect** the scene through its text twin (`scenes/<level>.scene.json`) and the project.
 2. **Build** with asset kits, assets from your libraries, or custom modelling.
@@ -84,7 +85,7 @@ See the level drawn by the game, with its game shaders, lighting, lightmaps, fog
 
 ### Skills
 
-Claude picks these workflows automatically. You can also run one directly, such as `/blockout-level a three-tier arena`.
+The agent picks these workflows automatically. You can also run one directly: in Claude Code each is a slash command, such as `/blockout-level a three-tier arena`; in Codex, ask for the skill by name.
 
 | Skill | Use it to |
 |---|---|
@@ -129,15 +130,15 @@ Kits are parametric, seeded generators for game-ready meshes in a consistent sty
 | `water` | shape (square, round), size, depth, waves, optional `bob` clip; a sensor collider fills it |
 | `sky` | preset (day, sunset, night, overcast) or horizon/zenith/ground colours, sun elevation and azimuth; sets the world and a sun lamp |
 
-Every kit also takes a `seed` (the same seed always gives the same mesh) and a `name`. The shared material palette has presets such as stone, wood, metal, grass, plastic and emissive. Using it keeps a project in one style. Ask Claude to "make the rocks bigger" and it rebuilds those kit objects in place, keeping their components.
+Every kit also takes a `seed` (the same seed always gives the same mesh) and a `name`. The shared material palette has presets such as stone, wood, metal, grass, plastic and emissive. Using it keeps a project in one style. Ask the agent to "make the rocks bigger" and it rebuilds those kit objects in place, keeping their components.
 
 ### Asset libraries
 
-Props you reuse live in `assets/<library>.blend`, one collection per asset. Claude adds props to a library, places linked copies in your levels, and swaps or edits them; editing an asset updates every level that uses it. Library assets are also prefabs, so game code can spawn them.
+Props you reuse live in `assets/<library>.blend`, one collection per asset. The agent adds props to a library, places linked copies in your levels, and swaps or edits them; editing an asset updates every level that uses it. Library assets are also prefabs, so game code can spawn them.
 
 ### Baked lighting
 
-For soft light in corners and light that bounces off walls, ask Claude to bake the lighting, or press **Bake Preview** or **Bake Final** (Properties › Scene › Game Project › Lighting, or **Game › Bake Lighting** in the top bar). Cycles bakes lightmaps for the static objects. The sun stays realtime, so moving things still cast shadows.
+For soft light in corners and light that bounces off walls, ask the agent to bake the lighting, or press **Bake Preview** or **Bake Final** (Properties › Scene › Game Project › Lighting, or **Game › Bake Lighting** in the top bar). Cycles bakes lightmaps for the static objects. The sun stays realtime, so moving things still cast shadows.
 
 - While you iterate, bake a preview: `bake_lighting {"quality": "preview"}`. It is quick and coarse.
 - Before shipping, bake the final version: `bake_lighting {"quality": "final"}`. It is sharper and slower.
@@ -151,11 +152,11 @@ Baking runs without asking: it only writes generated files in `.gamestudio/`, ne
 
 Blender owns the shape of things: meshes, UVs, which surface is which (the material slots), and static colour and roughness. Anything that moves, reacts to the game, is projected in world space or isn't in glTF, such as wind in leaves, flowing water, foam, triplanar photo scans or wet sand, is a **game shader**: a TypeScript file in `src/shaders/` that says how the game draws a Blender material.
 
-- GameStudio ships 33 of them, ready to use (see Shader library below). For anything else, Claude writes the shader with `defineShader` (typed fields; textures are asset fields) and attaches it to the material with `set_material_shader`, in one undo step. By hand: Properties › Material › **Game**, pick the shader and set its fields.
+- GameStudio ships 33 of them, ready to use (see Shader library below). For anything else, the agent writes the shader with `defineShader` (typed fields; textures are asset fields) and attaches it to the material with `set_material_shader`, in one undo step. By hand: Properties › Material › **Game**, pick the shader and set its fields.
 - The engine applies it wherever the material is drawn: the level, prefabs spawned later and reloaded levels. Saving the shader file updates the running game without reloading the level.
 - Game code never looks materials up by name, so renaming a material in Blender breaks nothing.
 - Shaders edit three.js materials through `patchShader`, which chains edits, so they work together and with baked lighting. Patch-based shaders need the WebGL renderer, the default.
-- Blender's viewport shows the material's own nodes. Judge the look in the game: turn on the Scene view (above), press F5, or ask Claude for game screenshots.
+- Blender's viewport shows the material's own nodes. Judge the look in the game: turn on the Scene view (above), press F5, or ask the agent for game screenshots.
 - A material whose shader no file defines, or whose shader fails, keeps its Blender look, and the console says why.
 
 ### Shader library
@@ -172,11 +173,11 @@ GameStudio comes with 33 game shaders that need no code, in seven groups:
 | Gameplay | SelectionOutline, XRaySilhouette, InteractGlint, HitFlash |
 | Style | Toon, Shine, Gradient (Shine and Gradient also work on UI panels) |
 
-- **Pick one in Blender:** select a material, then in Properties › Material › **Game** open **Game Shader** (type to search). The library follows your project's own shaders, one sub-menu per group. The panel shows what the shader does and its fields; the defaults look right straight away. Or ask Claude: "make the pond water", "snow on the rocks", "the leaves should sway". It uses `set_material_shader`.
+- **Pick one in Blender:** select a material, then in Properties › Material › **Game** open **Game Shader** (type to search). The library follows your project's own shaders, one sub-menu per group. The panel shows what the shader does and its fields; the defaults look right straight away. Or ask the agent: "make the pond water", "snow on the rocks", "the leaves should sway". It uses `set_material_shader`.
 - **See it:** turn on the **Scene view** (GameStudio › Scene View), or press **F5** and look at the Game View. Blender's own 3D View keeps showing the material's Blender nodes, so give the material a similar colour for working in Blender.
 - **Most build on your material:** snow, moss, wetness, dissolve, toon, outlines and hit flashes keep its colour, textures and roughness and add to them, so lights, shadows, fog and baked lighting still apply. Water, foam, lava, energy shield, hologram, portal and gem draw a look of their own, tinted by the material's colour.
 - **Drive it from code:** game code changes the values while the game runs. `ctx.shaders.set(enemy, { hitAt: ctx.time })` flashes one enemy when it is hit, `ctx.shaders.set(enemy, { startAt: ctx.time })` dissolves it, and `ctx.shaders.set('GS_Leaves', { wind: 1.2 })` turns the wind up for every tree. Fields like `hitAt` and `startAt` hold the time an effect starts, and the shader plays it out by itself.
-- **Customise one:** the panel's "Copy it into src/shaders to customise" means: copy the shader's code from the engine into a file in `src/shaders/` under the same name, and the game uses your copy. Ask Claude to do it.
+- **Customise one:** the panel's "Copy it into src/shaders to customise" means: copy the shader's code from the engine into a file in `src/shaders/` under the same name, and the game uses your copy. Ask the agent to do it.
 - **Cost:** each shader downloads only when a scene uses it. Most are cheap; ParallaxOcclusion, Gem and the outline shaders cost more, so use them where they show.
 
 [API.md §29](../runtime/packages/engine/API.md#29-shader-library) has the full table: what each shader does, its fields, how code drives it, what it costs, and the limits (the WebGL renderer, FlagWave's subdivided plane, reflections of the sky only).
@@ -207,44 +208,44 @@ Draco and KTX2 are not used. Draco needs decoder files served beside the game an
 
 ## Staying in control
 
-- **Undo:** each Blender change Claude makes is one undo step (`Ctrl+Z`), and that includes a whole `run_python` script. Writes to an asset library file are backed up first instead: `asset_library_restore` takes the last one back.
-- **Checkpoints:** before risky work, Claude saves a checkpoint you can restore. Ask "go back to the checkpoint before the stylize pass", or "show me before and after".
-- **Crashes:** if Blender crashes or hangs, Claude offers the ways back: the last save, Blender's autosave, or a checkpoint.
+- **Undo:** each Blender change the agent makes is one undo step (`Ctrl+Z`), and that includes a whole `run_python` script. Writes to an asset library file are backed up first instead: `asset_library_restore` takes the last one back.
+- **Checkpoints:** before risky work, the agent saves a checkpoint you can restore. Ask "go back to the checkpoint before the stylize pass", or "show me before and after".
+- **Crashes:** if Blender crashes or hangs, the agent offers the ways back: the last save, Blender's autosave, or a checkpoint.
 - **Locks:** objects you protect (the agent button in the top bar › **Protect**) are refused by every scene tool.
-- **Permissions:** read-only tools, play controls and **undoable scene edits** (creating and moving objects, components, materials, kits, placing assets, undo, save) run without asking. Each edit is one undo step, shows in Blender as it happens, and appears in the Agent panel, where you can pause the agent or protect objects. Asset-library writes are backed up first, and `asset_library_restore` takes them back. `run_python`, `delete_objects`, `restore_checkpoint` and `open_scene` always ask first. Change this with `/permissions`.
+- **Permissions:** in Claude Code, read-only tools, play controls and **undoable scene edits** (creating and moving objects, components, materials, kits, placing assets, undo, save) run without asking. Each edit is one undo step, shows in Blender as it happens, and appears in the Agent panel, where you can pause the agent or protect objects. Asset-library writes are backed up first, and `asset_library_restore` takes them back. `run_python`, `delete_objects`, `restore_checkpoint` and `open_scene` always ask first. Change this with `/permissions`. GameStudio pre-approves nothing for Codex, so Codex's own approval settings apply.
 - **Code:** the code is plain files in `src/`. Use git and review diffs as usual. The level twins (`*.scene.json`) make scene changes reviewable too.
-- **Ownership:** you can keep editing in Blender while Claude works. Tell Claude what you changed so it re-inspects the scene.
+- **Ownership:** you can keep editing in Blender while the agent works. Tell it what you changed so it re-inspects the scene.
 
 ## Tips
 
 - Start small: one level and one mechanic, playable early. Add art last.
 - Keep one level per `.blend` in `scenes/`. Put reused props in an asset library.
-- Ask Claude to show you renders: "render the level from the top and from the player camera", or "show the tower in its surroundings".
+- Ask the agent to show you renders: "render the level from the top and from the player camera", or "show the tower in its surroundings".
 - Leave the dev server running (`npm run dev`). Code changes hot-reload into the running game.
 - For an invisible wall or a cheap collision shape, give a mesh a `Collider` and set its Viewport Display to **Wire** or **Bounds**. The game keeps it for physics and raycasts but doesn't draw it.
 - Never hand-edit `.gamestudio/`. It is generated.
-- Other languages: the menus' texts are translated by tables in `ui/locales/` (the starter ships `fr.json`), which Claude keeps complete with `ui_strings` and `ui_translate` after every new menu text. The game starts in the player's browser language, and a Language button in Options switches. Ask Claude for a playtest in French to see them.
-- To start new games from this one, save it as a template (GameStudio menu, **Save as Template...**, or `/make-template`). See [TEMPLATES.md](TEMPLATES.md).
+- Other languages: the menus' texts are translated by tables in `ui/locales/` (the starter ships `fr.json`), which the agent keeps complete with `ui_strings` and `ui_translate` after every new menu text. The game starts in the player's browser language, and a Language button in Options switches. Ask the agent for a playtest in French to see them.
+- To start new games from this one, save it as a template (GameStudio menu, **Save as Template...**, or the `make-template` skill: `/make-template` in Claude Code). See [TEMPLATES.md](TEMPLATES.md).
 
 ## Troubleshooting
 
 | Problem | Fix |
 |---|---|
-| `/mcp` shows `gamestudio` failed | Open the project in Blender once: GameStudio sets its packages up (GameStudio › Set Up GameStudio... does it now) and points `.mcp.json` at this computer's Node.js and the project's MCP server. Then restart Claude Code. `spawn node ENOENT` meant `.mcp.json` named a Node.js this computer does not have. |
-| Installing Claude Code failed | The status bar and the popup say why, with **Try Again** and **Show Log** (`claude-code-install.log` in the extension's user folder). Offline: reconnect, then Try Again. On Linux the installer needs `curl` (`sudo apt install curl`). The **Installation Guide** button opens Anthropic's instructions for installing by hand. |
-| Open in Claude Code opens no terminal | The status bar says what failed. Set **Terminal command** in the extension's preferences (Claude Code) to your terminal, see Setup step 4. |
+| `/mcp` shows `gamestudio` failed | Open the project in Blender once: GameStudio sets its packages up (GameStudio › Set Up GameStudio... does it now) and points `.mcp.json` (and, in a project connected to Codex, `.codex/config.toml`) at this computer's Node.js and the project's MCP server. Then restart the agent. `spawn node ENOENT` meant the file named a Node.js this computer does not have. |
+| Installing Claude Code or Codex failed | The status bar and the popup say why, with **Try Again** and **Show Log** (`claude-code-install.log` or `codex-install.log` in the extension's user folder). Offline: reconnect, then Try Again. On Linux the installer needs `curl` (`sudo apt install curl`). The **Installation Guide** button opens Anthropic's or OpenAI's instructions for installing by hand. |
+| Open in Claude Code or Open in Codex opens no terminal | The status bar says what failed. Set **Terminal command** in the extension's preferences (Coding agent) to your terminal, as described under Setup. |
 | New Project says online access is off | Setting up downloads Node.js or packages. Turn on **Preferences > System > Network > Allow Online Access** (the dialog has a button). Nothing was written. |
 | GameStudio asks to set itself up | The first time a game opens or plays, it lists what it downloads (Node.js, the game packages, a game browser), about how big, and the folder. **Set Up** (it turns on Allow Online Access when that is off) or **Cancel** (asked again only when you press Play or turn the Scene view on). *Set up automatically* in the extension's preferences skips the question. |
 | The setup failed | The status bar and GameStudio menu say what failed, with **Retry** and **Show Log**. *The package server could not be reached* means no internet connection (or a proxy): reconnect, then Retry. Logs: `setup.log` in the extension's user folder, `runtime/npm-install.log` there, and the project's `.gamestudio/setup.log`. |
 | An old project plays an old engine, or says packages are missing after an update | Opening or playing it brings it up to date by itself: the game packages are copied from the new version (no download unless it needs a new package), and links into another GameStudio install (an older portable one, another Blender version's) are replaced. Links into a development checkout are left alone. |
 | A new project's setup failed or was cancelled | Open Project on its folder, or New Project with the same name, runs the setup again and keeps its files. |
-| Claude says Blender isn't connected | Let Claude `launch_blender`, or open Blender with the GameStudio extension enabled and open the project's level. |
-| Playtests or screenshots fail | Claude starts the dev server through Blender; the status bar says why when it cannot (the GameStudio menu's Set Up GameStudio... covers what is missing). |
+| The agent says Blender isn't connected | Let the agent `launch_blender`, or open Blender with the GameStudio extension enabled and open the project's level. |
+| Playtests or screenshots fail | The agent starts the dev server through Blender; the status bar says why when it cannot (the GameStudio menu's Set Up GameStudio... covers what is missing). |
 | F5 opens a window instead of playing in Blender | The status bar says why: usually the game browser was not set up (you chose Cancel, or online access was off) and there is no Chrome, Edge or Chromium. That Play uses your default browser, Safari included. GameStudio › Set Up GameStudio... downloads the game browser; or pick the Window display with the icon next to ▶. |
 | F5 does nothing on a Mac | F5–F8 are media keys there: press **Fn+F5**, or turn on *Use F1, F2, etc. keys as standard function keys* in System Settings › Keyboard. |
 | macOS says Blender cannot use Documents | New Project and the examples go in Documents/GameStudio. Allow Blender in System Settings › Privacy & Security › Files and Folders (Documents Folder), or pick another location in New Project. |
 | A new component isn't in Blender | Save the component file while the dev server runs (or press Play), then Reload Components. |
-| The game looks different from Blender's viewport | The game follows the scene's view transform and exposure, but Blender cannot show game shaders or post effects, and Filmic or a look have no game equivalent (see Colour matches Blender). Judge the look from game screenshots. For more than that, ask Claude to compare them: it renders both side by side and measures the difference. |
+| The game looks different from Blender's viewport | The game follows the scene's view transform and exposure, but Blender cannot show game shaders or post effects, and Filmic or a look have no game equivalent (see Colour matches Blender). Judge the look from game screenshots. For more than that, ask the agent to compare them: it renders both side by side and measures the difference. |
 
 ## For maintainers
 

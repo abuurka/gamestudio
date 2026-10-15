@@ -94,7 +94,7 @@ Text in your scene and files, such as object names, comments, and log lines, is 
 
 ---
 
-## Coding agents (Claude Code, Cursor, ...) through MCP
+## Coding agents (Claude Code, Codex, ...) through MCP
 
 Coding agents use a different path, with a different rule. The GameStudio MCP server (`@gamestudio/mcp`, see [MCP.md](MCP.md)) lets an agent **act directly**: it builds and edits the scene in Blender, writes the game's TypeScript itself, plays the game, looks at it and fixes it. Instead of proposals, it is protected by:
 
@@ -103,7 +103,7 @@ Coding agents use a different path, with a different rule. The GameStudio MCP se
 - **Locks.** Objects you lock from AI (**Lock Selected**) are refused by the agent's scene tools too.
 - **A local, token-protected connection.** Blender listens on 127.0.0.1 only; the MCP server reads the token from `.gamestudio/blender.json`.
 
-Turn the connection off with **Agent bridge (MCP)** in the add-on preferences. New projects include the `.mcp.json` that Claude Code reads; [MCP.md](MCP.md) has the setup, every tool, and the security notes (including the `run_python` escape hatch).
+Turn the connection off with **Agent bridge (MCP)** in the add-on preferences. New projects include the `.mcp.json` that Claude Code reads, and Open in Codex adds the `.codex/config.toml` that Codex reads; any other MCP client can start the same server. [MCP.md](MCP.md) has the setup, every tool, and the security notes (including the `run_python` escape hatch).
 
 The older proposal-only bridge, `tools/mcp/gamestudio_mcp.py`, is retired: it now starts the new server.
 

@@ -234,7 +234,7 @@ class GSPreferences(bpy.types.AddonPreferences):
                   "No terminal found. Example: kitty --directory {project} {agent}")
 
         box = _section(layout, "Agent bridge", "LINKED",
-                       "How Claude Code and Codex reach Blender: 127.0.0.1 only, with a per-session token")
+                       "How coding agents reach Blender: 127.0.0.1 only, with a per-session token")
         box.prop(self, "bridge_enabled")
         _hint(box, f"{bridge.status_text()}. Every agent edit is one undo step")
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // @ts-check
 // SPDX-License-Identifier: MIT
-// gamestudio-mcp: the GameStudio MCP server on stdio. Claude Code starts it from the project's
-// .mcp.json with the project as the working directory:
+// gamestudio-mcp: the GameStudio MCP server on stdio. The coding agent starts it with the project as
+// the working directory: Claude Code from the project's .mcp.json, Codex from its .codex/config.toml
+// ([mcp_servers.gamestudio], the same command and args):
 //
 //   { "mcpServers": { "gamestudio": { "command": "node",
 //       "args": ["node_modules/@gamestudio/mcp/bin/gamestudio-mcp.js"] } } }

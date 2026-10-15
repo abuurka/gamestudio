@@ -78,7 +78,7 @@ When debugging collision, simplify the visual model and collider relationship be
 
 | Symptom | Check | Action |
 |---|---|---|
-| Agent cannot find Blender | Intended project open, bridge enabled, correct integration files | Reopen through GameStudio's agent launcher and ask for a scene inspection |
+| Agent cannot find Blender | Intended project open, bridge enabled, correct integration files | Reopen through GameStudio's agent launcher, or restart another MCP client in the project folder, and ask for a scene inspection |
 | Agent can read but edits fail | Paused bridge, protected object or tool permissions | Inspect the Agent panel and the concrete permission response |
 | Playtests fail while manual editing works | Dev server or automated browser setup | Inspect their logs and finish game-browser setup |
 | Build fails on TypeScript | Type or import error | Run the project's typecheck and fix the first relevant diagnostic |
@@ -105,7 +105,7 @@ Open **GameStudio > Preferences**. These are the main user-facing controls; defa
 | Scene view frame rate | 30; range 5–60 | Balance preview responsiveness and resource use |
 | Animate game shaders in the Scene view | On | Freeze animated surfaces while inspecting them |
 | Code editor | Automatic selection | Choose an editor or a custom launch command |
-| Coding agent | Select the preferred integration | Change which agent the launcher and top bar open |
+| Coding agent | Claude Code; the other choice is Codex | Change which agent the launcher, welcome and top bar open; the GameStudio menu keeps both Open in commands |
 | Agent bridge (MCP) | Enables the local agent connection | Connect or disconnect external agent tools |
 | Enable AI assistant | Off | Use the separate proposal-based assistant inside Blender |
 | Play Shortcuts | F5, F6, F7, F8 | Resolve keyboard conflicts or accessibility needs |

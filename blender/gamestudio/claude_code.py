@@ -1304,7 +1304,7 @@ def _on_load_post(*_args):
         if note:
             environment.notify(note, "INFO")  # the status bar and the Info log, once: it is done now
     except Exception:  # noqa: BLE001 - never break loading a file
-        log.exception("Checking the Claude Code files failed")
+        log.exception("Checking the project's agent files failed")
 
 
 _seen_job = {"finished": None}
@@ -1772,8 +1772,8 @@ def _allow_online(context) -> None:
 class GAMESTUDIO_OT_claude_code_install(bpy.types.Operator):
     bl_idname = "gamestudio.claude_code_install"
     bl_label = "Install Claude Code"
-    bl_description = ("Install Claude Code, the coding agent that builds games in GameStudio, with Anthropic's "
-                      "official installer: about 250 MB, for your user only, no administrator rights")
+    bl_description = ("Install Claude Code, Anthropic's coding agent, with Anthropic's official installer: about "
+                      "250 MB, for your user only, no administrator rights")
 
     open_after: BoolProperty(options={"HIDDEN", "SKIP_SAVE"})  # Open in Claude Code goes on once it is installed
     now: BoolProperty(options={"HIDDEN", "SKIP_SAVE"})         # Try Again: no dialog

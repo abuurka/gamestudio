@@ -1197,7 +1197,7 @@ A lightmap is a texture that holds the light falling on a surface. Blender compu
 
 **Bake:**
 
-- Claude: the MCP tool `bake_lighting {quality?, objects?, force?, export?}`.
+- Your agent: the MCP tool `bake_lighting {quality?, objects?, force?, export?}`.
 - Blender: **Bake Preview** or **Bake Final** in Properties › Scene › Game Project › Lighting, or **Game › Bake Lighting** in the top bar. It bakes a saved copy of the open file in a background Blender, so you can keep working, then exports the scene. The panel shows the last bake, and its bin button clears the lightmaps.
 - Python: `gamestudio.core.lightmap.bake_lighting(quality="preview")` (also `objects`, `force`). Blender waits until it is done.
 
@@ -1486,7 +1486,7 @@ defineSystem({
 
 GameStudio ships 33 ready-made game shaders (§28): water, lava, foliage and grass in the wind, snow and moss, dissolves, holograms, hit flashes, outlines, and shines and gradients for menus, and more. They need no code. Blender lists them in Properties › Material › **Game** after the project's own shaders, by category: `Water`, `Nature`, `Magic & Sci-fi`, `Surfaces`, `Transformations`, `Gameplay`, `Style`. A build puts each shader's code in a chunk of its own, so a game downloads only the shaders its scenes use.
 
-**Pick one.** In Blender, select the material, open **Game Shader** in its Game panel (type to search), pick a shader from its category and set its values. From Claude: `set_material_shader {"objects": ["Pond"], "shader": "Water", "values": {"foam": 0.4}}`, or `material` to name the material. `list_component_types` lists the library with one line per shader, and `list_component_types {"type": "Water"}` gives one shader's fields. Values are what code sees: angle fields are radians, which Blender shows in degrees (`{"angle": 1.5708}` is Blender's 90°), and colours are linear RGBA arrays, 0–1 each (`[1, 0.5, 0, 1]`; the tools also take `"#RRGGBB"`). The defaults look right as soon as you pick a shader. Blender's list comes from the registry the dev server writes, so start it once (Play, or `npm run registry`).
+**Pick one.** In Blender, select the material, open **Game Shader** in its Game panel (type to search), pick a shader from its category and set its values. From your agent: `set_material_shader {"objects": ["Pond"], "shader": "Water", "values": {"foam": 0.4}}`, or `material` to name the material. `list_component_types` lists the library with one line per shader, and `list_component_types {"type": "Water"}` gives one shader's fields. Values are what code sees: angle fields are radians, which Blender shows in degrees (`{"angle": 1.5708}` is Blender's 90°), and colours are linear RGBA arrays, 0–1 each (`[1, 0.5, 0, 1]`; the tools also take `"#RRGGBB"`). The defaults look right as soon as you pick a shader. Blender's list comes from the registry the dev server writes, so start it once (Play, or `npm run registry`).
 
 **See it in the game.** Blender's viewport keeps showing the material's own nodes. Press Play (F5) and look at the Game View (**Scene | Game** in its header switches back and forth), or use `game_screenshot`. Keep the Blender colour close to the game's look, so renders of the level still read.
 

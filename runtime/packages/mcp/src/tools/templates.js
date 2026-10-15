@@ -18,7 +18,7 @@ export function templateTools(ctx) {
       title: 'Save as template',
       description:
         'Save this project as a template that New Project in Blender lists under "Your templates". It copies src/, ' +
-        'scenes/, assets/, public/, tools/, AGENTS.md, CLAUDE.md, .claude/ (custom skills included), .mcp.json and the ' +
+        'scenes/, assets/, public/, tools/, AGENTS.md, CLAUDE.md, .claude/ (custom skills included), .mcp.json, .codex/ and the ' +
         'config files to Documents/GameStudio/Templates/<id>/ (GAMESTUDIO_TEMPLATES overrides the folder), and turns the ' +
         "game's name and package paths back into placeholders; instructions only in CLAUDE.md move to the template's " +
         'AGENTS.md, with a CLAUDE.md that imports it. node_modules, .gamestudio, dist, *.blend1 and ' +

@@ -5,7 +5,7 @@ Project-level UI lives in Scene Properties, next to the scene settings it goes w
 
   Game Project   the project (name, folder, the scene's export name, the start scene, the last
                  export), the dev server and the project's packages, the component registry,
-                 Open in <code editor> and Claude Code, the scene's Live Link setting, and the
+                 Open in <code editor>, Claude Code and Codex, the scene's Live Link setting, and the
                  Levels list (Open, the start and current level) with Export All
     Scripts      the components and systems in src/, New Component and New System
     Lighting     Bake Lighting (Preview, Final), Clear and the scene's baked lightmaps (ops_lighting.py)

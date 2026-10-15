@@ -378,7 +378,7 @@ export class BlenderManager {
     if (!exe) {
       throw new ToolError('Could not find Blender to launch.', {
         code: 'blender_not_found',
-        hint: 'Set GAMESTUDIO_BLENDER to blender(.exe) (Blender 5.2+) in the MCP server environment (.mcp.json "env"), or open Blender once with the GameStudio extension so it records its path.',
+        hint: 'Set GAMESTUDIO_BLENDER to blender(.exe) (Blender 5.2+) in the MCP server environment ("env" in .mcp.json for Claude Code, [mcp_servers.gamestudio.env] in .codex/config.toml for Codex), or open Blender once with the GameStudio extension so it records its path.',
       });
     }
     let file = scene === undefined ? (this.root ? defaultScene(this.root) : null) : scene;
