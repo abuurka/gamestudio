@@ -2,7 +2,7 @@
 
 Build a game in Blender, play it while you work, and export it for the web. GameStudio keeps the level and art in Blender files, attaches game data to objects, and runs game logic in TypeScript. You can work manually, with a coding agent, or with both.
 
-This manual covers the **GameStudio 0.1.0 extension**, whose declared minimum is **Blender 5.2.0**. Screenshots show the included demonstration content and may differ slightly from your theme, window size or agent selection. Paths in examples are relative to a fictional game project.
+This manual covers the **GameStudio 0.1.1 extension**, whose declared minimum is **Blender 5.2.0**. Screenshots show the included demonstration content and may differ slightly from your theme, window size or agent selection. Paths in examples are relative to a fictional game project.
 
 ![GameStudio playing the demo inside Blender, with object components at the right and the game console below](../images/extension/embedded-play.png)
 

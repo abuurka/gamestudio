@@ -21,6 +21,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import tomllib
 from urllib.parse import unquote, urlsplit
 
 try:
@@ -36,6 +37,7 @@ MANUAL = DOCS / "manual"
 OUTPUT = DOCS / "manual.html"
 MD = MarkdownIt("commonmark", {"html": False}).enable("table")
 CHAPTERS = [MANUAL / "README.md", *sorted(MANUAL.glob("[0-9][0-9]-*.md"))]
+VERSION = tomllib.loads((ROOT / "blender" / "gamestudio" / "blender_manifest.toml").read_text(encoding="utf-8"))["version"]
 
 
 def label(path: Path) -> str:
@@ -246,7 +248,7 @@ def render(image_count):
 <nav aria-label="Chapters">{navigation}</nav><p class="nav-note">Use your browser's Find command to search the full manual.<br><br>All screenshots are embedded. No network connection is needed to read this edition.</p></aside>
 <main id="main"><header class="masthead"><div class="eyebrow">Blender extension · Illustrated documentation</div>
 <h1>GameStudio user manual</h1><p>From installation and your first playable level to reusable assets, game logic and a tested web build.</p>
-<div class="toolbar"><button type="button" id="print-button">Print or save as PDF</button><span>10 chapters · {image_count} screenshots and previews · Version 0.1.0</span></div></header>
+<div class="toolbar"><button type="button" id="print-button">Print or save as PDF</button><span>10 chapters · {image_count} screenshots and previews · Version {VERSION}</span></div></header>
 <details class="mobile-contents"><summary>Browse the chapters</summary><nav aria-label="Mobile chapters">{navigation}</nav></details>
 {body}<footer class="endnote">Generated from the Markdown manual. Full technical references use repository-relative links and are available alongside this file in the source checkout.</footer></main>
 <script>

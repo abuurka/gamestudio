@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 (15 October 2026)
+
+- **Works with your agent, not just Claude Code.** The add-on, the MCP server's messages, the docs, the manual and the website now speak of your coding agent. Claude Code stays the default; Codex and any other MCP client are first-class. The MCP server's hints now name each agent's own settings (`.mcp.json` for Claude Code, `.codex/config.toml` for Codex).
+- **The in-Blender AI assistant can use other models** (experimental). Next to Anthropic (Claude), the default, a new "OpenAI-compatible" provider works with OpenAI, OpenRouter, Ollama, LM Studio and other servers with that API, with nothing extra to install. A local server needs no key or internet access. Models without a known price show "cost unknown" instead of a wrong cost.
+- **Templates:** the `make-template` skill and `save_template` now say that `.codex/` and `.agents/` travel with a template.
+- **Docs:** corrected the tool count (64), Codex setup, what Claude Code's project settings pre-approve, and the shader count; new screenshots of the welcome, launcher, Game Project panel and preferences.
+
 ## 0.1.0 (15 October 2026)
 
 The first public release, an early preview.

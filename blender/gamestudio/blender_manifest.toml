@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "gamestudio"
-version = "0.1.0"
+version = "0.1.1"
 name = "GameStudio"
 tagline = "Make 3D web games in Blender with your AI agent"
 maintainer = "GameStudio contributors"
