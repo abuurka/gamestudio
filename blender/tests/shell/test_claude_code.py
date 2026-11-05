@@ -451,6 +451,17 @@ class _TempProject(unittest.TestCase):
         self.root = self.base / "My Game"
         self.root.mkdir()
         (self.root / "gamestudio.json").write_text(json.dumps({"name": "Gem Island"}), encoding="utf-8")
+        if sys.platform.startswith("linux"):
+            # A Linux desktop always has a terminal; a CI machine may have none. The operator tests
+            # replace the spawn, so this stand-in on PATH is found but never runs.
+            bin_dir = self.base / "bin"
+            bin_dir.mkdir()
+            fake = bin_dir / "x-terminal-emulator"
+            fake.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+            fake.chmod(0o755)
+            path = mock.patch.dict(os.environ, {"PATH": f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '')}"})
+            path.start()
+            self.addCleanup(path.stop)
 
     def tearDown(self):
         project.set_project_root_override(None)

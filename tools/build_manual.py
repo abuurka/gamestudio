@@ -90,7 +90,9 @@ def privacy_check(text: str, source: Path) -> list[str]:
     errors = [f"{label(source)}: review {kind}" for kind, pattern in patterns.items()
               if re.search(pattern, text)]
     # Do not write a local account name into the report itself.
-    names = {os.environ.get("USERNAME", ""), os.environ.get("USER", ""), Path.home().name}
+    # Skipped on GitHub Actions: its account is "runner", no person's, and the manual names the Endless Runner template.
+    names = set() if os.environ.get("GITHUB_ACTIONS") == "true" else {
+        os.environ.get("USERNAME", ""), os.environ.get("USER", ""), Path.home().name}
     for name in names:
         if len(name) >= 4 and re.search(r"(?<!\w)" + re.escape(name) + r"(?!\w)", text, re.I):
             errors.append(f"{label(source)}: review local account identifier")

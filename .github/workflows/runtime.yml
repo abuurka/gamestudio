@@ -55,12 +55,15 @@ jobs:
           - name: Linux
             os: ubuntu-latest
             node: "22.12.0"
+            browser: /usr/bin/google-chrome
           - name: Linux
             os: ubuntu-latest
             node: "24.21.0"
+            browser: /usr/bin/google-chrome
           - name: macOS (experimental)
             os: macos-latest
             node: "24.21.0"
+            browser: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
             experimental: true
     steps:
       - uses: actions/checkout@v7
@@ -79,4 +82,6 @@ jobs:
         run: npm run typecheck
 
       - name: npm test (vitest)
+        env:
+          GS_BROWSER: ${{ matrix.browser }} # the real-browser tests use Chrome, not the first browser that may not start
         run: npm test

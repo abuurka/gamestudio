@@ -121,6 +121,8 @@ jobs:
 
       - name: Unit tests (vitest)
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        env:
+          GS_BROWSER: ${{ matrix.browser }} # the real-browser tests use Chrome, not the first browser that may not start
         run: npm test
 
       - name: Blender suites (addon, shell, contract)
