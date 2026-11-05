@@ -490,7 +490,8 @@ describe('third-party notices', () => {
       symlinkSync(ENGINE, path.join(game.root, 'node_modules', '@gamestudio', 'engine'), 'junction');
       await buildGame(game.root);
       const text = readFileSync(path.join(game.root, 'dist', NOTICES_FILE), 'utf8');
-      expect(text).toContain('## @gamestudio/engine - 0.1.0 (MIT)\n\nMIT License\n');
+      const { version } = JSON.parse(readFileSync(path.join(ENGINE, 'package.json'), 'utf8'));
+      expect(text).toContain(`## @gamestudio/engine - ${version} (MIT)\n\nMIT License\n`);
       expect(text).toContain('## Code from other authors in @gamestudio/engine (THIRD-PARTY-NOTICES.md)');
       expect(text).toContain('### webgl-noise (3D simplex noise)');
       expect(text).toContain('Copyright (C) 2011 by Ashima Arts (Simplex noise)');

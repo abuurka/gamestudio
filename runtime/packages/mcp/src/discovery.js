@@ -282,7 +282,7 @@ export function engineDocsPath(root, here) {
 // test/browser-discovery.test.js checks that both find the same browser.
 
 /** Chrome Headless Shell (the browser GameStudio downloads). @param {string | null | undefined} file */
-export const isHeadlessShell = (file) => /^chrome-headless-shell(\.exe)?$/i.test(path.basename(file ?? ''));
+export const isHeadlessShell = (file) => /^chrome-headless-shell(\.exe)?$/i.test(path.win32.basename(file ?? '')); // win32: splits at \ as well as /, on any host
 
 /** @param {string | undefined} value */
 const off = (value) => ['0', 'false', 'off', 'no'].includes(String(value ?? '').trim().toLowerCase());

@@ -4,10 +4,16 @@
 
     python tools/ci/install_blender.py --dest DIR [--github-env]
 
-Picks this platform's archive from the lock (a portable .zip on Windows, a .tar.xz on Linux),
-checks it against the pinned SHA-256, unpacks it into DIR and prints the blender executable's
-path. A DIR that already holds that archive's Blender (the CI cache) is reused without
-downloading. --github-env also writes BLENDER=<path> to $GITHUB_ENV for the next steps.
+Picks this platform's archive from the lock (a portable .zip on Windows, a .tar.xz on Linux, a
+.dmg on macOS), checks it against the pinned SHA-256, unpacks it into DIR and prints the blender
+executable's path (DIR/blender-<version>-<platform>/blender(.exe), or on macOS
+DIR/Blender.app/Contents/MacOS/Blender). A DIR that already holds that archive's Blender (the CI
+cache) is reused without downloading. --github-env also writes BLENDER=<path> to $GITHUB_ENV for
+the next steps.
+
+macOS: the .dmg is mounted read-only with hdiutil (no Finder window), Blender.app is copied out
+with ditto (keeps the bundle's symlinks, permissions and code signature) and the image is detached
+again, even when the copy fails.
 
 Keep DIR short on Windows: Blender's own files sit about 110 characters below it, and Blender does
 not open paths longer than 260 characters (its glTF exporter then fails to import).
@@ -22,8 +28,10 @@ import os
 import pathlib
 import platform
 import shutil
+import subprocess
 import sys
 import tarfile
+import tempfile
 import urllib.request
 import zipfile
 
@@ -40,8 +48,12 @@ def platform_key() -> str:
 
 
 def executable(folder: pathlib.Path) -> pathlib.Path | None:
-    """blender(.exe) in the unpacked release (one top folder, e.g. blender-5.2.2-linux-x64/)."""
-    name = "blender.exe" if sys.platform == "win32" else "blender"
+    """blender(.exe) in the unpacked release (one top folder, e.g. blender-5.2.2-linux-x64/), or on
+    macOS the app bundle's Blender.app/Contents/MacOS/Blender."""
+    if sys.platform == "darwin":
+        name = "Blender.app/Contents/MacOS/Blender"
+    else:
+        name = "blender.exe" if sys.platform == "win32" else "blender"
     for candidate in (folder / name, *(p / name for p in sorted(folder.iterdir()) if p.is_dir())):
         if candidate.is_file():
             return candidate
@@ -60,8 +72,33 @@ def download(url: str, dest: pathlib.Path, sha256: str) -> None:
         sys.exit(f"[blender] {url}: SHA-256 {digest.hexdigest()} does not match the pinned {sha256}")
 
 
+def copy_from_dmg(image: pathlib.Path, dest: pathlib.Path) -> None:
+    """Copy the .app bundle(s) of a macOS disk image into dest (the image's "Applications" link
+    and other files are left behind)."""
+    mount = pathlib.Path(tempfile.mkdtemp(prefix=f".{dest.name}-mount-", dir=dest.parent))
+    # "Y" answers a licence prompt, should the image ever carry one; it is ignored otherwise.
+    subprocess.run(["hdiutil", "attach", str(image), "-nobrowse", "-readonly", "-noautoopen",
+                    "-mountpoint", str(mount)], input=b"Y\n", stdout=subprocess.DEVNULL, check=True)
+    try:
+        apps = [p for p in sorted(mount.iterdir()) if p.suffix == ".app" and p.is_dir() and not p.is_symlink()]
+        if not apps:
+            sys.exit(f"[blender] no .app bundle in {image.name}")
+        for app in apps:
+            subprocess.run(["ditto", str(app), str(dest / app.name)], check=True)
+    finally:
+        detach = ["hdiutil", "detach", str(mount)]
+        if subprocess.run(detach, stdout=subprocess.DEVNULL).returncode != 0:
+            subprocess.run([*detach, "-force"], stdout=subprocess.DEVNULL)
+        try:
+            mount.rmdir()
+        except OSError:
+            pass
+
+
 def unpack(archive: pathlib.Path, dest: pathlib.Path) -> None:
-    if archive.name.endswith(".zip"):
+    if archive.name.endswith(".dmg"):
+        copy_from_dmg(archive, dest)
+    elif archive.name.endswith(".zip"):
         with zipfile.ZipFile(archive) as zf:
             zf.extractall(dest)  # zipfile drops ".." and absolute parts
     else:

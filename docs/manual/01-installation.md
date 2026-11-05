@@ -17,17 +17,16 @@ You do not need to install a coding agent to edit a level, add components or pla
 
 ## Install the extension archive
 
-1. Obtain the `gamestudio-<version>.zip` extension archive. If you are working from this repository, the developer build command below creates it in `dist/`.
-2. Open Blender and choose **Edit > Preferences > Get Extensions**.
-3. Open the menu for extension management and choose **Install from Disk**.
-4. Select the ZIP archive. Install and enable GameStudio if Blender does not enable it automatically.
-5. Return to Blender's main window. The **GameStudio** and **Game** menus should now be visible.
+1. Download `gamestudio-<version>.zip` from the [latest GitHub release](https://github.com/abuurka/gamestudio/releases/latest), under **Assets**. Keep it zipped. Do not use the **Source code** archives; they are not the extension.
+2. Drag the ZIP onto Blender's window and confirm the install, or open **Edit > Preferences > Get Extensions**, open the menu for extension management and choose **Install from Disk**, then select the ZIP.
+3. Enable GameStudio if Blender does not enable it automatically.
+4. Return to Blender's main window. The **GameStudio** and **Game** menus should now be visible.
 
 ![Welcome to GameStudio with New Project, Open Demo and Add Game Workspace controls](../images/extension/01-welcome.png)
 
 *The welcome screen provides the main entry points. The agent button becomes useful after you open a game project. A missing agent does not prevent manual editing.*
 
-For a source checkout, run this in the repository root with Python and a supported Blender available:
+Only if you work from a clone of the repository: build the archive yourself by running this in the repository root with Python and a supported Blender available. It writes the ZIP to `dist/`.
 
 ```sh
 python tools/build_extension.py

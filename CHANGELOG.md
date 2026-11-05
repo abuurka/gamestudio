@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- **Install from the release.** The README and the manual now start from the zip on the latest GitHub release (drag it onto Blender's window). Building the zip yourself is only for people working from a clone.
+- **macOS in CI** (experimental): the extension and runtime suites run on Apple Silicon runners against Blender 5.2.2 for macOS. They don't block a merge yet.
+- **Fixes for CI failures.** On Linux, a test picked up the runner's own browsers, and spotting Chrome Headless Shell from a Windows path failed (`isHeadlessShell`, in the dev server and the MCP server).
+- **One version number.** The `@gamestudio/*` packages now carry the extension's version (0.1.1), and a test keeps them in step.
+- **A smaller repository.** The tutorial videos and promo clips are now assets of the `site-media` release. The website workflow fetches them and builds `manual.html` when it deploys, so neither is in git any more.
+- **For contributors:** `CONTRIBUTING.md`, issue forms for bugs (asking for versions, OS, agent and the log from **Show Log**) and features, a pull request template, and CI badges in the README.
+
 ## 0.1.1 (15 October 2026)
 
 - **Works with your agent, not just Claude Code.** The add-on, the MCP server's messages, the docs, the manual and the website now speak of your coding agent. Claude Code stays the default; Codex and any other MCP client are first-class. The MCP server's hints now name each agent's own settings (`.mcp.json` for Claude Code, `.codex/config.toml` for Codex).

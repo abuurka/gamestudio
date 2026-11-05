@@ -214,6 +214,8 @@ class SceneViewCase(StubbedBlender):
         return sceneview.enable(self.window, self.screen, area or self.big)
 
     def tick(self, client, times=3):
+        if self.hub is not None and client.connected:
+            self.assertTrue(self.hub.delivered(client), "the client read what the hub sent")
         for _ in range(times):
             client.pump()
             play.pump()

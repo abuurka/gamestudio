@@ -1,6 +1,6 @@
 {
   "name": "@gamestudio/devserver",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GameStudio Vite plugin: live-link hub, component registry generation and scene export serving.",
   "license": "MIT",
   "type": "module",

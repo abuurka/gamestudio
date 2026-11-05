@@ -53,4 +53,4 @@ The downloadable output is a browser game. Blender's tools author its content, w
 
 Screenshots have descriptive alternative text and captions. In the offline edition, click an image or focus it and press Enter to enlarge it; Escape closes the enlarged view. Some editor captures deliberately contain example warnings and errors to illustrate the Console. They do not indicate that a new installation should produce those errors.
 
-For exact field names and advanced APIs, use the [documentation index](../README.md). To read all chapters in one browser tab, open the [offline edition](../manual.html).
+For exact field names and advanced APIs, use the [documentation index](../README.md). To read all chapters in one browser tab, open the [offline edition](https://abuurka.github.io/gamestudio/manual.html).

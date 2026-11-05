@@ -202,6 +202,25 @@ class FakeHub:
         for conn in conns:
             self.write_raw(conn, data)
 
+    def delivered(self, client, timeout=5.0) -> bool:
+        """Pump `client` until it has read everything sent to it so far. broadcast() returns once the
+        bytes are written, but the client's non-blocking socket may not have them yet (Linux loopback
+        delivers a moment later), so a single client.pump() right after it can miss them."""
+        with self._lock:
+            self._pings = getattr(self, "_pings", 0) + 1
+            n = self._pings
+        seen = []
+
+        def handler(msg):
+            seen.append(msg.get("n"))
+
+        client.on("test.ping", handler)
+        try:
+            self.broadcast({"t": "test.ping", "n": n})
+            return pump_until(lambda: n in seen, [client.pump], timeout)
+        finally:
+            client.off("test.ping", handler)
+
     def messages(self, t=None) -> list:
         with self._lock:
             return [m for m in self.received if t is None or m.get("t") == t]

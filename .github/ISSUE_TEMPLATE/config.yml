@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: User manual
+    url: https://abuurka.github.io/gamestudio/manual.html
+    about: Setup, every feature and a troubleshooting chapter.
+  - name: Video tutorials
+    url: https://abuurka.github.io/gamestudio/videos/
+    about: 20 short narrated lessons, from install to publishing.

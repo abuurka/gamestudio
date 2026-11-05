@@ -14,7 +14,11 @@ python tools/build_manual.py --check
 
 The builder uses Markdown source, local images and inline styles. It does not fetch fonts, scripts or images from the network. The result, `docs/manual.html`, contains the whole manual and its image data, so it can be copied as a standalone reading artifact. Links to full technical references need the surrounding repository.
 
-`--check` is read-only. It validates local links and Markdown anchors, JSON examples, alternative text, the image inventory, basic privacy patterns and whether the HTML matches its sources. This is a documentation check, not a test of the add-on's runtime behavior.
+`docs/manual.html` is not committed: it embeds every image, so each rebuild would add several megabytes to the repository's history. The website workflow (`.github/workflows/pages.yml`) builds it on every deploy, so the published copy at <https://abuurka.github.io/gamestudio/manual.html> always matches the Markdown on `main`. Build it locally to review it.
+
+`--check` is read-only. It validates local links and Markdown anchors, JSON examples, alternative text, the image inventory and basic privacy patterns, and renders the HTML without writing it. This is a documentation check, not a test of the add-on's runtime behavior.
+
+The tutorial videos and promo clips are not in git either. `docs/site-media.json` lists them with their checksums, `python tools/site_media.py fetch` downloads them into `docs/` from the `site-media` release, and the website workflow does the same before it deploys. See the header of `tools/site_media.py` to change a video.
 
 ## Screenshot provenance and privacy
 

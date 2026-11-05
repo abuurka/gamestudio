@@ -1,6 +1,6 @@
 {
   "name": "@gamestudio/host",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GameStudio runtime host: runs a game in Electron, docked (offscreen, GPU-shared frames to the editor over docs/SURFACE.md) or in its own window.",
   "license": "MIT",
   "type": "module",

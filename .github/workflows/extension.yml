@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: MIT
 #
-# The GameStudio extension on stock Blender 5.2.2, on GitHub-hosted Ubuntu and Windows runners:
-# typecheck, unit tests, the Blender suites (addon, shell, contract), the extension zip (uploaded
-# as an artifact from Ubuntu) and the headless-browser runs (smoke, features).
+# The GameStudio extension on stock Blender 5.2.2, on GitHub-hosted Ubuntu, Windows and macOS
+# (Apple Silicon) runners: typecheck, unit tests, the Blender suites (addon, shell, contract), the
+# extension zip (uploaded as an artifact from Ubuntu) and the headless-browser runs (smoke,
+# features). macOS is experimental (continue-on-error) until it has passed: a red macOS job shows
+# what to fix but does not fail the run.
 #
 # Safe for pull requests: GitHub-hosted runners are throwaway VMs, the token is read-only and no
 # secrets are used. Blender comes from download.blender.org: tools/ci/blender.lock.json pins each
@@ -55,6 +57,7 @@ jobs:
     name: Extension (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
+    continue-on-error: ${{ matrix.experimental == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -64,7 +67,11 @@ jobs:
             browser: /usr/bin/google-chrome
           - name: Windows
             os: windows-latest
-            browser: C:\Program Files\Google\Chrome\Application\chrome.exe
+            browser: 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+          - name: macOS (experimental)
+            os: macos-latest # Apple Silicon: tools/ci/blender.lock.json has macos-arm64 only
+            browser: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            experimental: true
     defaults:
       run:
         shell: bash
@@ -73,14 +80,14 @@ jobs:
         if: runner.os == 'Windows'
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -95,7 +102,7 @@ jobs:
           echo "TMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
 
       - name: Cache Blender
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/gs-ci/blender
           key: blender-${{ runner.os }}-${{ hashFiles('tools/ci/blender.lock.json') }}
@@ -126,7 +133,7 @@ jobs:
 
       - name: Upload the extension zip
         if: ${{ !cancelled() && runner.os == 'Linux' && hashFiles('dist/gamestudio-*.zip') != '' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gamestudio-extension
           path: dist/gamestudio-*.zip
@@ -146,9 +153,9 @@ jobs:
 
       - name: Upload screenshots
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: screenshots-${{ matrix.name }}
+          name: screenshots-${{ runner.os }}
           path: runtime/.smoke/*.png
           if-no-files-found: ignore
 
@@ -158,14 +165,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -173,7 +180,7 @@ jobs:
         run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends ${{ env.BLENDER_APT }}
 
       - name: Cache Blender
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/gs-ci/blender
           key: blender-${{ runner.os }}-${{ hashFiles('tools/ci/blender.lock.json') }}
@@ -191,7 +198,7 @@ jobs:
 
       - name: Upload screenshots
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: templates-screenshots
           path: ${{ runner.temp }}/templates-e2e/screenshots/*.png

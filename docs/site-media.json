@@ -1,0 +1,171 @@
+{
+  "comment": "Large website files kept out of git; see tools/site_media.py. Rewrite with `python tools/site_media.py manifest`.",
+  "release": "https://github.com/abuurka/gamestudio/releases/tag/site-media",
+  "files": [
+    {
+      "path": "media/agent.mp4",
+      "size": 166866,
+      "sha256": "1b9d3c2f2b93e0b97201d2081be3728935e713fe79b97b27f19eb5f535709a0b"
+    },
+    {
+      "path": "media/agent.webm",
+      "size": 186182,
+      "sha256": "5de9aaa1e567b9b4cdaf8d30a2f8b2d80dfddbe2188ab9ff2c9c2fb82c8e02d7"
+    },
+    {
+      "path": "media/demo.mp4",
+      "size": 5277953,
+      "sha256": "2dc34d3563f944c36d5c433696b6f613868815e3da1da6abf6898096e4e27bdb"
+    },
+    {
+      "path": "media/fix.mp4",
+      "size": 130200,
+      "sha256": "30aec3f453e7c856cb8008a9f5b48bdef8b98d917abdb24c14f6110179b52156"
+    },
+    {
+      "path": "media/fix.webm",
+      "size": 172282,
+      "sha256": "53147f180f95146d1f1c82693389e6ef7821adedd5e55d835e6a210f3b02c0f3"
+    },
+    {
+      "path": "media/game.mp4",
+      "size": 146829,
+      "sha256": "bf23c7795a868408818ac467cef212ae84b006e507b0e48f6d7e5ab82bee91e3"
+    },
+    {
+      "path": "media/game.webm",
+      "size": 134694,
+      "sha256": "8bccb159a0bb74eaf7a3e22eb7a3742516aa71f2e1781b72cbc003078cd51a82"
+    },
+    {
+      "path": "media/promo.mp4",
+      "size": 3690642,
+      "sha256": "3f8bb23f94a164facd284bdca85d15a98949f2a13784d3c584610e656067a212"
+    },
+    {
+      "path": "media/promo.webm",
+      "size": 3289479,
+      "sha256": "e7be4287e42cb6c049053a4ab3e9108f9eba4c038a03c85521ed7e0fb8d39c83"
+    },
+    {
+      "path": "media/web.mp4",
+      "size": 43235,
+      "sha256": "58e49efcaf585246024211e8354244aa58d184a1517cd40e6bb86b608654485d"
+    },
+    {
+      "path": "media/web.webm",
+      "size": 55463,
+      "sha256": "5023190b36e39967e53d56553bc4700af733b6816f8b6844cfc83ec962bc20ae"
+    },
+    {
+      "path": "media/world.mp4",
+      "size": 345343,
+      "sha256": "c65479102e7ee4ef8f44866815f81a35d9230e8ad9682cc65b1266a36a224fd8"
+    },
+    {
+      "path": "media/world.webm",
+      "size": 332495,
+      "sha256": "8c9918ac96415f2c2a44d968380ea31e33e737805a2d0fd8029ae74ec77f94de"
+    },
+    {
+      "path": "videos/01-install.webm",
+      "size": 3987213,
+      "sha256": "b05db34c0126688fe12d54f681c0fc741422cb484a479b010a20043e266f75e6"
+    },
+    {
+      "path": "videos/02-first-project.webm",
+      "size": 5858814,
+      "sha256": "88cba5e8545ead30d525cb99c18dbfb92e7bb78d0c54e4172ae3fb9851c10e3f"
+    },
+    {
+      "path": "videos/03-edit-and-play.webm",
+      "size": 4351144,
+      "sha256": "a740488e08fca0017ecb931697adf6ed056839839243ca1b7adc9d5f41df0012"
+    },
+    {
+      "path": "videos/04-claude-code.webm",
+      "size": 4882652,
+      "sha256": "94a61253523dfac4e157d426d76782e2df0d52f39eefaece3231841a68a372dd"
+    },
+    {
+      "path": "videos/05-kit-props.webm",
+      "size": 5334951,
+      "sha256": "e74a78a30bbda2f947ab4bf160382a9c8e6d5a0a87207ec8ee80f74198b7c69e"
+    },
+    {
+      "path": "videos/06-procedural-world.webm",
+      "size": 3815206,
+      "sha256": "f9501053f4ef4c95ecec19c942e2300a16b52d96150f0603ae981cba4584c4f4"
+    },
+    {
+      "path": "videos/07-asset-libraries.webm",
+      "size": 5876578,
+      "sha256": "1ffbad6f98107b90340d33f8dbba88462f461996ea25af441600463cdcf0d69f"
+    },
+    {
+      "path": "videos/08-make-it-pretty.webm",
+      "size": 5699362,
+      "sha256": "201235830335502db810598ef47c591a3f4e60555ef3120721f5dcb9f3314704"
+    },
+    {
+      "path": "videos/09-first-component.webm",
+      "size": 6144512,
+      "sha256": "121794b0cd70f1feb3c72a9b44590099f53989de198cbfc6cb2fc7cce22db0c3"
+    },
+    {
+      "path": "videos/10-menus-and-hud.webm",
+      "size": 6434449,
+      "sha256": "f2d8be1ef40a00cfe3f6046d87943bc4667cb6b12cfc3237467409b5702423d8"
+    },
+    {
+      "path": "videos/11-animated-character.webm",
+      "size": 5120058,
+      "sha256": "3755c6b779a5548ea51005e5e8201b071035508f152466a21cf8e897f444f21f"
+    },
+    {
+      "path": "videos/12-enemies-navmesh.webm",
+      "size": 5889780,
+      "sha256": "a515f10476acf62be7a91ec7b4811725669cfbc7a876986abc4290674c0b6795"
+    },
+    {
+      "path": "videos/13-more-levels.webm",
+      "size": 5232568,
+      "sha256": "5f03e137e9192be5561b662b4173fcde48c33169926a208ef40edebd9df8b60d"
+    },
+    {
+      "path": "videos/14-sound-and-music.webm",
+      "size": 5069351,
+      "sha256": "94109136e7758556db6c73c192016bed3c37702ce9ba83de3526f3c492fbb49b"
+    },
+    {
+      "path": "videos/15-idea-to-game.webm",
+      "size": 4115823,
+      "sha256": "bd6287266765712fa3f7675781bcd6b87e3ccd4d018b549437fabdffdf6da149"
+    },
+    {
+      "path": "videos/16-playtest-and-fix.webm",
+      "size": 4736784,
+      "sha256": "4f75e5567665f146678da44f70b310a7a7158c2f99f24cd174d86958bc4ca527"
+    },
+    {
+      "path": "videos/17-staying-in-control.webm",
+      "size": 6648169,
+      "sha256": "9772154feeea9a3fe0500315a98b867fdb0e8ae445289f17d02845e9fccdfd36"
+    },
+    {
+      "path": "videos/18-codex.webm",
+      "size": 5986368,
+      "sha256": "e3794eb8d6507e0990b4f04b21819fb05cf355357c9441a1f762675ae298552f"
+    },
+    {
+      "path": "videos/19-publish-web.webm",
+      "size": 6173859,
+      "sha256": "f7e2b680ec359e41a48cfa77025b294d5a344b6735c894f7f0d337891dfe0fd4"
+    },
+    {
+      "path": "videos/20-save-template.webm",
+      "size": 5934861,
+      "sha256": "8e28a81ba0a9c6f25967c16546b01b879e7e9c8ce42706933a32668dc18901fb"
+    }
+  ]
+}

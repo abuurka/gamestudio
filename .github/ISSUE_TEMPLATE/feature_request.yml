@@ -1,0 +1,30 @@
+name: Feature request
+description: Something GameStudio should do, or do better.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: game
+    attributes:
+      label: What were you making?
+      description: The game, level or asset, and the step where GameStudio got in the way or fell short.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: What you'd like GameStudio, or your agent through GameStudio, to be able to do.
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: How do you work around it today?
+  - type: dropdown
+    id: who
+    attributes:
+      label: Who does this step?
+      options:
+        - Me, by hand in Blender
+        - My agent, through the MCP tools
+        - Both

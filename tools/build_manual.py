@@ -5,7 +5,8 @@
     python tools/build_manual.py
     python tools/build_manual.py --check
 
-The check mode is read-only and also checks that the committed HTML is current.
+The check mode is read-only. docs/manual.html is not in git: .github/workflows/pages.yml builds it
+for the website on every deploy.
 Images must match the visually reviewed inventory in docs/manual/screenshots.json.
 No network requests, image editing, user-profile capture or timestamps are used.
 """
@@ -295,22 +296,19 @@ if ('IntersectionObserver' in window) {{
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--check", action="store_true", help="Validate without changing files; fail if HTML is stale")
+    parser.add_argument("--check", action="store_true", help="Validate and render without writing docs/manual.html")
     args = parser.parse_args()
     try:
         _parsed, images, links = validate()
         output = render(images)
-        if args.check:
-            if not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8") != output:
-                raise ValueError("docs/manual.html is stale; run python tools/build_manual.py")
-        else:
+        if not args.check:
             OUTPUT.write_text(output, encoding="utf-8", newline="\n")
     except (ValueError, OSError) as exc:
         print(str(exc), file=sys.stderr)
         return 1
     words = sum(len(path.read_text(encoding="utf-8").split()) for path in CHAPTERS)
     print(f"Manual validated: {len(CHAPTERS) - 1} chapters, {words:,} words, {images} reviewed images, {links} links.")
-    print("Offline HTML is current." if args.check else "Built docs/manual.html")
+    print("Offline HTML renders (not written)." if args.check else "Built docs/manual.html")
     return 0
 
 

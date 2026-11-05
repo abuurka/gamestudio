@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: MIT
+#
+# The website (https://abuurka.github.io/gamestudio/): publishes docs/ to GitHub Pages.
+#
+# Two things the site serves are not in git, to keep the repository small:
+# - docs/manual.html, the one-page manual, is built here from docs/manual/ (tools/build_manual.py).
+# - The tutorial videos and promo clips are fetched from the `site-media` pre-release, checked
+#   against the SHA-256s in docs/site-media.json (tools/site_media.py).
+# The site's URLs stay the same as when docs/ was published straight from the branch.
+#
+# Needs Settings > Pages > Build and deployment > Source: "GitHub Actions".
+
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "tools/build_manual.py"
+      - "tools/site_media.py"
+      - "tools/manual-requirements.txt"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Build the one-page manual
+        run: |
+          python -m pip install -r tools/manual-requirements.txt
+          python tools/build_manual.py
+
+      - name: Fetch the videos and promo clips
+        run: python tools/site_media.py fetch
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

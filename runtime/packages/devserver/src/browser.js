@@ -31,7 +31,7 @@ const EXTENSION_ID = 'gamestudio';
  */
 
 /** Chrome Headless Shell (the downloaded browser): no window, so no 'offscreen' mode. @param {string | null | undefined} file */
-export const isHeadlessShell = (file) => /^chrome-headless-shell(\.exe)?$/i.test(path.basename(file ?? ''));
+export const isHeadlessShell = (file) => /^chrome-headless-shell(\.exe)?$/i.test(path.win32.basename(file ?? '')); // win32: splits at \ as well as /, on any host
 
 /** A short name for status lines ("Playing in Edge 155"). @param {string} file */
 export function browserLabel(file) {

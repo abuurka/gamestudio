@@ -2,7 +2,7 @@
 
 GameStudio is a Blender extension for creating and playing 3D web games. Use the illustrated manual to learn the editor, then use the technical references when you need an exact API or file format.
 
-**[Read the user manual](manual/README.md)** · **[Open the illustrated offline edition](manual.html)**
+**[Read the user manual](manual/README.md)** · **[Open the illustrated offline edition](https://abuurka.github.io/gamestudio/manual.html)**
 
 **[Watch the narrated tutorials](videos/index.html)** — 20 click-by-click lessons, from installing GameStudio to publishing a game, with captions and transcripts.
 

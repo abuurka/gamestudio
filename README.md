@@ -5,7 +5,7 @@
   </picture>
 </h1>
 
-**Website:** [https://abuurka.github.io/gamestudio](https://abuurka.github.io/gamestudio/) · **Documentation:** [Illustrated user manual](docs/manual/README.md) · [Offline HTML edition](docs/manual.html) · [20 narrated video tutorials](docs/videos/README.md) · [All references](docs/README.md)
+**Website:** [https://abuurka.github.io/gamestudio](https://abuurka.github.io/gamestudio/) · **Documentation:** [Illustrated user manual](docs/manual/README.md) · [Offline HTML edition](https://abuurka.github.io/gamestudio/manual.html) · [20 narrated video tutorials](docs/videos/README.md) · [All references](docs/README.md)
 
 **Let your AI agent build your game inside Blender.**
 
@@ -94,7 +94,7 @@ The genre templates add one skill each: `add-level-section` (Platformer), `add-e
 
 ## Quick start
 
-1. **Install the extension** in Blender 5.2+: Edit › Preferences › Get Extensions › Install from Disk, then choose `gamestudio-<version>.zip` (build it with `python tools/build_extension.py`, or `npm run extension:install` for a Blender it finds). That is the only install: no terminal, no npm, no Node.js or browser to get yourself.
+1. **Download and install the extension.** Download `gamestudio-<version>.zip` (today `gamestudio-0.1.1.zip`) from the [latest release](https://github.com/abuurka/gamestudio/releases/latest) and keep it zipped. In Blender 5.2+, drag the zip onto Blender's window, or use Edit › Preferences › Get Extensions › ⌄ › Install from Disk. That is the only install: no terminal, no npm, no Node.js or browser to get yourself. (Working from a clone of this repository instead? See [Developing GameStudio](#developing-gamestudio).)
    The first time you open a game (an example, a template, your own project) or press Play, GameStudio asks once to set itself up and lists what it downloads, about how big, and where it goes: **Node.js 24** (about 32–55 MB, only if you have no Node.js 22.12+), **the game packages** (three.js, Vite, TypeScript, ...: about 70 MB, 150 MB on disk) and, only if there is no Chrome, Edge or Chromium, **a game browser** (Chrome Headless Shell, about 100–125 MB). Everything goes in the extension's own folder in your Blender profile; nothing is installed system-wide. **Set Up** starts it (and turns on Blender's *Allow Online Access* if it is off); the status bar and the GameStudio menu show the progress, and whatever you pressed (Play, Scene view, Open in Claude Code, Open in Codex) goes on by itself when it is done. If something fails, the message says what, with **Retry** and **Show Log**. Turn on *Set up automatically* in the extension's preferences to skip the question. After an update of the extension, projects get the new engine by themselves (no download unless it needs a new package).
 2. **GameStudio › New Project** and pick a template, or open the demo game from **GameStudio › Examples**. Every template comes with the runtime, a playable level, ready-made sound effects and HUD icons (hearts, stars, a coin, a gem, a key), `AGENTS.md` (with a short `CLAUDE.md` that imports it), the skills and `.mcp.json`:
    Each one opens on a title screen made in Blender, has pause and options menus (music and sound volumes), and ends on a win or game-over screen, with particles, a sky and fog.
@@ -156,7 +156,7 @@ python tools/build_extension.py    # dist/gamestudio-<version>.zip
 
 `tools/blender_dev.py` points Blender at `blender/gamestudio` through a junction: restart Blender to pick up Python changes, while TypeScript hot-reloads. Tests never touch your Blender profile.
 
-On Linux, use `python3`, Blender 5.2.2 from the tarball (`--blender` or `BLENDER`), Google Chrome or Chromium (found on PATH, or set `GS_BROWSER`), and Blender's libraries even in `--background` (Ubuntu: `libx11-6 libxext6 libxi6 libxfixes3 libxrender1 libxxf86vm1 libxkbcommon0 libsm6 libice6 libgl1 libegl1`). No display is needed. CI (`.github/workflows/extension.yml`) runs all of the above on Ubuntu and Windows.
+On Linux, use `python3`, Blender 5.2.2 from the tarball (`--blender` or `BLENDER`), Google Chrome or Chromium (found on PATH, or set `GS_BROWSER`), and Blender's libraries even in `--background` (Ubuntu: `libx11-6 libxext6 libxi6 libxfixes3 libxrender1 libxxf86vm1 libxkbcommon0 libsm6 libice6 libgl1 libegl1`). No display is needed. CI (`.github/workflows/extension.yml`) runs all of the above on Ubuntu and Windows, and on macOS as an experimental job. To contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 | Path | What it is | Licence |
 |---|---|---|
@@ -168,7 +168,7 @@ On Linux, use `python3`, Blender 5.2.2 from the tarball (`--blender` or `BLENDER
 | `runtime/packages/mcp/` | `@gamestudio/mcp`: the MCP server your agent launches | MIT |
 | `runtime/packages/host/` | `@gamestudio/host`: runs a game in Electron, in its own window or docked | MIT |
 | `examples/demo-game/` | A small platformer | MIT-0 |
-| `docs/` | The [user manual](docs/manual/README.md) (also as one `manual.html`), the [video tutorials](docs/videos/README.md), `ARCHITECTURE.md`, `MCP.md`, `SPEC.md`, `WORKFLOWS.md`, `TEMPLATES.md` (project templates, your own included), `GAME-UI.md` (menus and HUDs made in Blender), `AI-ASSISTANT.md`, `EXTENSION-LISTING.md` (draft store listing); `fork/` holds the shelved Blender fork's docs | |
+| `docs/` | The website, published by `.github/workflows/pages.yml`; the videos and the one-page `manual.html` are fetched or built there, not kept in git ([tools/site_media.py](tools/site_media.py)). The [user manual](docs/manual/README.md), the [video tutorials](docs/videos/README.md), `ARCHITECTURE.md`, `MCP.md`, `SPEC.md`, `WORKFLOWS.md`, `TEMPLATES.md` (project templates, your own included), `GAME-UI.md` (menus and HUDs made in Blender), `AI-ASSISTANT.md`, `EXTENSION-LISTING.md` (draft store listing); `fork/` holds the shelved Blender fork's docs | |
 | `tools/` | Development scripts: the extension build, test runners, end-to-end runs, benchmarks, manual screenshots, sound and icon generators | |
 | `research/` | Background research from planning: other engines, Blender internals, runtime options, AI agents, the fork | |
 | `editor/` | The shelved GameStudio Editor fork of Blender (kept for reference, not maintained) | GPL |
@@ -177,22 +177,24 @@ A game you make with GameStudio is yours to license as you like. It runs on the 
 
 ## Tests
 
-Last full run: 15 October 2026, Windows 11, Blender 5.2.2. The CI workflows in `.github/workflows/` run the same suites on Windows and Ubuntu.
+[![extension](https://github.com/abuurka/gamestudio/actions/workflows/extension.yml/badge.svg?branch=main)](https://github.com/abuurka/gamestudio/actions/workflows/extension.yml) [![runtime](https://github.com/abuurka/gamestudio/actions/workflows/runtime.yml/badge.svg?branch=main)](https://github.com/abuurka/gamestudio/actions/workflows/runtime.yml)
 
-| Suite | Command | Result |
+The badges show the latest CI run on `main`, against stock Blender 5.2.2 on GitHub-hosted runners. macOS runs too, but it is experimental and doesn't turn the badge red yet. Open a badge to see each run's results.
+
+| Suite | Command | Runs in CI on |
 |---|---|---|
-| Extension in Blender | `python tools/test_blender.py addon` | 1083 passed (12 mesh checks skipped for the sky kit, which builds no mesh) |
-| Blender UI shell | `python tools/test_blender.py shell` | 263 passed (13 skipped: 11 need the shelved Editor fork, 2 need a POSIX shell) |
-| Extension contract | `python tools/test_blender.py contract` | 39 passed (5 skipped: they need an Editor fork build) |
-| Engine, dev server, MCP server, skills | `npm test` | 1087 passed |
-| Types | `npm run typecheck` | clean |
-| A game in headless Chrome/Edge: live link, hot reload | `npm run smoke` | 27/27 |
-| Engine features: animation, audio, prefabs, particles, screens, levels | `npm run features` | 38/38 |
-| Every template from New Project to its ending | `npm run e2e:templates` | 120/120 (5 templates) |
-| Extension package | `python tools/build_extension.py` | 2.9 MB zip (554 files), passes `extension validate` |
+| Extension in Blender | `python tools/test_blender.py addon` | Windows, Linux, macOS |
+| Blender UI shell | `python tools/test_blender.py shell` | Windows, Linux, macOS |
+| Extension contract | `python tools/test_blender.py contract` | Windows, Linux, macOS |
+| Engine, dev server, MCP server, skills | `npm test` | Windows, Linux (Node 22.12 and 24), macOS |
+| Types | `npm run typecheck` | Windows, Linux, macOS |
+| A game in headless Chrome: live link, hot reload | `npm run smoke` | Windows, Linux, macOS |
+| Engine features: animation, audio, prefabs, particles, screens, levels | `npm run features` | Windows, Linux, macOS |
+| Every template from New Project to its ending | `npm run e2e:templates` | Linux, when started by hand (slow with software rendering) |
+| Extension package | `python tools/build_extension.py` | Windows, Linux, macOS; the Linux zip is kept as a build artifact |
 
 ## Status
 
-GameStudio is an early preview ([CHANGELOG.md](CHANGELOG.md) lists what's new). Developed on Windows with Blender 5.2.2, and the full test matrix also passes on Linux (Ubuntu 24.04, in WSL). macOS paths are written but untested. The in-Blender AI assistant (Claude or any OpenAI-compatible API, proposal workflow) is still included; an AI agent through MCP is the main way to work.
+GameStudio is an early preview ([CHANGELOG.md](CHANGELOG.md) lists what's new). Developed on Windows with Blender 5.2.2; CI runs the test suites on Windows and Linux. macOS support is written and CI now runs it, but nobody has tested it on a real Mac yet: [reports](CONTRIBUTING.md#reporting-a-bug) are very welcome. The in-Blender AI assistant (Claude or any OpenAI-compatible API, proposal workflow) is still included; an AI agent through MCP is the main way to work.
 
 GameStudio is based on Blender's open source code; Blender is a trademark of the Blender Foundation, and GameStudio is not affiliated with or endorsed by it.

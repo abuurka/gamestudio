@@ -109,9 +109,12 @@ def read_config(root) -> dict:
         return config
     path = pathlib.Path(root) / PROJECT_FILE
     try:
-        mtime = path.stat().st_mtime
+        stat = path.stat()
     except OSError:
         return config
+    # The size too: Linux stamps files from a coarse clock, so two writes a few milliseconds apart can
+    # share an mtime (a gamestudio.json saved twice in quick succession would keep the first).
+    mtime = (stat.st_mtime_ns, stat.st_size)
     if _config_cache["path"] == path and _config_cache["mtime"] == mtime:
         return json.loads(json.dumps(_config_cache["config"]))
     try:

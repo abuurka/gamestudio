@@ -250,8 +250,11 @@ class NodeChoiceTests(_Temp):
         toolchain.set_user_dir(self.user)
         self.exe = _write(self.user / "node" / ("node.exe" if WINDOWS else "bin/node"), b"")
 
+    # A system Node.js path of this platform: on Linux and macOS os.pathsep is ":", which "C:/..." contains.
+    SYSTEM_NODE = "C:/Program Files/nodejs/node.exe" if WINDOWS else "/opt/nodejs/bin/node"
+
     def _system(self, version):
-        info = ("C:/Program Files/nodejs/node.exe", version) if version else (None, None)
+        info = (self.SYSTEM_NODE, version) if version else (None, None)
         return mock.patch.object(toolchain, "_system_node_info", lambda: info)
 
     def test_system_node_wins_when_new_enough(self):
@@ -259,7 +262,7 @@ class NodeChoiceTests(_Temp):
             self.assertIsNone(toolchain.node_dir())
             self.assertEqual(toolchain.node_status()["source"], "system")
             path = toolchain.child_env({"PATH": "X"})["PATH"].split(os.pathsep)
-            self.assertEqual(path, [str(pathlib.Path("C:/Program Files/nodejs")), "X"], "the chosen Node.js first")
+            self.assertEqual(path, [str(pathlib.Path(self.SYSTEM_NODE).parent), "X"], "the chosen Node.js first")
 
     def test_portable_node_without_a_usable_system_node(self):
         with self._system((20, 11, 1)), mock.patch.object(toolchain, "node_version", lambda _exe: (24, 21, 0)):

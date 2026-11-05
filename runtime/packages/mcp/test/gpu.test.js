@@ -103,7 +103,13 @@ describe('launching per mode', () => {
   /** @param {string | undefined} gpu */
   function gameBrowser(gpu) {
     const lines = /** @type {string[]} */ ([]);
-    const env = { GAMESTUDIO_BROWSER: process.execPath, ...(gpu !== undefined && { GAMESTUDIO_BROWSER_GPU: gpu }) };
+    // Only the stand-in browser: no system browser (a Linux CI runner has several, each tried when
+    // a launch fails) and no browser downloaded into this machine's Blender profile.
+    const nowhere = path.join(os.tmpdir(), 'gs_no_home_does_not_exist');
+    const env = {
+      GAMESTUDIO_BROWSER: process.execPath, GAMESTUDIO_BROWSER_SYSTEM: '0', HOME: nowhere, USERPROFILE: nowhere, APPDATA: nowhere, XDG_CONFIG_HOME: nowhere, PATH: '',
+      ...(gpu !== undefined && { GAMESTUDIO_BROWSER_GPU: gpu }),
+    };
     return { browser: new GameBrowser({ env, log: (l) => lines.push(l) }), lines };
   }
   const switches = () => launch.mock.calls.map((/** @type {any[]} */ [o]) => o.args);

@@ -1,0 +1,105 @@
+name: Bug report
+description: Something in GameStudio doesn't work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Before you paste logs or screenshots, check them for personal details (your user name in paths, window titles, recent files). **Never paste** `.gamestudio/blender.json`, tokens or API keys.
+        A security problem? Please use [Report a vulnerability](https://github.com/abuurka/gamestudio/security/advisories/new) instead of a public issue.
+  - type: input
+    id: gamestudio
+    attributes:
+      label: GameStudio version
+      description: Edit › Preferences › Get Extensions, under GameStudio.
+      placeholder: "0.1.1"
+    validations:
+      required: true
+  - type: input
+    id: blender
+    attributes:
+      label: Blender version
+      description: Help › About.
+      placeholder: "5.2.2"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Linux
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os_version
+    attributes:
+      label: OS version
+      placeholder: "Windows 11 24H2, macOS 15.4, Ubuntu 24.04, ..."
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Coding agent involved
+      options:
+        - None, I was working by hand
+        - Claude Code
+        - Codex
+        - Another MCP client
+        - The in-Blender AI assistant
+    validations:
+      required: true
+  - type: input
+    id: agent_details
+    attributes:
+      label: Agent version and model
+      description: Only if an agent was involved.
+      placeholder: "Claude Code 2.x, claude-opus-5-5"
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did it go wrong?
+      options:
+        - Installing the extension or first-run setup
+        - New Project, templates or examples
+        - Playing the game (F5, Scene view, game window)
+        - Connecting an agent (Open in Claude Code / Codex, MCP)
+        - An MCP tool the agent called
+        - Components, systems or the engine API
+        - Menus and HUD (ui.blend)
+        - Web build or export
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Starting from a template or the demo game makes it much easier to reproduce.
+      placeholder: |
+        1. GameStudio › New Project › Platformer
+        2. Press F5
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: |
+        When setup, Play or an agent install fails, the message has a **Show Log** button: paste the relevant part here.
+        Other logs are in your project's `.gamestudio/` folder: `devserver.log`, `stream.log`, `build.log`. For a failing MCP tool, paste the tool's error as your agent showed it.
+      render: text
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or anything else

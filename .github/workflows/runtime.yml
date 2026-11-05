@@ -6,7 +6,9 @@
 # bump it here with the lock). Nothing here touches Blender, so it is quick and safe for pull
 # requests: GitHub-hosted runners are throwaway VMs, the token is read-only and no secrets are used.
 #
-# Node 22 on Ubuntu and Windows, the Blender suites, smoke and features run in extension.yml.
+# Both versions run on Ubuntu; macOS (Apple Silicon) runs the portable LTS and is experimental
+# (continue-on-error) until it has passed. Node 22 on Ubuntu, Windows and macOS, the Blender
+# suites, smoke and features run in extension.yml.
 
 name: runtime
 
@@ -42,17 +44,28 @@ concurrency:
 
 jobs:
   test:
-    name: Typecheck and unit tests (Node ${{ matrix.node }})
-    runs-on: ubuntu-latest
+    name: Typecheck and unit tests (${{ matrix.name }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
+    continue-on-error: ${{ matrix.experimental == true }}
     strategy:
       fail-fast: false
       matrix:
-        node: ["22.12.0", "24.21.0"]
+        include:
+          - name: Linux
+            os: ubuntu-latest
+            node: "22.12.0"
+          - name: Linux
+            os: ubuntu-latest
+            node: "24.21.0"
+          - name: macOS (experimental)
+            os: macos-latest
+            node: "24.21.0"
+            experimental: true
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
           cache: npm

@@ -37,3 +37,11 @@ tools/ocr_winrt.py
 .claude/settings.json
 .claude/settings.local.json
 .claude/*.lock
+
+# The website's large files: built (manual.html) or fetched from the site-media release (videos,
+# promo clips) by .github/workflows/pages.yml. docs/site-media.json lists them; see tools/site_media.py.
+docs/manual.html
+docs/videos/*.webm
+docs/media/*.webm
+docs/media/*.mp4
+docs/**/*.part
