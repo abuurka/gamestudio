@@ -12,7 +12,7 @@ body:
     attributes:
       label: GameStudio version
       description: Edit › Preferences › Get Extensions, under GameStudio.
-      placeholder: "0.1.1"
+      placeholder: "0.1.2"
     validations:
       required: true
   - type: input
@@ -20,7 +20,7 @@ body:
     attributes:
       label: Blender version
       description: Help › About.
-      placeholder: "5.2.2"
+      placeholder: "5.3.0"
     validations:
       required: true
   - type: dropdown

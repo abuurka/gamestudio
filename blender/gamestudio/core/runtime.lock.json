@@ -1480,7 +1480,7 @@
     },
     "packages/devserver": {
       "name": "@gamestudio/devserver",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "license": "MIT",
       "dependencies": {
         "@puppeteer/browsers": "3.2.4",
@@ -1504,7 +1504,7 @@
     },
     "packages/engine": {
       "name": "@gamestudio/engine",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "license": "MIT",
       "dependencies": {
         "@dimforge/rapier3d-compat": "0.21.0",
@@ -1512,13 +1512,13 @@
         "three": "0.186.1"
       },
       "devDependencies": {
-        "@gamestudio/devserver": "0.1.1",
+        "@gamestudio/devserver": "0.1.2",
         "@types/three": "0.186.0"
       }
     },
     "packages/mcp": {
       "name": "@gamestudio/mcp",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "license": "MIT",
       "dependencies": {
         "puppeteer-core": "25.13.0"

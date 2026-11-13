@@ -1,15 +1,17 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 (13 November 2026)
 
-- **Blender 5.3 support.** GameStudio, the extension for Blender 5.2+, is now tested with Blender 5.3.0 next to 5.2.2. The mesh cache recognises 5.3's glTF exporter, so repeat exports stay fast. Live game-shader edits stay instant under 5.3's changed update tagging. Drawing was checked on Vulkan, 5.3's default graphics backend on Windows and Linux. CI runs the extension suites on both versions (the 5.3 jobs don't block a merge until they have passed).
-- **Test runs leave your Blender's cache alone.** Blender 5.3 keeps its shader cache outside the profile folder, so a test run could write into your real Blender's cache. The suites, the UI smoke test and the end-to-end scripts now keep that cache in their throw-away profile as well. The UI smoke test follows the Game workspace and takes `--gpu-backend opengl|vulkan`, and the stream probe's Blender phase runs again.
+- **Blender 5.3 support.** GameStudio, the extension for Blender 5.2+, now runs on Blender 5.3.0 as well as 5.2.2 LTS. The minimum stays Blender 5.2.0. Two things were slower on 5.3 and now behave as on 5.2: repeat exports are fast again (the mesh cache recognises 5.3's glTF exporter), and live game-shader value edits no longer reload the game (5.3 tags updates differently). Blender 5.3 draws with Vulkan by default on Windows and Linux; Scene view, the game inside Blender, the agent's viewport pictures and the game UI overlay were checked on Vulkan and look as they do on 5.2.
 - **Install from the release.** The README and the manual now start from the zip on the latest GitHub release (drag it onto Blender's window). Building the zip yourself is only for people working from a clone.
-- **macOS in CI** (experimental): the extension and runtime suites run on Apple Silicon runners against Blender 5.2.2 for macOS. They don't block a merge yet.
-- **Fixes for CI failures.** On Linux, a test picked up the runner's own browsers, and spotting Chrome Headless Shell from a Windows path failed (`isHeadlessShell`, in the dev server and the MCP server).
-- **One version number.** The `@gamestudio/*` packages now carry the extension's version (0.1.1), and a test keeps them in step.
-- **A smaller repository.** The tutorial videos and promo clips are now assets of the `site-media` release. The website workflow fetches them and builds `manual.html` when it deploys, so neither is in git any more.
 - **For contributors:** `CONTRIBUTING.md`, issue forms for bugs (asking for versions, OS, agent and the log from **Show Log**) and features, a pull request template, and CI badges in the README.
+- **CI on Blender 5.3 and macOS** (experimental): the extension suites also run on Blender 5.3.0, and the extension and runtime suites run on Apple Silicon runners against Blender 5.2.2 for macOS. These jobs don't block a merge until they have passed.
+- **Test runs leave your Blender's cache alone.** Blender 5.3 keeps its shader cache outside the profile folder, so a test run could write into your real Blender's cache. The suites, the UI smoke test and the end-to-end scripts now keep that cache in their throw-away profile as well. The UI smoke test follows the Game workspace and takes `--gpu-backend opengl|vulkan`, and the stream probe's Blender phase runs again.
+- **Fixes for CI failures.** On Linux, a test picked up the runner's own browsers, and spotting Chrome Headless Shell from a Windows path failed (`isHeadlessShell`, in the dev server and the MCP server).
+- **One version number.** The `@gamestudio/*` packages now carry the extension's version, and a test keeps them in step.
+- **A smaller repository.** The tutorial videos and promo clips are now assets of the `site-media` release. The website workflow fetches them and builds `manual.html` when it deploys, so neither is in git any more.
+
+Tested on Windows with Blender 5.2.2 and 5.3.0. Blender 5.3 has not been tried by hand on Linux or macOS, and macOS is still untested on a real Mac.
 
 ## 0.1.1 (15 October 2026)
 

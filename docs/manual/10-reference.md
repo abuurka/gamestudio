@@ -72,6 +72,7 @@ When debugging collision, simplify the visual model and collider relationship be
 | UI layout changes badly with aspect ratio | Anchor, stretch or text box unsuitable | Adjust top-level anchors and test several window shapes |
 | Translation is ignored | Key does not exactly match authored text | Update the JSON key, preserve binding tokens and check selected locale |
 | Font looks wrong or misses glyphs | Font asset or language coverage | Use Choose Font to copy it into the project and inspect the runtime result |
+| On Blender 5.3, Scene view, the game inside Blender or Blender's own viewport draws wrongly or not at all | Blender 5.3 draws with Vulkan by default on Windows and Linux; 5.2 used OpenGL | Update the graphics driver. If that does not help, set **Edit > Preferences > System > Display Graphics > Backend** to OpenGL and restart Blender, then report the problem with your graphics card and driver version |
 | Sound is silent at page load | Browser interaction not yet granted, muted channel or missing clip | Click Start, check volume settings, path and Console |
 
 ## Agent and build problems
@@ -89,7 +90,7 @@ When debugging collision, simplify the visual model and collider relationship be
 
 ## Preferences
 
-Open **GameStudio > Preferences**. These are the main user-facing controls; defaults below refer to the documented 0.1.1 implementation.
+Open **GameStudio > Preferences**. These are the main user-facing controls; defaults below refer to the documented 0.1.2 implementation.
 
 | Preference | Default or behavior | When to change it |
 |---|---|---|

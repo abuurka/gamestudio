@@ -1,6 +1,6 @@
 {
   "name": "@gamestudio/mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "GameStudio MCP server: lets coding agents such as Claude Code drive Blender (scene, assets, components) and the running game.",
   "license": "MIT",
   "type": "module",

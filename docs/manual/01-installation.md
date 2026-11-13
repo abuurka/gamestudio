@@ -6,7 +6,7 @@
 
 | Requirement | Details |
 |---|---|
-| Blender | Version 5.2.0 or later, as declared by this extension's manifest |
+| Blender | Version 5.2.0 or later, as declared by this extension's manifest. GameStudio 0.1.2 is tested with Blender 5.2.2 LTS and 5.3.0 on Windows; Blender 5.3 has not been tried by hand on Linux or macOS |
 | Operating system | The manifest lists Windows, macOS and Linux, each for x64 and ARM64; the matching Blender and runtime binaries must be available |
 | Project storage | A writable folder for levels, assets, code and generated files |
 | Network during setup | Used to obtain missing runtime dependencies; external coding agents also have their own service requirements |

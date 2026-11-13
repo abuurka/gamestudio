@@ -89,7 +89,9 @@ Code) or `.codex/config.toml` (Codex).
 
 ## Requirements
 
-- **Blender 5.2 or newer**, on Windows, macOS or Linux (x64 or arm64).
+- **Blender 5.2 or newer**, on Windows, macOS or Linux (x64 or arm64). Tested on Windows with
+  Blender 5.2.2 LTS and 5.3.0; Blender 5.3 has not been tried by hand on Linux or macOS, and macOS
+  is untested on a real Mac.
 - **Node.js 22.12 or newer.** Optional: GameStudio downloads Node.js 24 LTS the first time it is
   needed if the system has none.
 - **A coding agent**: optional, recommended. Any MCP client works. Claude Code and Codex install in

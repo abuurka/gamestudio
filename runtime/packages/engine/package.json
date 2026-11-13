@@ -1,6 +1,6 @@
 {
   "name": "@gamestudio/engine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "GameStudio runtime: ECS, scene loader, Rapier physics, input, HUD and the live-link client.",
   "license": "MIT",
   "type": "module",
@@ -26,7 +26,7 @@
     "three": "0.186.1"
   },
   "devDependencies": {
-    "@gamestudio/devserver": "0.1.1",
+    "@gamestudio/devserver": "0.1.2",
     "@types/three": "0.186.0"
   }
 }

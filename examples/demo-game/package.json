@@ -10,12 +10,12 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@gamestudio/engine": "0.1.1",
+    "@gamestudio/engine": "0.1.2",
     "three": "0.186.1"
   },
   "devDependencies": {
-    "@gamestudio/devserver": "0.1.1",
-    "@gamestudio/mcp": "0.1.1",
+    "@gamestudio/devserver": "0.1.2",
+    "@gamestudio/mcp": "0.1.2",
     "typescript": "7.0.2",
     "vite": "8.3.4",
     "@types/three": "0.186.0"
