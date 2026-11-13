@@ -8,7 +8,7 @@
 #
 # Both versions run on Ubuntu; macOS (Apple Silicon) runs the portable LTS and is experimental
 # (continue-on-error) until it has passed. Node 22 on Ubuntu, Windows and macOS, the Blender
-# suites, smoke and features run in extension.yml.
+# suites (on Blender 5.2.2 and 5.3.0), smoke and features run in extension.yml.
 
 name: runtime
 

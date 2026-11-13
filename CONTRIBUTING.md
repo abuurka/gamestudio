@@ -26,13 +26,14 @@ The [README](README.md#developing-gamestudio) shows how to run the extension fro
 ```bash
 npm install                        # runtime packages and tools (Node.js 22.12+)
 python tools/test_blender.py       # Blender suites (addon, shell, contract), Blender 5.2+
+                                   # (CI runs them on Blender 5.2.2 and 5.3.0)
 npm test && npm run typecheck      # engine, dev server, MCP server
 npm run smoke && npm run features  # games in a headless browser
 ```
 
 A few rules keep the project healthy:
 
-- **Tests never touch your Blender profile.** The runners start Blender with `--factory-startup` and a throwaway user folder. Any script you add that starts Blender, even a one-off check, must do the same (`tools/blender_dev.py` has `dev_env()` for this).
+- **Tests never touch your Blender profile.** The runners start Blender with `--factory-startup` and a throwaway user folder. Any script you add that starts Blender, even a one-off check, must do the same (`tools/blender_dev.py` has `dev_env()` for this). That folder also holds Blender's cache (Blender 5.3 keeps its Vulkan shader caches there), so a test run never writes into your real Blender cache. The UI smoke test (`python blender/tests/ui/run_ui_smoke.py --blender PATH --out DIR`) opens a real Blender window for about 20 seconds; pass `--gpu-backend opengl` or `--gpu-backend vulkan` to choose the backend it draws with.
 - **Add or update tests with your change.** CI runs everything above on Windows and Linux (macOS is experimental), and a pull request should be green.
 - **No new manual setup for users.** Anything that has to be downloaded goes through the extension's first-run setup and its one consent prompt (`environment.ensure_ready`). User-facing text never says "run npm" or "install X".
 - **Say "your agent".** GameStudio works with any MCP agent; Claude Code and Codex are examples, not the only option.

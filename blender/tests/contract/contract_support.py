@@ -92,6 +92,18 @@ class ProbeError(AssertionError):
     pass
 
 
+def _cache_env(profile) -> dict:
+    """tools/blender_dev.py cache_env: keeps bpy.app.cachedir inside the scratch profile."""
+    import sys
+
+    tools = str(BLENDER_DIR.parent / "tools")
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    import blender_dev
+
+    return blender_dev.cache_env(profile)
+
+
 def run_blender(script, args=(), *, env=None, app_template="default", blend_file=None, binary=None,
                 timeout=PROBE_TIMEOUT) -> subprocess.CompletedProcess:
     """Run `script` in a new headless Blender and return the completed process.
@@ -102,6 +114,7 @@ def run_blender(script, args=(), *, env=None, app_template="default", blend_file
     profile = make_tmp_dir("gs_contract_profile_")
     full_env = dict(os.environ)
     full_env["BLENDER_USER_RESOURCES"] = str(profile)
+    full_env.update(_cache_env(profile))  # Blender's cache folder (5.3's shader caches) too
     for key, value in (env or {}).items():
         if value is None:
             full_env.pop(key, None)

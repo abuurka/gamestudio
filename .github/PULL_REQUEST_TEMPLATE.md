@@ -5,6 +5,7 @@
 ## How I tested it
 
 <!-- The suites you ran and on which OS, e.g. "npm test, python tools/test_blender.py addon, Windows 11 + Blender 5.2.2".
+     CI runs the suites on Blender 5.2.2 and 5.3.0; say which you used locally.
      For anything visible, a screenshot or a short clip helps. -->
 
 ## Checklist

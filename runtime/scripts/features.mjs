@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { createServer } from 'vite';
-import { findBlender, findBrowser } from './programs.mjs';
+import { blenderCacheEnv, findBlender, findBrowser } from './programs.mjs';
 
 const RUNTIME = fileURLToPath(new URL('..', import.meta.url));
 const REPO = path.resolve(RUNTIME, '..');
@@ -202,7 +202,7 @@ function runBlender(args, onEvent = () => {}) {
   return new Promise((resolve, reject) => {
     mkdtemp(path.join(os.tmpdir(), 'gs_features_profile_')).then((profile) => {
       // A scratch profile: never the user's Blender settings.
-      const env = { ...process.env, BLENDER_USER_RESOURCES: profile };
+      const env = { ...process.env, BLENDER_USER_RESOURCES: profile, ...blenderCacheEnv(profile) };
       const proc = spawn(BLENDER, ['--background', '--factory-startup', '--python-exit-code', '1', '--python', SCENE_SCRIPT, '--', ...args], {
         cwd: REPO,
         env,

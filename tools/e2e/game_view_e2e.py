@@ -20,7 +20,9 @@ import tempfile
 
 REPO = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "editor" / "tools"))
+sys.path.insert(0, str(REPO / "tools"))
 
+import blender_dev  # noqa: E402
 import gsfork  # noqa: E402
 
 
@@ -42,7 +44,7 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="gs_gameview_profile_") as profile:
         env = dict(os.environ, **gsfork.shell_env(gsfork.paths(), isolate=False),
-                   BLENDER_USER_RESOURCES=profile, GS_EDITOR_KIND="fork")
+                   BLENDER_USER_RESOURCES=profile, GS_EDITOR_KIND="fork", **blender_dev.cache_env(profile))
         cmd = [str(exe), "--factory-startup", "--window-geometry", "0", "0", "1600", "900",
                str(REPO / "examples" / "demo-game" / "scenes" / "main.blend"),
                "--python", str(REPO / "tools" / "e2e" / "blender_game_view.py"), "--", str(result)]

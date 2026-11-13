@@ -159,13 +159,18 @@ my-game/
 - **Developers:** no build step.
   - `tools/blender_dev.py` points Blender at `blender/gamestudio` through a junction, so editing the
     Python takes effect after a Blender restart, and TypeScript changes hot-reload.
-  - `python tools/test_blender.py` runs the Blender suites with a throw-away profile.
+  - `python tools/test_blender.py` runs the Blender suites with a throw-away profile, which also
+    holds Blender's cache folder (Blender 5.3's shader caches).
   - `npm test`, `npm run typecheck`, `npm run smoke` and `npm run features` cover the runtime.
   - `python tools/build_extension.py` makes the zip.
 - **CI** (GitHub-hosted runners, `.github/workflows/`):
   - `extension.yml`, on every push and pull request, on Ubuntu and Windows: stock Blender 5.2.2
-    (pinned URL and SHA-256, cached; `tools/ci/install_blender.py`), then typecheck, vitest, the
-    Blender suites, the zip (an artifact from Ubuntu), smoke and features in headless Chrome.
+    (the LTS and declared minimum) and 5.3.0 (the latest release), each pinned by URL and SHA-256 in
+    `tools/ci/blender.lock.json` and cached (`tools/ci/install_blender.py --version`), then
+    typecheck, vitest, the Blender suites, the zip (an artifact from Ubuntu with 5.2.2), smoke and
+    features in headless Chrome. macOS and the 5.3.0 jobs are experimental (`continue-on-error`)
+    until they have passed. The runners have no GPU: 5.2 draws through software OpenGL, and the
+    Ubuntu 5.3 job installs Mesa's software Vulkan (lavapipe), 5.3's default backend.
   - `runtime.yml`: typecheck and vitest on Node 22.12 (the minimum) and the pinned portable Node.
   - `editor.yml` and `canary.yml` belong to the shelved fork and only run by hand.
 

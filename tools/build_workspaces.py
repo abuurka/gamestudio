@@ -105,7 +105,7 @@ def run_blender(blender: str | None) -> int:
 
     exe = blender_dev.find_blender(blender)
     with tempfile.TemporaryDirectory(prefix="gs_build_workspaces_") as profile:
-        env = dict(os.environ, BLENDER_USER_RESOURCES=profile)
+        env = dict(os.environ, BLENDER_USER_RESOURCES=profile, **blender_dev.cache_env(profile))
         cmd = [str(exe), "--background", "--factory-startup", "--python-exit-code", "1",
                "--python", str(pathlib.Path(__file__).resolve()), "--", "--output", str(OUTPUT)]
         result = subprocess.run(cmd, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")

@@ -156,7 +156,7 @@ python tools/build_extension.py    # dist/gamestudio-<version>.zip
 
 `tools/blender_dev.py` points Blender at `blender/gamestudio` through a junction: restart Blender to pick up Python changes, while TypeScript hot-reloads. Tests never touch your Blender profile.
 
-On Linux, use `python3`, Blender 5.2.2 from the tarball (`--blender` or `BLENDER`), Google Chrome or Chromium (found on PATH, or set `GS_BROWSER`), and Blender's libraries even in `--background` (Ubuntu: `libx11-6 libxext6 libxi6 libxfixes3 libxrender1 libxxf86vm1 libxkbcommon0 libsm6 libice6 libgl1 libegl1`). No display is needed. CI (`.github/workflows/extension.yml`) runs all of the above on Ubuntu and Windows, and on macOS as an experimental job. To contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
+On Linux, use `python3`, Blender 5.2.2 or 5.3.0 from the tarball (`--blender` or `BLENDER`), Google Chrome or Chromium (found on PATH, or set `GS_BROWSER`), and Blender's libraries even in `--background` (Ubuntu: `libx11-6 libxext6 libxi6 libxfixes3 libxrender1 libxxf86vm1 libxkbcommon0 libsm6 libice6 libgl1 libegl1`). No display is needed. CI (`.github/workflows/extension.yml`) runs all of the above on Ubuntu and Windows, and on macOS as an experimental job. To contribute, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 | Path | What it is | Licence |
 |---|---|---|
@@ -179,7 +179,7 @@ A game you make with GameStudio is yours to license as you like. It runs on the 
 
 [![extension](https://github.com/abuurka/gamestudio/actions/workflows/extension.yml/badge.svg?branch=main)](https://github.com/abuurka/gamestudio/actions/workflows/extension.yml) [![runtime](https://github.com/abuurka/gamestudio/actions/workflows/runtime.yml/badge.svg?branch=main)](https://github.com/abuurka/gamestudio/actions/workflows/runtime.yml)
 
-The badges show the latest CI run on `main`, against stock Blender 5.2.2 on GitHub-hosted runners. macOS runs too, but it is experimental and doesn't turn the badge red yet. Open a badge to see each run's results.
+The badges show the latest CI run on `main`, against stock Blender 5.2.2 and 5.3.0 on GitHub-hosted runners. macOS and the Blender 5.3.0 jobs run too, but they are experimental and don't turn the badge red yet. Open a badge to see each run's results.
 
 | Suite | Command | Runs in CI on |
 |---|---|---|
@@ -195,6 +195,6 @@ The badges show the latest CI run on `main`, against stock Blender 5.2.2 on GitH
 
 ## Status
 
-GameStudio is an early preview ([CHANGELOG.md](CHANGELOG.md) lists what's new). Developed on Windows with Blender 5.2.2; CI runs the test suites on Windows and Linux. macOS support is written and CI now runs it, but nobody has tested it on a real Mac yet: [reports](CONTRIBUTING.md#reporting-a-bug) are very welcome. The in-Blender AI assistant (Claude or any OpenAI-compatible API, proposal workflow) is still included; an AI agent through MCP is the main way to work.
+GameStudio is an early preview ([CHANGELOG.md](CHANGELOG.md) lists what's new). Developed on Windows with Blender 5.2.2 and tested with 5.3.0; CI runs the test suites on Windows and Linux. macOS support is written and CI now runs it, but nobody has tested it on a real Mac yet: [reports](CONTRIBUTING.md#reporting-a-bug) are very welcome. The in-Blender AI assistant (Claude or any OpenAI-compatible API, proposal workflow) is still included; an AI agent through MCP is the main way to work.
 
 GameStudio is based on Blender's open source code; Blender is a trademark of the Blender Foundation, and GameStudio is not affiliated with or endorsed by it.

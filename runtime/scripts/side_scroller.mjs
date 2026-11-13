@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { createServer } from 'vite';
-import { findBlender, findBrowser } from './programs.mjs';
+import { blenderCacheEnv, findBlender, findBrowser } from './programs.mjs';
 
 const RUNTIME = fileURLToPath(new URL('..', import.meta.url));
 const REPO = path.resolve(RUNTIME, '..');
@@ -73,7 +73,7 @@ async function writeProject() {
 function runBlender() {
   return new Promise((resolve, reject) => {
     mkdtemp(path.join(os.tmpdir(), 'gs_side_profile_')).then((profile) => {
-      const env = { ...process.env, BLENDER_USER_RESOURCES: profile, TEMP: profile, TMP: profile, TMPDIR: profile };
+      const env = { ...process.env, BLENDER_USER_RESOURCES: profile, TEMP: profile, TMP: profile, TMPDIR: profile, ...blenderCacheEnv(profile) };
       const proc = spawn(BLENDER, ['--background', '--factory-startup', '--python-exit-code', '1', '--python', SCENE_SCRIPT, '--', PROJECT], { cwd: REPO, env });
       const events = [];
       const log = [];

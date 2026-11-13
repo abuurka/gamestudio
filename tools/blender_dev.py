@@ -66,6 +66,30 @@ def find_blender(explicit: str | None = None) -> pathlib.Path:
     sys.exit("Blender 5.2+ not found. Pass --blender PATH or set BLENDER.")
 
 
+def cache_env(profile: str | os.PathLike) -> dict:
+    """Variables that move Blender's cache folder (bpy.app.cachedir) into the scratch profile.
+
+    Blender 5.3 keeps its Vulkan shader caches (vk-spirv-cache, vk-pipeline-cache) there, and
+    BLENDER_USER_RESOURCES does not move it, so without this a test run writes into the user's
+    real Blender cache.
+    - Windows: Blender builds it from %USERPROFILE%\\AppData\\Local (LOCALAPPDATA and APPDATA are
+      ignored, verified on 5.2.2 and 5.3.0); if that folder is missing it falls back to
+      <temp>\\.cache. Only USERPROFILE changes; LOCALAPPDATA/APPDATA (Node, npm) stay the user's.
+    - Linux: $XDG_CACHE_HOME/blender, else $HOME/.cache/blender: XDG_CACHE_HOME is enough.
+    - macOS: ~/Library/Caches/Blender, from $HOME. Moving it would mean changing HOME for the whole
+      process (git, Node, Python and Blender's own profile lookups), so it is left alone there.
+    """
+    if sys.platform == "win32":
+        home = pathlib.Path(profile) / "home"
+        (home / "AppData" / "Local").mkdir(parents=True, exist_ok=True)
+        return {"USERPROFILE": str(home)}
+    if sys.platform == "darwin":
+        return {}
+    cache = pathlib.Path(profile) / "cache"
+    cache.mkdir(parents=True, exist_ok=True)
+    return {"XDG_CACHE_HOME": str(cache)}
+
+
 def dev_env(profile: str | os.PathLike, template: bool = False) -> dict:
     """Environment for a development run: the extension from this checkout, a scratch profile
     (never the user's Blender settings) and, with `template`, the fork's app template."""
@@ -76,6 +100,7 @@ def dev_env(profile: str | os.PathLike, template: bool = False) -> dict:
     temp = pathlib.Path(profile) / "tmp"
     temp.mkdir(parents=True, exist_ok=True)
     env.update(TEMP=str(temp), TMP=str(temp), TMPDIR=str(temp))
+    env.update(cache_env(profile))
     if template:
         env["BLENDER_SYSTEM_SCRIPTS"] = str(TEMPLATE_SCRIPTS)
     return env

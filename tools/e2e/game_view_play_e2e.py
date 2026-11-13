@@ -26,7 +26,9 @@ import time
 REPO = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "editor" / "tools"))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+sys.path.insert(0, str(REPO / "tools"))
 
+import blender_dev  # noqa: E402
 import gsfork  # noqa: E402
 import gv_procs  # noqa: E402
 
@@ -38,7 +40,7 @@ def run_editor(exe: pathlib.Path, mode: str, out_dir: pathlib.Path, timeout: int
     result.unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(prefix="gs_gameview_play_") as profile:
         env = dict(os.environ, **gsfork.shell_env(gsfork.paths(), isolate=False),
-                   BLENDER_USER_RESOURCES=profile, GS_EDITOR_KIND="fork")
+                   BLENDER_USER_RESOURCES=profile, GS_EDITOR_KIND="fork", **blender_dev.cache_env(profile))
         cmd = [str(exe), "--factory-startup", "--window-geometry", "0", "0", "1600", "900"]
         if mode == "play":
             cmd.append("--enable-event-simulate")

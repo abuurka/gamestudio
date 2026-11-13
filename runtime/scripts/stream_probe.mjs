@@ -25,7 +25,7 @@ import { promisify } from 'node:util';
 import puppeteer from 'puppeteer-core';
 import { createServer } from 'vite';
 import { MessageReader, decodeFrame, encodeJson } from '../packages/devserver/src/stream-protocol.js';
-import { findBlender, findBrowser } from './programs.mjs';
+import { blenderCacheEnv, findBlender, findBrowser } from './programs.mjs';
 
 const RUNTIME = fileURLToPath(new URL('..', import.meta.url));
 const REPO = path.resolve(RUNTIME, '..');
@@ -320,7 +320,7 @@ async function main() {
     if (!argv.includes('--no-blender') && blender) {
       const profile = await mkdtemp(path.join(os.tmpdir(), 'gs-stream-probe-blender-'));
       try {
-        const env = { ...process.env, BLENDER_USER_RESOURCES: profile, TEMP: profile, TMP: profile, TMPDIR: profile };
+        const env = { ...process.env, BLENDER_USER_RESOURCES: profile, TEMP: profile, TMP: profile, TMPDIR: profile, ...blenderCacheEnv(profile) };
         const out = await new Promise((resolve, reject) => {
           const proc = spawn(blender, ['--background', '--factory-startup', '--python-exit-code', '1', '--python', path.join(RUNTIME, 'scripts', 'stream_probe_blender.py'), '--', url, PROJECT, OUT, String(SECONDS), String(WIDTH), String(HEIGHT)], { env, stdio: ['ignore', 'pipe', 'pipe'] });
           let stdout = '';

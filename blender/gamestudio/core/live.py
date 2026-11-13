@@ -45,8 +45,12 @@ screens, which gameui_live.py sends instead. Sources of change:
   export yet) re-exports and reloads instead. A write to those properties
   tags the material and its node tree as a property write does (transform and
   geometry), and the meshes that draw with it for shading; those updates are
-  ignored for a short time after the edit. A material update with shading
-  alone (a node or setting edit) still re-exports. The export journal sees
+  ignored for a short time after the edit. The objects drawing with it are
+  tagged for shading, and on Blender 5.3 mesh objects without modifiers also
+  for geometry: that echo (the object's data not tagged for geometry, one of
+  its materials inside the quiet time) is ignored too (_material_echo). A
+  material update with shading alone (a node or setting edit) still
+  re-exports. The export journal sees
   the same updates and knows the manifest is stale: the next export is a
   layout one (game shader settings are manifest-only).
 * undo/redo: everything is re-compared against what was last sent.
@@ -354,9 +358,35 @@ def _in_object_mode() -> bool:
     return getattr(bpy.context, "mode", "OBJECT") == "OBJECT"
 
 
+def _material_echo(obj, update, updates_geo: set, shaded_mats: set, now: float) -> bool:
+    """True when obj's geometry flag only echoes a game shader edit of one of its materials: Blender
+    5.3 also tags the mesh objects drawing with an updated material for geometry and shading (not
+    transform) when they have no modifiers; 5.2 tags them for shading only. The flags alone cannot
+    tell the echo from a geometry change that tags only the object (a boolean cutter or an armature
+    that moved, in the same update as the value edit), but such a change needs a modifier, and a
+    real change of the object's own geometry (an edit, a shape key, a data swap, a material slot
+    change, a modifier added) also tags its data for geometry. A real material edit re-exports
+    through the material's own update, so only materials inside their suppress_mat window count."""
+    if (not shaded_mats or obj.type != "MESH" or obj.modifiers or update.is_updated_transform
+            or not update.is_updated_shading):
+        return False
+    data = obj.data
+    if data is None or data.session_uid in updates_geo:
+        return False
+    return any(s.material is not None and s.material.session_uid in shaded_mats
+               and _s.suppress_mat.get(s.material.session_uid, 0.0) >= now for s in obj.material_slots)
+
+
 def _collect(scene, depsgraph) -> None:
     now = time.monotonic()
     object_mode = _in_object_mode()
+    updates_geo, shaded_mats = set(), set()
+    for update in depsgraph.updates:
+        data = update.id
+        if update.is_updated_geometry and not isinstance(data, bpy.types.Object):
+            updates_geo.add(getattr(data, "original", data).session_uid)
+        if update.is_updated_shading and isinstance(data, bpy.types.Material):
+            shaded_mats.add(getattr(data, "original", data).session_uid)
     for update in depsgraph.updates:
         data = update.id
         if isinstance(data, bpy.types.Object):
@@ -376,7 +406,8 @@ def _collect(scene, depsgraph) -> None:
             if anim != _s.anim_sig.get(uid):
                 _s.anim_sig[uid] = anim
                 _schedule_rebuild(f"animation of '{obj.name}'")
-            if update.is_updated_geometry and obj.mode == "OBJECT" and object_mode and not _suppressed(obj, now):
+            if (update.is_updated_geometry and obj.mode == "OBJECT" and object_mode and not _suppressed(obj, now)
+                    and not _material_echo(obj, update, updates_geo, shaded_mats, now)):
                 _schedule_rebuild(f"geometry of '{obj.name}'")
         elif isinstance(data, bpy.types.Action):
             _schedule_rebuild(f"action '{data.name}'")

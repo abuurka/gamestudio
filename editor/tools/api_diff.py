@@ -84,7 +84,11 @@ def dump_binary(blender, out) -> pathlib.Path:
     out = pathlib.Path(out).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="gs_api_dump_") as profile:
-        env = dict(os.environ, BLENDER_USER_RESOURCES=profile)
+        sys.path.insert(0, str(REPO / "tools"))
+        import blender_dev
+
+        # The cache folder too (Blender 5.3's Vulkan shader caches): never the user's.
+        env = dict(os.environ, BLENDER_USER_RESOURCES=profile, **blender_dev.cache_env(profile))
         for var in ("BLENDER_SYSTEM_SCRIPTS", "BLENDER_SYSTEM_EXTENSIONS", "BLENDER_USER_SCRIPTS",
                     "BLENDER_USER_CONFIG", "BLENDER_USER_EXTENSIONS", "BLENDER_USER_DATAFILES"):
             env.pop(var, None)  # stock surface only: no GameStudio shell, no user add-ons
@@ -757,6 +761,19 @@ def _prop_shape(info):
     return {k: info.get(k) for k in ("type", "fixed_type", "array_length", "readonly")}
 
 
+def _enum_value(value, old_items, new_items):
+    """Is a value the shell uses for an enum still valid? The dump holds an enum's *static* items
+    (prop.enum_items, read without a context). Run-time enums (RenderSettings.engine,
+    ColorManagedViewSettings.look, ...) list only a placeholder there, the same in both versions,
+    so a value missing from the old static items too says nothing about the new version: INFO."""
+    if new_items is None or value in new_items:
+        return []
+    if old_items is not None and value not in old_items:
+        return [("INFO", f"value {value!r} is not among the static items in either version "
+                         f"(a run-time enum, e.g. filled from the context): not checked")]
+    return [("BREAK", f"value {value!r} no longer valid")]
+
+
 def check(fact, old, new):
     """Compare one fact (true in `old`) with `new`. Returns [(severity, message)]."""
     kind = fact[0]
@@ -800,18 +817,17 @@ def check(fact, old, new):
         if fact[3] not in params:
             return [("BREAK", f"parameter '{fact[3]}' removed")]
         if kind == "param_enum":
-            items = new.enum_items(params[fact[3]])
-            if items is not None and fact[4] not in items:
-                return [("BREAK", f"value {fact[4]!r} no longer valid")]
+            before = old.find_member(fact[1], fact[2])
+            old_param = {p["id"]: p for p in before[1].get("params", [])}.get(fact[3]) if before else None
+            return _enum_value(fact[4], old_param and old.enum_items(old_param), new.enum_items(params[fact[3]]))
         return []
     if kind == "enum_value":
         found = new.find_member(fact[1], fact[2])
         if found is None or found[0] != "prop":
             return [("BREAK", "property removed")]
-        items = new.enum_items(found[1])
-        if items is not None and fact[3] not in items:
-            return [("BREAK", f"value {fact[3]!r} no longer valid")]
-        return []
+        before = old.find_member(fact[1], fact[2])
+        old_items = old.enum_items(before[1]) if before and before[0] == "prop" else None
+        return _enum_value(fact[3], old_items, new.enum_items(found[1]))
     if kind == "op":
         return [] if fact[1] in new.ops else [("BREAK", "operator removed")]
     if kind in ("op_param", "op_enum"):
@@ -821,9 +837,10 @@ def check(fact, old, new):
         if fact[2] not in props:
             return [("BREAK", f"parameter '{fact[2]}' removed")]
         if kind == "op_enum":
-            items = new.enum_items(props[fact[2]])
-            if items is not None and fact[3] not in items:
-                return [("BREAK", f"value {fact[3]!r} no longer valid")]
+            old_prop = old.ops.get(fact[1], {}).get("properties", {}).get(fact[2])
+            found = _enum_value(fact[3], old_prop and old.enum_items(old_prop), new.enum_items(props[fact[2]]))
+            if found:
+                return found
         old_shape, new_shape = _prop_shape(old.ops[fact[1]]["properties"][fact[2]]), _prop_shape(props[fact[2]])
         if kind == "op_param" and old_shape != new_shape:
             return [("CHANGE", f"parameter '{fact[2]}' changed: {old_shape} -> {new_shape}")]

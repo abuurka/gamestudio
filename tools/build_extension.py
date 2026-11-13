@@ -149,7 +149,9 @@ def check_zip(path: pathlib.Path) -> list[str]:
 
 def blender_run(blender: pathlib.Path, args: list[str]) -> subprocess.CompletedProcess:
     with tempfile.TemporaryDirectory(prefix="gs_build_ext_") as profile:
-        env = dict(os.environ, BLENDER_USER_RESOURCES=profile)
+        import blender_dev  # tools/ is on sys.path (main)
+
+        env = dict(os.environ, BLENDER_USER_RESOURCES=profile, **blender_dev.cache_env(profile))
         return subprocess.run([str(blender), "--factory-startup", "--command", *args], env=env,
                               capture_output=True, encoding="utf-8", errors="replace")
 

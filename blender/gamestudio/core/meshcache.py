@@ -72,6 +72,7 @@ SIGNATURE = ("materials", "blender_mesh", "uuid_for_skined_data", "blender_verte
 # what _key() hashes. Another exporter version runs uncached until it is checked and added here.
 KNOWN_SOURCES = {
     "1c0a91b5e4da5cd0ebe53d1de8311805bf53ec56": "Blender 5.2.2 (glTF exporter 5.2.40)",
+    "b47d54e5576801d85fa44ae509483077870795e5": "Blender 5.3.0 (glTF exporter 5.3.43)",
 }
 # The export settings extraction reads.
 SETTINGS = ("gltf_normals", "gltf_tangents", "gltf_texcoords", "gltf_morph", "gltf_morph_normal",
@@ -342,11 +343,19 @@ def _key(module, materials, mesh, uuid, vertex_groups, modifiers, export_setting
         used = np.unique(faces.astype(np.uint32))  # the triangles' material indices, as extraction reads them
     h.update(repr(len(materials)).encode("utf-8"))
     for index in used:
-        base, info = module.get_base_material(index, materials, export_settings)
+        base, info = _base_material(module.get_base_material(index, materials, export_settings))
         if info.get("udim_info"):
             raise _Uncacheable("a UDIM material")
         h.update(repr((int(index), base is None, _canonical(info))).encode("utf-8"))
     return h.digest(), armature_uuid
+
+
+def _base_material(result):
+    """(glTF material or None, material info) from get_base_material()'s result: exporter 5.2 returns
+    those two, 5.3 puts the material identifier in front (extraction does not read it)."""
+    if not isinstance(result, tuple) or len(result) not in (2, 3) or not isinstance(result[-1], dict):
+        raise _Uncacheable("get_base_material() returned an unexpected result")
+    return result[-2], result[-1]
 
 
 def _attributes(h, mesh):

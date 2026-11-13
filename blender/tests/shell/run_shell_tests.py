@@ -90,7 +90,9 @@ class ShellTests(unittest.TestCase):
         info = host.info()
         expect_native = os.environ.get("GS_EDITOR_KIND") == "fork"
         self.assertEqual(info["native"], expect_native, info)
-        self.assertEqual(info["blender"][:2], (5, 2))
+        # GameStudio supports Blender 5.2 and later; host.info() must report the Blender it runs in.
+        self.assertEqual(tuple(info["blender"]), tuple(bpy.app.version), info)
+        self.assertGreaterEqual(tuple(info["blender"][:2]), (5, 2), info)
         if not expect_native:
             self.assertEqual(info["product"], "GameStudio for Blender")
             self.assertEqual(info["app_template"], "")
@@ -99,6 +101,19 @@ class ShellTests(unittest.TestCase):
         config = bpy.utils.user_resource("CONFIG")
         self.assertNotIn(os.path.join("Blender Foundation", "Blender"), config,
                          "the tests must never use the real Blender profile")
+
+    def test_cache_folder_is_isolated(self):
+        # Blender 5.3 writes its Vulkan shader caches here; BLENDER_USER_RESOURCES does not move it.
+        cachedir = getattr(bpy.app, "cachedir", None)
+        if not cachedir:
+            self.skipTest("this Blender has no bpy.app.cachedir")
+        if sys.platform == "darwin":
+            self.skipTest("macOS: the cache follows HOME, which tools/blender_dev.py leaves alone")
+        profile = os.environ.get("BLENDER_USER_RESOURCES")
+        self.assertTrue(profile, "the tests run with a scratch profile")
+        cache = os.path.normcase(os.path.abspath(cachedir))
+        self.assertTrue(cache.startswith(os.path.normcase(os.path.abspath(profile)) + os.sep),
+                        f"Blender's cache {cachedir!r} is outside the scratch profile {profile!r}")
 
     def test_user_folder_is_the_extensions(self):
         environment = importlib.import_module(f"{EXTENSION}.environment")

@@ -14,13 +14,13 @@
 // 4. Play the game with the keyboard and save screenshots.
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdir, rm, writeFile, copyFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { createServer } from 'vite';
-import { findBlender, findBrowser } from '../../runtime/scripts/programs.mjs';
+import { blenderCacheEnv, findBlender, findBrowser } from '../../runtime/scripts/programs.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DEMO = path.join(REPO, 'examples', 'demo-game');
@@ -80,6 +80,8 @@ async function main() {
   await mkdir(OUT, { recursive: true });
   const sentinel = path.join(os.tmpdir(), `gs_e2e_${process.pid}.done`);
   await rm(sentinel, { force: true });
+  // A scratch Blender profile, its cache folder included: never the user's settings or shader caches.
+  const profile = await mkdtemp(path.join(os.tmpdir(), 'gs_e2e_profile_'));
 
   const server = await createServer({ root: DEMO, logLevel: 'warn', server: { port: 5191, strictPort: false } });
   let browser;
@@ -107,7 +109,10 @@ async function main() {
     // --- Blender ------------------------------------------------------------------
     const blenderLog = [];
     blender = spawn(BLENDER, ['--background', '--factory-startup', '--python-exit-code', '1',
-      '--python', path.join(REPO, 'tools', 'e2e', 'blender_e2e.py'), '--', sentinel], { cwd: REPO });
+      '--python', path.join(REPO, 'tools', 'e2e', 'blender_e2e.py'), '--', sentinel], {
+      cwd: REPO,
+      env: { ...process.env, BLENDER_USER_RESOURCES: profile, ...blenderCacheEnv(profile) },
+    });
     const blenderExit = new Promise((resolve) => blender.on('exit', resolve));
     let waitingSeen = false;
     const onLine = (line) => {
@@ -182,6 +187,7 @@ async function main() {
     await browser?.close();
     await server.close();
     await rm(sentinel, { force: true });
+    await rm(profile, { recursive: true, force: true }).catch(() => {});
   }
   const failed = results.filter((r) => !r.ok).length;
   console.log(`\ne2e: ${results.length - failed}/${results.length} checks passed`);

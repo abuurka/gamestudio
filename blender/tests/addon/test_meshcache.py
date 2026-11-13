@@ -112,6 +112,19 @@ def build_level() -> dict:
         value.color = (0.1 * i, 0.2, 0.3, 0.5)
     paint.data.materials.append(material("Painted", color_attribute="Col"))
 
+    # Two slots whose materials read different colour attributes. glTF allows one vertex colour per
+    # mesh: extraction warns and maps COLOR_0 to the first material's attribute only; the second
+    # attribute is still written, as COLOR_1, by the pass that adds every remaining colour attribute.
+    objs["mixed"] = mixed = primitive("cube", "Mixed", (9, 3, 0))
+    for name, domain in (("ColA", "CORNER"), ("ColB", "POINT")):
+        attribute = mixed.data.color_attributes.new(name, "FLOAT_COLOR", domain)
+        for i, value in enumerate(attribute.data):
+            value.color = ((i % 5) / 5, 0.3 if name == "ColA" else 0.7, (i % 2) * 0.5, 1.0)
+    mixed.data.materials.append(material("ReadsA", color_attribute="ColA"))
+    mixed.data.materials.append(material("ReadsB", color_attribute="ColB"))
+    for face in mixed.data.polygons:
+        face.material_index = face.index % 2
+
     objs["smooth"] = smooth = primitive("uv_sphere", "Smooth", (0, 6, 0), segments=12, ring_count=6)
     normals = [tuple(loop.normal) for loop in smooth.data.loops]
     smooth.data.normals_split_custom_set([(n[0], n[1] + 0.3, n[2]) for n in normals])
@@ -262,6 +275,12 @@ class MeshCacheTest(MeshCacheTestCase):
         slot = self.objs["slots"].material_slots[1]
         self.assertEditMisses(lambda: setattr(slot, "material", material("Reads", color_attribute="Col")),
                               "a slot's material now reads a colour attribute")
+        mixed = self.objs["mixed"].data
+        self.assertEditMisses(lambda: setattr(mixed.color_attributes["ColB"].data[1], "color", (1.0, 0.0, 0.0, 1.0)),
+                              "a colour only the second material reads")
+        node = next(n for n in bpy.data.materials["ReadsB"].node_tree.nodes if n.bl_idname == "ShaderNodeVertexColor")
+        self.assertEditMisses(lambda: setattr(node, "layer_name", "ColA"),
+                              "both materials now read the same colour attribute")
         principled = bpy.data.materials["Slot0"].node_tree.nodes["Principled BSDF"]
         principled.inputs["Base Color"].default_value = (0.3, 0.3, 0.3, 1.0)
         _path, counts = self.counted()
@@ -344,6 +363,96 @@ class MeshCacheFallbackTest(MeshCacheTestCase):
             cached, counts = self.counted()
             self.assertGreater(counts["misses"], 0)
             self.assertSameGlb(stock, cached, "bounded")
+
+
+def build_colour_level() -> dict:
+    """The vertex colour and material paths of extraction build_level() leaves out, a skinned mesh
+    with an unweighted vertex (the exporter adds a neutral bone) and an object parented to a bone."""
+    objs = {}
+    # No material: the exporter reads the render colour attribute itself.
+    objs["nomat"] = nomat = primitive("cube", "NoMat", (0, 0, 0))
+    for name, domain in (("A", "CORNER"), ("B", "POINT")):
+        attribute = nomat.data.color_attributes.new(name, "FLOAT_COLOR", domain)
+        for i, value in enumerate(attribute.data):
+            value.color = ((i % 3) / 3, 0.2 if name == "A" else 0.8, 0.5, 0.25 + (i % 2) * 0.5)
+    # A material that reads no colour while the mesh has one: COLOR_0 forced, every attribute added.
+    objs["forced"] = forced = primitive("cube", "Forced", (3, 0, 0))
+    forced.data.materials.append(material("Plain", (0.4, 0.4, 0.4, 1)))
+    paint = forced.data.color_attributes.new("Paint", "BYTE_COLOR", "POINT")
+    for i, value in enumerate(paint.data):
+        value.color = (i / 8, 0.3, 0.6, 1.0)
+    # Face material indices past the last slot (the exporter clamps them to it).
+    objs["clamp"] = clamp = primitive("cube", "Clamp", (6, 0, 0))
+    clamp.data.color_attributes.new("Col", "BYTE_COLOR", "CORNER")
+    clamp.data.materials.append(material("C0", (1, 0, 0, 1)))
+    clamp.data.materials.append(material("C1", (0, 1, 0, 1)))
+    for face in clamp.data.polygons:
+        face.material_index = 5 if face.index % 2 else 0
+    # One material on two meshes, reading a colour attribute both have.
+    shared = material("ReadsY", color_attribute="Y")
+    for key, x in (("mix", 9), ("mix2", 12)):
+        objs[key] = obj = primitive("cube", key.title(), (x, 0, 0))
+        for name in ("X", "Y"):
+            attribute = obj.data.color_attributes.new(name, "FLOAT_COLOR", "CORNER")
+            for i, value in enumerate(attribute.data):
+                value.color = (0.1 * (i % 7), x / 20, 0.9 if name == "X" else 0.1, 1.0)  # meshes differ
+        obj.data.materials.append(shared)
+    rig, body = kits.create("character_rigged", {"name": "Hero"})
+    objs.update(rig=rig, body=body)
+    for group in body.vertex_groups:
+        group.remove([0])
+    # Parented to a bone of the armature its modifier names: extraction gives it no skin.
+    objs["held"] = held = primitive("cube", "Held", (0, 0, 2), size=0.3)
+    held.modifiers.new("Armature", "ARMATURE").object = rig
+    held.parent, held.parent_type, held.parent_bone = rig, "BONE", rig.data.bones[0].name
+    bpy.context.view_layer.update()
+    return objs
+
+
+class MeshCacheColourTest(MeshCacheTestCase):
+    def setUp(self):
+        helpers.ProjectTestCase.setUp(self)
+        os.makedirs(tempfile.gettempdir(), exist_ok=True)
+        bpy.context.scene.name = "main"
+        meshcache.set_enabled(True)
+        meshcache.clear()
+        self.count = 0
+        self.objs = build_colour_level()
+
+    def test_colour_material_and_skin_paths_are_the_exporters(self):
+        stock = self.glb(cached=False)
+        cold, counts = self.counted()
+        meshes = counts["misses"]
+        self.assertEqual((counts["hits"], counts["uncached"]), (0, 0))
+        warm, counts = self.counted()  # the body's neutral bone flag is replayed from the entry
+        self.assertEqual(counts, {"hits": meshes, "misses": 0, "uncached": 0})
+        self.assertSameGlb(stock, cold, "cold")
+        self.assertSameGlb(stock, warm, "warm")
+        self.assertTrue(any(e.neutral_bone for e in meshcache._entries.values()), "no neutral bone asked for")
+
+        objs = self.objs
+        nomat = objs["nomat"].data
+        self.assertEditMisses(lambda: setattr(nomat.color_attributes, "render_color_index", 1),
+                              "no material: the render colour attribute")
+        self.assertEditMisses(lambda: setattr(nomat.color_attributes["A"], "name", "Z"),
+                              "no material: a colour attribute renamed")
+        forced = objs["forced"].data
+        self.assertEditMisses(lambda: forced.color_attributes.remove(forced.color_attributes["Paint"]),
+                              "a colour no material reads removed")
+        self.assertEditMisses(lambda: setattr(objs["clamp"].material_slots[1], "material",
+                                              material("C1VC", color_attribute="Col")),
+                              "the last slot, which takes the indices past it, now reads a colour")
+        shared = bpy.data.materials["ReadsY"]
+        node = next(n for n in shared.node_tree.nodes if n.bl_idname == "ShaderNodeVertexColor")
+        self.assertEditMisses(lambda: setattr(node, "layer_name", "X"), "a shared material retargeted", misses=2)
+
+        def alpha_from_colour():
+            shared.node_tree.links.new(node.outputs["Alpha"], shared.node_tree.nodes["Principled BSDF"].inputs["Alpha"])
+            shared.surface_render_method = "BLENDED"
+
+        self.assertEditMisses(alpha_from_colour, "alpha from the colour attribute", misses=2)
+        _again, counts = self.counted()
+        self.assertEqual(counts, {"hits": meshes, "misses": 0, "uncached": 0})
 
 
 class MeshCacheFullExportTest(MeshCacheTestCase):

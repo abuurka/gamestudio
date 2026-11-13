@@ -1,10 +1,22 @@
 {
-  "comment": "The stock Blender CI tests against (tools/ci/install_blender.py, .github/workflows/extension.yml). Bump version and every sha256 together, from https://download.blender.org/release/Blender<major.minor>/blender-<version>.sha256.",
-  "version": "5.2.2",
-  "base_url": "https://download.blender.org/release/Blender5.2/",
-  "files": {
-    "macos-arm64": {"name": "blender-5.2.2-macos-arm64.dmg", "sha256": "dc4125399b8bfefe283cc1624d6cfc7809d1cac20ace51072127eb371f31f210"},
-    "linux-x64": {"name": "blender-5.2.2-linux-x64.tar.xz", "sha256": "84098912789dc450e95697c4184fb8a90acbe5111c2ba4aede3fecb57806a168"},
-    "windows-x64": {"name": "blender-5.2.2-windows-x64.zip", "sha256": "3849d17a682cba006075aaa3f3597ecb5c9c30ec31035b2e092c53e40679b535"}
+  "comment": "The stock Blenders CI tests against (tools/ci/install_blender.py --version, .github/workflows/extension.yml): 5.2.2, the LTS and declared minimum, and 5.3.0, the latest release. 'default' is the one used without --version. Add or bump a version with all its sha256 values together, taken from https://download.blender.org/release/Blender<major.minor>/blender-<version>.sha256.",
+  "default": "5.2.2",
+  "versions": {
+    "5.2.2": {
+      "base_url": "https://download.blender.org/release/Blender5.2/",
+      "files": {
+        "macos-arm64": {"name": "blender-5.2.2-macos-arm64.dmg", "sha256": "dc4125399b8bfefe283cc1624d6cfc7809d1cac20ace51072127eb371f31f210"},
+        "linux-x64": {"name": "blender-5.2.2-linux-x64.tar.xz", "sha256": "84098912789dc450e95697c4184fb8a90acbe5111c2ba4aede3fecb57806a168"},
+        "windows-x64": {"name": "blender-5.2.2-windows-x64.zip", "sha256": "3849d17a682cba006075aaa3f3597ecb5c9c30ec31035b2e092c53e40679b535"}
+      }
+    },
+    "5.3.0": {
+      "base_url": "https://download.blender.org/release/Blender5.3/",
+      "files": {
+        "macos-arm64": {"name": "blender-5.3.0-macos-arm64.dmg", "sha256": "2d802b54766741e612cead50b03ebbc8eb64dadc71eda932573d256b8a784720"},
+        "linux-x64": {"name": "blender-5.3.0-linux-x64.tar.xz", "sha256": "dacb8264197a3f7fda6001285a5a506fc97ee943881261c2c3bd63c882f22e05"},
+        "windows-x64": {"name": "blender-5.3.0-windows-x64.zip", "sha256": "3ac567a63d59d9934f7b9213bfb27ba05760e1fb366f8f55c381573ec3eabfa8"}
+      }
+    }
   }
 }

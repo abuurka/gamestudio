@@ -1,14 +1,21 @@
 # SPDX-License-Identifier: MIT
 #
-# The GameStudio extension on stock Blender 5.2.2, on GitHub-hosted Ubuntu, Windows and macOS
-# (Apple Silicon) runners: typecheck, unit tests, the Blender suites (addon, shell, contract), the
-# extension zip (uploaded as an artifact from Ubuntu) and the headless-browser runs (smoke,
-# features). macOS is experimental (continue-on-error) until it has passed: a red macOS job shows
-# what to fix but does not fail the run.
+# The GameStudio extension on stock Blender 5.2.2 (the LTS and declared minimum) and 5.3.0 (the
+# latest release), on GitHub-hosted Ubuntu, Windows and macOS (Apple Silicon) runners: typecheck,
+# unit tests, the Blender suites (addon, shell, contract), the extension zip (uploaded as an artifact
+# from Ubuntu with 5.2.2) and the headless-browser runs (smoke, features). macOS and every 5.3.0 job
+# are experimental (continue-on-error) until they have passed: a red experimental job shows what to
+# fix but does not fail the run.
+#
+# GPU: the runners have none. Blender 5.2 draws offscreen through OpenGL (Mesa's software llvmpipe
+# on Ubuntu). Blender 5.3 defaults to Vulkan on Windows and Linux; the Ubuntu 5.3 job installs
+# Mesa's software Vulkan driver (lavapipe, mesa-vulkan-drivers) so that default path is tested, and
+# where no Vulkan device works Blender falls back to another backend (see --gpu-backend and
+# --debug-gpu-backend-no-fallback in Blender's command-line manual).
 #
 # Safe for pull requests: GitHub-hosted runners are throwaway VMs, the token is read-only and no
 # secrets are used. Blender comes from download.blender.org: tools/ci/blender.lock.json pins each
-# archive's URL and SHA-256, and the unpacked Blender is cached per lock. Every test step runs even
+# archive's URL and SHA-256 per version, and the unpacked Blender is cached per version and lock. Every test step runs even
 # when an earlier one failed, so one run shows all failures. No display is needed: the Blender
 # suites run in --background and Chrome runs headless (software WebGL).
 #
@@ -62,15 +69,40 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Blender 5.2.2: the job names stay as they were (branch protection may require them).
           - name: Linux
             os: ubuntu-latest
             browser: /usr/bin/google-chrome
+            blender: 5.2.2
           - name: Windows
             os: windows-latest
             browser: 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+            blender: 5.2.2
           - name: macOS (experimental)
             os: macos-latest # Apple Silicon: tools/ci/blender.lock.json has macos-arm64 only
             browser: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            blender: 5.2.2
+            experimental: true
+          # Blender 5.3.0: experimental until its first green run; then drop "experimental: true"
+          # and "(experimental)" from the Linux and Windows entries to make them required.
+          - name: Linux, Blender 5.3 (experimental)
+            os: ubuntu-latest
+            browser: /usr/bin/google-chrome
+            blender: 5.3.0
+            apt-extra: mesa-vulkan-drivers # lavapipe: software Vulkan, 5.3's default backend
+            artifact-suffix: -blender-5.3
+            experimental: true
+          - name: Windows, Blender 5.3 (experimental)
+            os: windows-latest
+            browser: 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+            blender: 5.3.0
+            artifact-suffix: -blender-5.3
+            experimental: true
+          - name: macOS, Blender 5.3 (experimental)
+            os: macos-latest
+            browser: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            blender: 5.3.0
+            artifact-suffix: -blender-5.3
             experimental: true
     defaults:
       run:
@@ -93,7 +125,7 @@ jobs:
 
       - name: Blender's libraries (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends ${{ env.BLENDER_APT }}
+        run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends ${{ env.BLENDER_APT }} ${{ matrix.apt-extra }}
 
       - name: Temp folder without 8.3 names (Windows)
         if: runner.os == 'Windows'
@@ -105,11 +137,11 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/gs-ci/blender
-          key: blender-${{ runner.os }}-${{ hashFiles('tools/ci/blender.lock.json') }}
+          key: blender-${{ runner.os }}-${{ matrix.blender }}-${{ hashFiles('tools/ci/blender.lock.json') }}
 
-      - name: Install Blender
+      - name: Install Blender ${{ matrix.blender }}
         # Git Bash hands ~ to python.exe as C:/Users/<runner>/..., the folder actions/cache uses.
-        run: python tools/ci/install_blender.py --dest ~/gs-ci/blender --github-env
+        run: python tools/ci/install_blender.py --dest ~/gs-ci/blender --version ${{ matrix.blender }} --github-env
 
       - name: npm ci
         id: deps
@@ -134,7 +166,7 @@ jobs:
         run: python tools/build_extension.py --blender "$BLENDER"
 
       - name: Upload the extension zip
-        if: ${{ !cancelled() && runner.os == 'Linux' && hashFiles('dist/gamestudio-*.zip') != '' }}
+        if: ${{ !cancelled() && runner.os == 'Linux' && matrix.blender == '5.2.2' && hashFiles('dist/gamestudio-*.zip') != '' }}
         uses: actions/upload-artifact@v7
         with:
           name: gamestudio-extension
@@ -157,7 +189,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
-          name: screenshots-${{ runner.os }}
+          name: screenshots-${{ runner.os }}${{ matrix.artifact-suffix }}
           path: runtime/.smoke/*.png
           if-no-files-found: ignore
 
@@ -185,10 +217,10 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/gs-ci/blender
-          key: blender-${{ runner.os }}-${{ hashFiles('tools/ci/blender.lock.json') }}
+          key: blender-${{ runner.os }}-5.2.2-${{ hashFiles('tools/ci/blender.lock.json') }}
 
-      - name: Install Blender
-        run: python tools/ci/install_blender.py --dest ~/gs-ci/blender --github-env
+      - name: Install Blender 5.2.2
+        run: python tools/ci/install_blender.py --dest ~/gs-ci/blender --version 5.2.2 --github-env
 
       - name: npm ci
         run: npm ci

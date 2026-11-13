@@ -35,12 +35,14 @@ import types
 
 import bpy
 
-EXPECTED_WORKSPACES = ("Layout", "Level", "Debug")  # Blender's, then the two Add GameStudio Workspaces adds
+GAME_WORKSPACE = "Game"  # workspaces.NAME: the one workspace GameStudio > Add Game Workspace adds
+EXPECTED_WORKSPACES = ("Layout", GAME_WORKSPACE)  # Blender's, then GameStudio's
 EXTENSION = "bl_ext.system.gamestudio"
 TOP_BAR_MENUS = "TOPBAR_MT_editor_menus"
 REGISTRY_FIXTURE = pathlib.Path(__file__).resolve().parents[1] / "addon" / "fixtures" / "components.json"
-# The 3D View sidebar tabs each GameStudio workspace opens (workspaces.py LAYOUT_PROP).
-WORKSPACE_TABS = {"Level": ["Game"], "Debug": ["Console", "Project"]}
+# The Game workspace's editors (workspaces.py docstring): Blender's own, no sidebar tab of its own.
+GAME_AREAS = ("VIEW_3D", "OUTLINER", "PROPERTIES", "TEXT_EDITOR")
+CONSOLE_TEXT = "Game Console"  # editors/console.py TEXT_NAME, shown in the Game workspace's Text Editor
 
 # Popups (wm.splash, wm.call_menu) and sidebar tabs are built synchronously, and screenshot()
 # redraws the window first, so those are opened and captured in one step. Workspace and editor
@@ -88,6 +90,8 @@ REPORT = {
     "app_template": None,
     "native": None,
     "isolated_profile": None,
+    "gpu": {},
+    "cachedir": None,
     "window": {},
     "window_titles": {},
     "workspaces": {"expected": list(EXPECTED_WORKSPACES), "present": [], "visited": []},
@@ -523,6 +527,15 @@ def s_environment():
     REPORT["user_config"] = config
     if not REPORT["isolated_profile"]:
         _error("check", f"user config {config!r} is not inside BLENDER_USER_RESOURCES {scratch!r}")
+    # Blender 5.3 keeps its Vulkan shader caches in bpy.app.cachedir (the runner moves it, see
+    # tools/blender_dev.py cache_env); the runner checks it is inside the scratch profile.
+    REPORT["cachedir"] = getattr(bpy.app, "cachedir", None)
+    try:
+        import gpu
+        REPORT["gpu"] = {"backend": gpu.platform.backend_type_get(), "vendor": gpu.platform.vendor_get(),
+                         "renderer": gpu.platform.renderer_get(), "version": gpu.platform.version_get()}
+    except Exception as exc:  # noqa: BLE001  (informational only)
+        _note(f"cannot read the GPU backend ({exc})")
     # The simulated cursor rests on the first item of every menu it opens: no tooltips over shots.
     prefs.view.show_tooltips = False
     move_mouse(win.width // 2, win.height // 2)
@@ -579,7 +592,7 @@ def s_popup(operator_path, shot_name, caption):
 
 
 def s_add_workspaces():
-    """GameStudio > Add GameStudio Workspaces."""
+    """GameStudio > Add Game Workspace (it also switches the window to it)."""
     with bpy.context.temp_override(**override()):
         result = bpy.ops.gamestudio.add_workspaces()
     if result != {"FINISHED"}:
@@ -599,7 +612,8 @@ def s_workspace(name):
 def s_workspace_shot(name):
     if name not in bpy.data.workspaces:
         return
-    # GameStudio's workspaces pick their sidebar tabs once the sidebar has drawn (workspaces.py).
+    # The Game workspace applies its LAYOUT_PROP settings (Console text, heights, Object tab) once
+    # a window shows it (workspaces.py).
     since = _state.setdefault(f"shown:{name}", time.time())
     if ext_module("workspaces").pending(bpy.data.workspaces[name]) and time.time() - since < READY_TIMEOUT:
         return Again(0.25)
@@ -608,10 +622,22 @@ def s_workspace_shot(name):
         _error("check", f"switching to workspace {name!r} left {current!r} active")
     screenshot(f"10_ws_{slug(name)}", f"Workspace: {name}")
     REPORT["workspaces"]["visited"].append(name)
-    tabs = sorted(region_of(a, "UI").active_panel_category for a in window().screen.areas if a.type == "VIEW_3D")
-    REPORT["layouts"][f"{name} sidebar tabs"] = tabs
-    if name in WORKSPACE_TABS and tabs != sorted(WORKSPACE_TABS[name]):
-        _error("check", f"workspace {name!r} shows the sidebar tabs {tabs}, expected {WORKSPACE_TABS[name]}")
+    if name == GAME_WORKSPACE:
+        check_game_workspace()
+
+
+def check_game_workspace():
+    """The Game workspace shows the editors workspaces.py promises, the Console in its Text Editor."""
+    areas = window().screen.areas
+    types = sorted(a.type for a in areas)
+    REPORT["layouts"][f"{GAME_WORKSPACE} editors (shown)"] = types
+    for area_type in GAME_AREAS:
+        if area_type not in types:
+            _error("check", f"the {GAME_WORKSPACE} workspace has no {area_type} area: {types}")
+    texts = [getattr(a.spaces.active.text, "name", None) for a in areas if a.type == "TEXT_EDITOR"]
+    REPORT["layouts"][f"{GAME_WORKSPACE} console"] = texts
+    if CONSOLE_TEXT not in texts:
+        _error("check", f"the {GAME_WORKSPACE} workspace's Text Editor shows {texts}, not {CONSOLE_TEXT!r}")
 
 
 def s_menus():
@@ -818,11 +844,12 @@ def s_scenario():
         {"t": "error", "level": "error", "msg": "TypeError: coin.value is undefined",
          "file": "src/systems/collect.ts", "line": 14, "col": 9, "time": now},
     ])
-    return s_workspace("Level")
+    return s_workspace(GAME_WORKSPACE)
 
 
 def s_scenario_shots():
-    screenshot("40_level_entity", "Level with a selected entity: Inspector, Console and status bar")
+    screenshot("40_game_entity", "Game workspace with a selected entity: Inspector (Object properties), "
+                                 "Console and status bar")
     area = area_of(window(), "VIEW_3D")
     _state["scenario_sidebar"] = area.spaces.active.show_region_ui
     area.spaces.active.show_region_ui = True
@@ -923,7 +950,7 @@ def build_plan():
     for name in EXPECTED_WORKSPACES:
         plan(f"workspace:{name}", s_workspace, name)
         plan(f"workspace:{name}:shot", s_workspace_shot, name)
-    plan("menus:workspace", s_workspace, "Level")  # menus and sidebar tabs on Level
+    plan("menus:workspace", s_workspace, GAME_WORKSPACE)  # menus and sidebar tabs on the Game workspace
     plan("checks", s_checks)
     plan("menus", s_menus)
     plan("prefs", s_prefs_popup)

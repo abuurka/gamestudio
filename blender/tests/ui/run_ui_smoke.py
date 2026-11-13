@@ -4,17 +4,21 @@
 (docs/fork/ARCHITECTURE.md section 7). Plain Python 3.12, standard library only.
 
 It starts stock Blender *with a GUI* and lets ui_smoke_driver.py walk the GameStudio extension:
-Blender's splash, the GameStudio launcher, Add GameStudio Workspaces and each GameStudio
-workspace, every top-bar menu (opened, plus a deep draw of each submenu, GameStudio's included),
-every 3D View sidebar tab GameStudio adds, and a small scenario (a project with an entity,
-components, game logs and an assistant conversation). It catches what headless tests cannot: a
-Python error while drawing a panel or menu, a broken workspace, play shortcuts missing from
-menus, and sidebar tabs the workspaces did not open.
+Blender's splash, the GameStudio launcher, Add Game Workspace and the Game workspace it adds
+(its editors and the Console in its Text Editor checked), every top-bar menu (opened, plus a deep
+draw of each submenu, GameStudio's included), every 3D View sidebar tab GameStudio adds, and a
+small scenario (a project with an entity, components, game logs and an assistant conversation).
+It catches what headless tests cannot: a Python error while drawing a panel or menu, a broken
+workspace, and play shortcuts missing from menus.
 
-    python blender/tests/ui/run_ui_smoke.py --blender <blender.exe> [--out DIR]
+    python blender/tests/ui/run_ui_smoke.py --blender <blender.exe> [--out DIR] [--gpu-backend opengl|vulkan]
 
-Blender runs with --factory-startup and a fresh scratch BLENDER_USER_RESOURCES (and TEMP), so it
-never touches the user's profile, and loads the extension from this checkout as a system
+Blender 5.3 draws with Vulkan by default on Windows and Linux, 5.2 with OpenGL; --gpu-backend
+passes Blender's own --gpu-backend option, and the report shows the backend that ran.
+
+Blender runs with --factory-startup and a fresh scratch BLENDER_USER_RESOURCES (and TEMP, and its
+cache folder, see tools/blender_dev.py cache_env), so it never touches the user's profile or
+Blender's shader caches, and loads the extension from this checkout as a system
 extension (BLENDER_SYSTEM_EXTENSIONS, tools/blender_dev.py); no app template. The driver enables
 it as a user would. --enable-event-simulate makes the session ignore the real mouse and keyboard;
 --no-window-focus keeps it from stealing focus.
@@ -44,7 +48,7 @@ sys.path.insert(0, str(REPO / "tools"))
 import blender_dev  # noqa: E402
 DRIVER = HERE / "ui_smoke_driver.py"
 
-EXPECTED_WORKSPACES = ("Layout", "Level", "Debug")  # Blender's first, then GameStudio's
+EXPECTED_WORKSPACES = ("Layout", "Game")  # Blender's first, then GameStudio's (workspaces.NAME)
 
 # A screenshot is "blank" below these (driver stats, 0-255 luminance scale).
 MIN_LUMA_STD = 4.0
@@ -101,11 +105,15 @@ def run_blender(args, out: pathlib.Path, profile: pathlib.Path) -> dict:
         "BLENDER_USER_RESOURCES": str(profile),
         "TEMP": str(tmp), "TMP": str(tmp), "TMPDIR": str(tmp),
     })
+    # Nor Blender's cache folder (5.3's Vulkan shader caches), which BLENDER_USER_RESOURCES does not move.
+    env.update(blender_dev.cache_env(profile))
     t0 = time.time()
     cmd = [str(args.blender), "--factory-startup", "--enable-event-simulate",
            "--window-geometry", "0", "0", str(width), str(height)]
     if not args.focus:
         cmd.append("--no-window-focus")
+    if args.gpu_backend:
+        cmd += ["--gpu-backend", args.gpu_backend]
     cmd += ["--python-exit-code", "1", "--python", str(DRIVER), "--",
             "--out", str(out), "--kind", "stock" if args.stock else "fork",
             "--t0", f"{t0:.3f}", "--timeout", str(args.timeout)]
@@ -194,6 +202,18 @@ def png_check(path: pathlib.Path) -> dict:
             "compression": round(len(data) / max(1, len(raw)), 4)}
 
 
+def _inside(path: str, folder: str) -> bool:
+    norm = lambda p: os.path.normcase(os.path.abspath(p))  # noqa: E731
+    return norm(path).startswith(norm(folder) + os.sep)
+
+
+def gpu_backend(report: dict | None) -> str:
+    """The GPU backend Blender drew with: the driver's gpu.platform reading, else host.info()."""
+    report = report or {}
+    return ((report.get("gpu") or {}).get("backend") or (report.get("host_info") or {}).get("gpu_backend")
+            or "?")
+
+
 def check(args, run: dict, report: dict | None, out: pathlib.Path) -> list:
     """Every assertion; returns a list of failure messages."""
     fails = []
@@ -220,6 +240,12 @@ def check(args, run: dict, report: dict | None, out: pathlib.Path) -> list:
         fails.append(f"app template is {report.get('app_template')!r}; GameStudio needs none")
     if report.get("isolated_profile") is not True:
         fails.append("Blender did not use the scratch profile")
+    cachedir = report.get("cachedir")
+    if cachedir and sys.platform != "darwin" and not _inside(cachedir, run["profile"]):
+        fails.append(f"Blender's cache folder {cachedir} is outside the scratch profile")
+    backend = gpu_backend(report)
+    if args.gpu_backend and backend.lower() != args.gpu_backend:
+        fails.append(f"--gpu-backend {args.gpu_backend} given, but Blender ran on {backend}")
 
     native = report.get("native")
     if args.stock and native:
@@ -247,7 +273,7 @@ def check(args, run: dict, report: dict | None, out: pathlib.Path) -> list:
     shots = report.get("screenshots", [])
     names = {s["name"] for s in shots}
     required = (["01_launcher"] + [f"10_ws_{w.lower()}" for w in EXPECTED_WORKSPACES]
-                + ["40_level_entity", "41_sidebar_game_entity", "42_assistant_chat"])
+                + ["40_game_entity","41_sidebar_game_entity", "42_assistant_chat"])
     for name in required:
         if name not in names:
             fails.append(f"screenshot {name} is missing")
@@ -295,6 +321,10 @@ def write_index(out: pathlib.Path, args, run: dict, report: dict | None, fails: 
         ("Editor", "stock Blender + the GameStudio extension" if args.stock else "GameStudio Editor (fork)"),
         ("Binary", str(args.blender)),
         ("Blender", (report.get("blender") or {}).get("version_string", "?")),
+        ("GPU backend", f"{gpu_backend(report)}"
+                        f"{' (--gpu-backend ' + args.gpu_backend + ')' if args.gpu_backend else ' (Blender default)'}; "
+                        f"{(report.get('gpu') or {}).get('renderer', '')} {(report.get('gpu') or {}).get('version', '')}"),
+        ("Cache folder", str(report.get("cachedir"))),
         ("host.info()", json.dumps(host)),
         ("App template", str(report.get("app_template"))),
         ("Window titles", "; ".join((report.get("window_titles") or {}).get("end", [])) or "(none)"),
@@ -309,7 +339,7 @@ def write_index(out: pathlib.Path, args, run: dict, report: dict | None, fails: 
     parts = [
         "<!doctype html><html lang='en'><head><meta charset='utf-8'>",
         "<meta name='viewport' content='width=device-width, initial-scale=1'>",
-        f"<title>UI Smoke {status}</title><style>",
+        f"<title>UI Smoke {status} {e(gpu_backend(report))}</title><style>",
         ":root{--bg:#fff;--fg:#1d1d1f;--muted:#666;--card:#f4f4f6;--bad:#b3261e;--good:#1b7f3b}",
         "@media (prefers-color-scheme: dark){:root{--bg:#161618;--fg:#e8e8ea;--muted:#9a9aa0;--card:#232327;"
         "--bad:#ff8a80;--good:#7bd88f}}",
@@ -324,7 +354,8 @@ def write_index(out: pathlib.Path, args, run: dict, report: dict | None, fails: 
         "figure img{width:100%;height:auto;display:block}figcaption{margin-top:6px}",
         ".muted{color:var(--muted)}.bad{color:var(--bad)}",
         "</style></head><body>",
-        f"<h1>GameStudio UI smoke: <span class='{status}'>{status}</span></h1>",
+        f"<h1>GameStudio UI smoke: <span class='{status}'>{status}</span> "
+        f"<span class='muted'>({e(gpu_backend(report))})</span></h1>",
         "<table>" + "".join(f"<tr><th>{e(k)}</th><td>{e(v)}</td></tr>" for k, v in rows) + "</table>",
     ]
     if fails:
@@ -372,10 +403,14 @@ def main(argv=None) -> int:
     parser.add_argument("--fork", dest="stock", action="store_false",
                         help="a GameStudio Editor build (shelved): expect the native module")
     parser.add_argument("--out", type=pathlib.Path, help="output folder (default: system temp)")
-    parser.add_argument("--timeout", type=float, default=120.0,
-                        help="hard limit in seconds, Blender startup included (default 120). A run takes "
-                             "about 25 s on an idle machine; under a parallel C++ build startup alone took "
-                             "8-45 s, sometimes more")
+    parser.add_argument("--timeout", type=float, default=240.0,
+                        help="hard limit in seconds, Blender startup included (default 240). A run takes "
+                             "about 30 s on an idle machine with OpenGL and about 80 s with Vulkan (Blender "
+                             "5.3's default: the scratch profile's shader cache starts empty, so Blender "
+                             "compiles its shaders on every run); a loaded machine takes longer")
+    parser.add_argument("--gpu-backend", choices=("opengl", "vulkan"),
+                        help="passed to Blender's --gpu-backend (default: Blender's own; 5.3 uses Vulkan on "
+                             "Windows and Linux, 5.2 OpenGL); the run fails if Blender drew with another")
     parser.add_argument("--size", default="1280x800", help="window size, WxH (default 1280x800)")
     parser.add_argument("--focus", action="store_true", help="let the window take focus (default: stays behind)")
     parser.add_argument("--keep-profile", action="store_true", help="keep the scratch profile for debugging")
@@ -397,6 +432,7 @@ def main(argv=None) -> int:
     profile = pathlib.Path(tempfile.mkdtemp(prefix="gs_ui_profile_"))
     try:
         run = run_blender(args, out, profile)
+        run["profile"] = str(profile)
     finally:
         if args.keep_profile:
             print(f"[ui-smoke] scratch profile kept at {profile}")
@@ -416,10 +452,12 @@ def main(argv=None) -> int:
     index = write_index(out, args, run, report, fails)
     summary = {"pass": not fails, "failures": fails, "timed_out": run["timed_out"],
                "returncode": run["returncode"], "seconds": run["seconds"], "cmd": run["cmd"],
-               "screenshots": len((report or {}).get("screenshots", []))}
+               "screenshots": len((report or {}).get("screenshots", [])), "gpu_backend": gpu_backend(report),
+               "requested_gpu_backend": args.gpu_backend}
     (out / "summary.json").write_text(json.dumps(summary, indent=1), encoding="utf-8")
 
-    print(f"[ui-smoke] {summary['screenshots']} screenshots, {run['seconds']} s, index: {index}")
+    print(f"[ui-smoke] {summary['screenshots']} screenshots, GPU backend {summary['gpu_backend']}, "
+          f"{run['seconds']} s, index: {index}")
     if args.inject_fault:
         caught = [fault for fault in INJECTED if any(fault in f for f in fails)]
         print(f"[ui-smoke] self-test: {len(fails)} failures reported; injected faults caught: {caught}")

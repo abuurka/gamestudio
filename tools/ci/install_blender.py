@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Download, verify and unpack the stock Blender that CI tests against (tools/ci/blender.lock.json).
 
-    python tools/ci/install_blender.py --dest DIR [--github-env]
+    python tools/ci/install_blender.py --dest DIR [--version 5.3.0] [--github-env]
 
+--version picks one of the lock's Blenders (default: the lock's "default", the declared minimum).
 Picks this platform's archive from the lock (a portable .zip on Windows, a .tar.xz on Linux, a
 .dmg on macOS), checks it against the pinned SHA-256, unpacks it into DIR and prints the blender
 executable's path (DIR/blender-<version>-<platform>/blender(.exe), or on macOS
@@ -60,6 +61,18 @@ def executable(folder: pathlib.Path) -> pathlib.Path | None:
     return None
 
 
+def lock_entry(lock: dict, version: str | None, key: str) -> tuple[str, str, str, str]:
+    """(version, url, sha256, archive name) of one Blender in the lock for platform key."""
+    version = version or lock["default"]
+    release = lock["versions"].get(version)
+    if release is None:
+        sys.exit(f"[blender] {LOCK.name} has no Blender {version} (has: {', '.join(lock['versions'])})")
+    entry = release["files"].get(key)
+    if entry is None:
+        sys.exit(f"[blender] {LOCK.name} has no Blender {version} archive for {key} (has: {', '.join(release['files'])})")
+    return version, release["base_url"] + entry["name"], entry["sha256"].lower(), entry["name"]
+
+
 def download(url: str, dest: pathlib.Path, sha256: str) -> None:
     digest = hashlib.sha256()
     request = urllib.request.Request(url, headers={"User-Agent": "GameStudio-CI"})
@@ -109,14 +122,12 @@ def unpack(archive: pathlib.Path, dest: pathlib.Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--dest", required=True, help="folder to unpack into (replaced unless it holds this release)")
+    parser.add_argument("--version", help="which Blender of the lock (default: its 'default')")
     parser.add_argument("--github-env", action="store_true", help="append BLENDER=<path> to $GITHUB_ENV")
     args = parser.parse_args()
 
     lock = json.loads(LOCK.read_text(encoding="utf-8"))
-    entry = lock["files"].get(platform_key())
-    if entry is None:
-        sys.exit(f"[blender] {LOCK.name} has no archive for {platform_key()} (has: {', '.join(lock['files'])})")
-    url, sha256 = lock["base_url"] + entry["name"], entry["sha256"].lower()
+    version, url, sha256, name = lock_entry(lock, args.version, platform_key())
 
     dest = pathlib.Path(args.dest).expanduser().resolve()
     try:
@@ -128,7 +139,7 @@ def main() -> int:
         if dest.exists():
             shutil.rmtree(dest)
         dest.mkdir(parents=True)
-        archive = dest.parent / f".{dest.name}-{entry['name']}"
+        archive = dest.parent / f".{dest.name}-{name}"
         print(f"[blender] downloading {url}", flush=True)
         try:
             download(url, archive, sha256)
@@ -141,7 +152,7 @@ def main() -> int:
             sys.exit(f"[blender] no blender executable in {dest}")
         (dest / MARKER).write_text(json.dumps({"url": url, "sha256": sha256}) + "\n", encoding="utf-8")
     else:
-        print(f"[blender] using the cached Blender {lock['version']} in {dest}", flush=True)
+        print(f"[blender] using the cached Blender {version} in {dest}", flush=True)
     print(exe)
     if args.github_env:
         with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env:

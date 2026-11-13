@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Blender 5.3 support.** GameStudio, the extension for Blender 5.2+, is now tested with Blender 5.3.0 next to 5.2.2. The mesh cache recognises 5.3's glTF exporter, so repeat exports stay fast. Live game-shader edits stay instant under 5.3's changed update tagging. Drawing was checked on Vulkan, 5.3's default graphics backend on Windows and Linux. CI runs the extension suites on both versions (the 5.3 jobs don't block a merge until they have passed).
+- **Test runs leave your Blender's cache alone.** Blender 5.3 keeps its shader cache outside the profile folder, so a test run could write into your real Blender's cache. The suites, the UI smoke test and the end-to-end scripts now keep that cache in their throw-away profile as well. The UI smoke test follows the Game workspace and takes `--gpu-backend opengl|vulkan`, and the stream probe's Blender phase runs again.
 - **Install from the release.** The README and the manual now start from the zip on the latest GitHub release (drag it onto Blender's window). Building the zip yourself is only for people working from a clone.
 - **macOS in CI** (experimental): the extension and runtime suites run on Apple Silicon runners against Blender 5.2.2 for macOS. They don't block a merge yet.
 - **Fixes for CI failures.** On Linux, a test picked up the runner's own browsers, and spotting Chrome Headless Shell from a Windows path failed (`isHeadlessShell`, in the dev server and the MCP server).

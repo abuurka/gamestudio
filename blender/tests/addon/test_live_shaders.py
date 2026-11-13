@@ -8,7 +8,7 @@ from unittest import mock
 
 import bpy
 
-from gamestudio.bridge import api
+from gamestudio.bridge import api, methods  # noqa: F401  (registers the bridge methods dispatch() runs)
 from gamestudio.core import export, ids, live, shaders
 
 import helpers
@@ -127,6 +127,81 @@ class LiveShaderTest(helpers.ProjectTestCase):
         bpy.context.view_layer.update()
         self.wait_for("scene.load")
         self.assertEqual(export.last_export()["tier"], "full")
+
+    def test_real_geometry_edits_right_after_a_value_edit_still_reload(self):
+        # Blender 5.3 tags the objects drawing with an updated material (without modifiers) for geometry
+        # too; that echo is ignored, but a real change also tags the object's data for geometry.
+        ground = bpy.data.objects["Ground"]
+        other = bpy.data.meshes.new("Other")
+        other.from_pydata([(0, 0, 0), (1, 0, 0), (0, 1, 0)], [], [(0, 1, 2)])
+        other.materials.append(self.sand)
+        plain = bpy.data.materials.new("Plain")
+
+        def vertex():
+            ground.data.vertices[0].co.x += 0.5
+            ground.data.update()
+
+        def modifier():
+            ground.modifiers.new("Sub", "SUBSURF")
+
+        def swap():
+            ground.data = other
+
+        def slot():
+            ground.material_slots[0].material = plain
+
+        for label, edit in (("vertex edit", vertex), ("modifier", modifier), ("swapped data", swap),
+                            ("material slot", slot)):
+            with self.subTest(label):
+                self.settle(0.2)
+                self.hub.clear()
+                self.sand.gss_Triplanar.wet += 0.125
+                bpy.context.view_layer.update()
+                edit()
+                bpy.context.view_layer.update()
+                self.wait_for("scene.load")
+
+    def test_an_object_only_geometry_change_with_a_value_edit_still_reloads(self):
+        # A moved boolean cutter tags only Ground (geometry and, with the value edit, shading), not its
+        # mesh: the same flags as 5.3's echo of the value edit, in the same update.
+        cutter = bpy.data.objects.new("Cutter", bpy.data.meshes.new("CutterMesh"))
+        cutter.data.from_pydata([(-1, -1, -1), (1, -1, -1), (1, 1, -1), (-1, 1, -1),
+                                 (-1, -1, 1), (1, -1, 1), (1, 1, 1), (-1, 1, 1)], [],
+                                [(0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)])
+        bpy.context.scene.collection.objects.link(cutter)
+        mod = bpy.data.objects["Ground"].modifiers.new("Cut", "BOOLEAN")
+        mod.object = cutter
+        bpy.context.view_layer.update()
+        self.wait_for("scene.load")
+        self.settle()
+        self.hub.clear()
+        seen = []
+
+        def record(_scene, depsgraph):
+            seen.extend((u.id.name, u.is_updated_geometry) for u in depsgraph.updates)
+
+        bpy.app.handlers.depsgraph_update_post.append(record)
+        try:
+            self.sand.gss_Triplanar.wet = 0.5
+            cutter.location.x += 0.25
+            bpy.context.view_layer.update()
+        finally:
+            bpy.app.handlers.depsgraph_update_post.remove(record)
+        self.assertIn(("Ground", True), seen)  # the object, for geometry
+        self.assertNotIn((bpy.data.objects["Ground"].data.name, True), seen)  # not its mesh
+        self.wait_for("scene.load")
+
+    def test_a_value_edit_on_an_object_with_a_modifier_does_not_reload(self):
+        bpy.data.objects["Ground"].modifiers.new("Sub", "SUBSURF")
+        bpy.context.view_layer.update()
+        self.wait_for("scene.load")
+        self.settle()
+        self.hub.clear()
+        self.sand.gss_Triplanar.wet = 0.5
+        bpy.context.view_layer.update()
+        self.wait_for("material.values")
+        self.settle()
+        self.assertEqual(self.hub.messages("scene.load"), [])
 
     def test_a_new_shader_reloads_instead(self):
         glbs = self.glbs()

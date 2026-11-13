@@ -20,7 +20,7 @@ import time
 REPO = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "blender"))
 
-from gamestudio.core import stream  # noqa: E402
+from gamestudio.core import stream, trust  # noqa: E402
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 URL, ROOT, OUT = argv[0], pathlib.Path(argv[1]), pathlib.Path(argv[2])
@@ -56,6 +56,7 @@ def marker(frame) -> str:
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    trust.trust(ROOT, "copied", save=False)  # its own throw-away project, for this session only
     ok, why = stream.available(ROOT)
     if not ok:
         print(json.dumps({"error": why}))
